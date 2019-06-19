@@ -1,0 +1,6 @@
+# 4 Vertices 1 Faces
+v 0 0 0
+v 0 2 0
+v 0 2 2
+v 0 0 2
+f 1 2 3 4
