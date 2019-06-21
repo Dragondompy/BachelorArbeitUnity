@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class HalfEdge : MonoBehaviour
+    public class HalfEdge
 	{
 		private Vertex v1;
 		private Vertex v2;

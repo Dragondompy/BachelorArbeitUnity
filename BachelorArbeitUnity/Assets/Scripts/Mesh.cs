@@ -16,6 +16,7 @@ namespace BachelorArbeitUnity
         private List<Edge> edges;
         private List<HalfEdge> halfEdges;
         private string comments;
+        private float size;
 
         //initializes the Mesh struktur from objMesh by adding all vertices,edges and faces to lists
         public void loadMeshFromObj(ObjMesh obj)
@@ -27,6 +28,8 @@ namespace BachelorArbeitUnity
             halfEdges = new List<HalfEdge>();
             comments = "";
 
+            size = calcSize(obj.getVertices());
+
             foreach (Vector3 v in obj.getVertices())
             {
                 addVertex(v);
@@ -37,7 +40,6 @@ namespace BachelorArbeitUnity
             }
 
             comments = obj.getComments();
-
         }
 
         //initializes the Mesh struktur with only the Vertices of another Mesh
@@ -47,6 +49,30 @@ namespace BachelorArbeitUnity
             {
                 addVertex(v.getPosition());
             }
+        }
+
+        public float calcSize(List<Vector3> verts)
+        {
+            float minX = 0f;
+            float minY = 0f;
+            float minZ = 0f;
+
+            float maxX = 0f;
+            float maxY = 0f;
+            float maxZ = 0f;
+
+            foreach (Vector3 v in verts)
+            {
+                maxX = Mathf.Max(maxX, v.x);
+                maxY = Mathf.Max(maxY, v.y);
+                maxZ = Mathf.Max(maxZ, v.z);
+
+                minX = Mathf.Min(minX, v.x);
+                minY = Mathf.Min(minY, v.y);
+                minZ = Mathf.Min(minZ, v.z);
+            }
+            float param = Mathf.Log(verts.Count, 2f);
+            return Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ)/(param);
         }
 
         //adds a Vertex to the Mesh and sets the handlenumber for that vertex
@@ -73,9 +99,7 @@ namespace BachelorArbeitUnity
             {
                 Quaternion rot = Quaternion.LookRotation(utils.direction(vertex1, vertex2), new Vector3(0, 1, 0)); ;
                 Vector3 pos = utils.middlePoint(vertex1, vertex2);
-                GameObject eGo = Instantiate(EdgeObj, pos, rot);
-                eGo.transform.localScale = new Vector3(1, 1, utils.direction(vertex1, vertex2).magnitude / 2);
-                e = eGo.GetComponent<Edge>();
+                e = Instantiate(EdgeObj, pos, rot).GetComponent<Edge>();
                 e.loadEdge(vertex1, vertex2, f, this);
                 e.setHandleNumber(getEdgeHandleNumber());
                 edges.Add(e);
@@ -120,8 +144,14 @@ namespace BachelorArbeitUnity
 
         internal void updateFaces(Face f1, Face f2)
         {
-            f1.setNeedToUpdateTransform();
-            f2.setNeedToUpdateTransform();
+            if (f1 != null)
+            {
+                f1.setNeedToUpdateTransform();
+            }
+            if (f2 != null)
+            {
+                f2.setNeedToUpdateTransform();
+            }
         }
 
         //deletes Vertex from Mesh TODO concatinate faces
@@ -129,7 +159,7 @@ namespace BachelorArbeitUnity
         {
             vertices[handleNumber].delete();
         }
-        
+
         public Vertex getVertexAt(int v)
         {
             return vertices[v];
@@ -166,6 +196,11 @@ namespace BachelorArbeitUnity
         public EmptyPattern getUtils()
         {
             return utils;
+        }
+
+        public float getSize()
+        {
+            return size;
         }
 
         public string getComments()

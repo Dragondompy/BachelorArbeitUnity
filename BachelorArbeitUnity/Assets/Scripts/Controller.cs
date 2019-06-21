@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Controller : MonoBehaviour
+    public class Controller
     {
 
 		public Controller ()

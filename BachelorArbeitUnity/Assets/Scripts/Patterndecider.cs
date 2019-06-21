@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Patterndecider : MonoBehaviour
+    public class Patterndecider
 	{
 		private int size;
 		private int alpha;

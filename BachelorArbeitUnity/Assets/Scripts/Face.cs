@@ -17,6 +17,7 @@ namespace BachelorArbeitUnity
 
         public void loadFace(Mesh m)
         {
+            enabled = false;
             vertices = new List<Vertex>();
             edges = new List<Edge>();
             halfEdges = new List<HalfEdge>();
@@ -34,6 +35,7 @@ namespace BachelorArbeitUnity
             {
                 updateTransform();
             }
+            print("asdf");
         }
 
         //adds vertex to this face

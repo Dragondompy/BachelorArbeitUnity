@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Pattern : MonoBehaviour
+    public class Pattern
 	{
 		private int size;
 		private int patternNumber;

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class ObjMesh : MonoBehaviour
+    public class ObjMesh
     {
         private List<Vector3> vertices = new List<Vector3>();
         private List<List<int>> faces = new List<List<int>>();
@@ -60,12 +60,11 @@ namespace BachelorArbeitUnity
                         line = string.Join(" ", line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
                         curLine = line.Split(' ');
                         List<int> faceVertices = new List<int>();
-                        Vector3 values;
 
                         if (curLine[0].Equals("v"))
                         {
                             vertices.Add(new Vector3(
-                               Single.Parse(curLine[1].Replace('.', ',')),
+                                Single.Parse(curLine[1].Replace('.', ',')),
                                 Single.Parse(curLine[2].Replace('.', ',')),
                                 Single.Parse(curLine[3].Replace('.', ','))
                             ));

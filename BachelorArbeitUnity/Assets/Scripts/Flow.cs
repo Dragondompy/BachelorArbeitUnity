@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Flow : MonoBehaviour
+    public class Flow
 	{
 		private int amount;
 		private int fromSide;

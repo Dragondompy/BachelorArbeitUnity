@@ -15,15 +15,24 @@ namespace BachelorArbeitUnity
         // Update is called once per frame
         void Update()
         {
-            if (GetComponent<Transform>().position.x < 2.5f)
+            if (Input.GetMouseButtonDown(0))
             {
-                r.AddForce(new Vector3(0.1f, 0, 0.1f));
-            }
-            else
-            {
-                r.AddForce(new Vector3(-0.1f, 0, -0.1f));
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (Physics.Raycast(ray, out hit, 100.0f))
+                {
+                    GameObject gHit = hit.transform.gameObject.transform.parent.gameObject;
+                    if(gHit.GetComponent<Edge>())
+                        Debug.Log("You selected an Edge");
+                    if (gHit.GetComponent<Vertex>())
+                        Debug.Log("You selected an Vertex");
+                    if (gHit.GetComponent<Face>())
+                        Debug.Log("You selected an Face");
+                }
+                else {
+                    Debug.Log("nothing");
+                }
             }
         }
-
     }
 }

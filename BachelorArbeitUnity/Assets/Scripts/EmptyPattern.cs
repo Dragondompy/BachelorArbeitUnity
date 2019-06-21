@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class EmptyPattern : MonoBehaviour
+    public class EmptyPattern
 	{
 		protected int size;
 		protected int patternNumber;

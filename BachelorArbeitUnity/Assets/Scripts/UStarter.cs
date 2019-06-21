@@ -7,16 +7,21 @@ namespace BachelorArbeitUnity
 {
     public class UStarter : MonoBehaviour
     {
-        public GameObject Vertex;
         public GameObject Mesh;
+        public string objName;
         // Start is called before the first frame update
         void Start()
         {
-            GameObject MeshOB = Instantiate(Mesh, new Vector3(0, 0, 0), Quaternion.identity);
-
-            ObjMesh o = new ObjMesh("./Assets/Data/output.obj");
-            Mesh m = MeshOB.GetComponent<Mesh>();
-            m.loadMeshFromObj(o);
+            testProgramm();
+            /*
+            long startmil = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            GameObject emp = new GameObject();
+            for (int i = 0; i < 50; i++) {
+                for (int j = 0; j < 50; j++)
+                {
+                }
+            }
+            print(DateTimeOffset.Now.ToUnixTimeMilliseconds()-startmil);*/
         }
 
         // Update is called once per frame
@@ -27,12 +32,11 @@ namespace BachelorArbeitUnity
 
         void testProgramm()
         {
-            UnityEngine.Mesh pol = GetComponent<MeshFilter>().mesh;
+            GameObject MeshOB = Instantiate(Mesh, new Vector3(0, 0, 0), Quaternion.identity);
 
-            pol.vertices = new Vector3[] { new Vector3(0, 0, 0), new Vector3(0, 0, 1), new Vector3(0, 1, 1), new Vector3(0, 1, 0) };
-            pol.triangles = new int[] { 0, 1, 2, 0, 2, 3 };
-
-            gameObject.GetComponent<MeshFilter>().mesh = pol;
+            ObjMesh o = new ObjMesh("./Assets/Data/" + objName + ".obj");
+            Mesh m = MeshOB.GetComponent<Mesh>();
+            m.loadMeshFromObj(o);
         }
     }
 }

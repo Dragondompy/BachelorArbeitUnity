@@ -14,6 +14,7 @@ namespace BachelorArbeitUnity
         public void loadVertex(Mesh m)
         {
             edges = new List<Edge>();
+            gameObject.transform.localScale = new Vector3(m.getSize(), m.getSize(), m.getSize());
             this.m = m;
         }
 

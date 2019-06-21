@@ -21,6 +21,7 @@ namespace BachelorArbeitUnity
         
         public void loadEdge(Vertex v1, Vertex v2, Face f, Mesh m)
         {
+            enabled = false;
             setV1(v1);
             setV2(v2);
             v1.addEdge(this);
@@ -28,6 +29,7 @@ namespace BachelorArbeitUnity
             f1 = f;
 
             this.m = m;
+            updateTransform();
         }
 
         //tests if this vertex connects v to any other vertex
@@ -133,7 +135,7 @@ namespace BachelorArbeitUnity
             Vector3 pos = middlePoint();
             gameObject.transform.position = pos;
             gameObject.transform.rotation = rot;
-            gameObject.transform.localScale = new Vector3(1, 1, direction().magnitude / 2);
+            gameObject.transform.localScale = new Vector3(m.getSize(), m.getSize(), direction().magnitude / 2);
 
             m.updateFaces(f1, f2);
         }

@@ -43,7 +43,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b14229718f2f5d34393b95e86bd4c73e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VertexObj: {fileID: 2627836256228634446, guid: f9216654ca87abd44a88f225021c4d7d,
+  VertexObj: {fileID: 4319152829609414177, guid: f9216654ca87abd44a88f225021c4d7d,
     type: 3}
   EdgeObj: {fileID: 6136745300685481546, guid: eb76fcf60a0497344851ca37966f35d1, type: 3}
   FaceObj: {fileID: 6007946017469790978, guid: ae1cc9eee06e76e46b7604b2da26ebba, type: 3}
+  size: 0
