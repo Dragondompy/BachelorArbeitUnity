@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2861583260942087661}
   - component: {fileID: 2861583260942087660}
   m_Layer: 0
-  m_Name: Starter
+  m_Name: Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,7 +43,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87d729c88fb15924f8d3edb8d60fc093, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objName: octahedron
+  objName: 
   MeshObject: {fileID: 3268674866036233772, guid: 76ee7410a011f3244ab3a8adfa2cb14d,
     type: 3}
+  VertexObj: {fileID: 3990228018305560259, guid: f9216654ca87abd44a88f225021c4d7d,
+    type: 3}
+  EdgeObj: {fileID: 0}
+  FaceObj: {fileID: 0}
   material: {fileID: 2100000, guid: b16aa175b4d061744a4e5c2e862cc374, type: 2}

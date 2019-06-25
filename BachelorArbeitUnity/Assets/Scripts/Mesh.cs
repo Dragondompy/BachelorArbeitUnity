@@ -6,15 +6,16 @@ namespace BachelorArbeitUnity
 {
     public class Mesh : MonoBehaviour
     {
-        public GameObject VertexObj;
-        public GameObject EdgeObj;
-        public GameObject FaceObj;
+        private GameObject VertexObj;
+        private GameObject EdgeObj;
+        private GameObject FaceObj;
 
         private EmptyPattern utils;
         private List<Vertex> vertices;
         private List<Face> faces;
         private List<Edge> edges;
         private List<HalfEdge> halfEdges;
+        private List<Vertex> selectedVertices;
         private string comments;
         private float size;
 
@@ -26,6 +27,7 @@ namespace BachelorArbeitUnity
             faces = new List<Face>();
             edges = new List<Edge>();
             halfEdges = new List<HalfEdge>();
+            selectedVertices = new List<Vertex>();
             comments = "";
 
             size = calcSize(obj.getVertices());
@@ -49,6 +51,13 @@ namespace BachelorArbeitUnity
             {
                 addVertex(v.getPosition());
             }
+        }
+        
+        public void addGameObjects(GameObject vOb, GameObject eOb, GameObject fObj)
+        {
+            VertexObj = vOb;
+            EdgeObj = eOb;
+            FaceObj = fObj;
         }
 
         public float calcSize(List<Vector3> verts)
@@ -140,11 +149,24 @@ namespace BachelorArbeitUnity
             Vertex ver = getVertexAt(v);
             if (ver.getVertexObject() == null)
             {
-                ver.setVertexObject(Instantiate(VertexObj, ver.getPosition(), Quaternion.identity));
+                if (selectedVertices.Count < 6)
+                {
+                    GameObject vOb = Instantiate(VertexObj, ver.getPosition(), Quaternion.identity);
+                    vOb.GetComponent<VertexObj>().vertexIndex = v;
+                    ver.setVertexObject(vOb);
+                    selectedVertices.Add(ver);
+                }
+                else
+                {
+                    print("To many Vertices selected");
+                }
             }
-            else {
+            else
+            {
                 Destroy(ver.getVertexObject());
+                selectedVertices.Remove(ver);
             }
+
         }
 
         //deletes Vertex from Mesh TODO concatinate faces

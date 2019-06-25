@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
 namespace BachelorArbeitUnity
 {
     public class ObjLoader
@@ -23,13 +24,13 @@ namespace BachelorArbeitUnity
             List<List<int>> faces = o.getFaces();
 
             Vector3[] vertices = new Vector3[o.getVertices().Count];
-            Vector2[] uv = new Vector2[o.getVertices().Count];
-            int[] triangles = new int[calcTri(faces)];
+            //Vector2[] uv = new Vector2[o.getVertices().Count];
+            int[] triangles = new int[calcTri(faces) * 3];
 
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = o.getVertices()[i];
-                uv[i] = new Vector2(0, 0);
+                //uv[i] = new Vector2(0, 0);
             }
 
             int highest = 0;
@@ -39,9 +40,9 @@ namespace BachelorArbeitUnity
                 {
                     for (int j = 0; j < faces[i].Count - 2; j++)
                     {
-                        triangles[highest + 0] = faces[i][j * 3 + 0];
-                        triangles[highest + 1] = faces[i][j * 3 + 1];
-                        triangles[highest + 2] = faces[i][j * 3 + 2];
+                        triangles[highest + 0] = faces[i][0];
+                        triangles[highest + 1] = faces[i][j + 1];
+                        triangles[highest + 2] = faces[i][j + 2];
                         highest += 3;
                     }
                 }
@@ -49,7 +50,7 @@ namespace BachelorArbeitUnity
 
             UnityEngine.Mesh mesh = new UnityEngine.Mesh();
             mesh.vertices = vertices;
-            mesh.uv = uv;
+            //mesh.uv = uv;
             mesh.triangles = triangles;
             mesh.RecalculateNormals();
 
@@ -66,7 +67,8 @@ namespace BachelorArbeitUnity
                     count += f.Count - 2;
                 }
             }
-            return count*3;
+            Debug.Log(count);
+            return count;
         }
     }
 }

@@ -102,7 +102,7 @@ GameObject:
   - component: {fileID: 5489042100318428323}
   m_Layer: 0
   m_Name: EdgeObject
-  m_TagString: Untagged
+  m_TagString: MeshParts
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
