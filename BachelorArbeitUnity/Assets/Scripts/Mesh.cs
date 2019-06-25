@@ -151,7 +151,7 @@ namespace BachelorArbeitUnity
             {
                 if (selectedVertices.Count < 6)
                 {
-                    GameObject vOb = Instantiate(VertexObj, ver.getPosition(), Quaternion.identity);
+                    GameObject vOb = Instantiate(VertexObj,transform.position+ ver.getPosition(), Quaternion.identity);
                     vOb.GetComponent<VertexObj>().vertexIndex = v;
                     ver.setVertexObject(vOb);
                     selectedVertices.Add(ver);
@@ -168,7 +168,6 @@ namespace BachelorArbeitUnity
             }
 
         }
-
         //deletes Vertex from Mesh TODO concatinate faces
         public void deleteVertex(int handleNumber)
         {
@@ -223,6 +222,9 @@ namespace BachelorArbeitUnity
             return comments;
         }
 
+        public List<Vertex> getSelectedVertices() {
+            return selectedVertices;
+        }
         public void setComments(string c)
         {
             comments = c;

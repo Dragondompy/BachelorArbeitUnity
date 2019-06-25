@@ -7,4 +7,5 @@ public static class InformationHolder {
     public static string pathToMesh;
     public static bool selectVertices;
     public static Controller con;
+    public static List<int> splitToNotSplitVertices;
 }

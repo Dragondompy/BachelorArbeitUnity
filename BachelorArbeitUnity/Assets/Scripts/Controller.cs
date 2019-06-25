@@ -16,6 +16,7 @@ namespace BachelorArbeitUnity
         public Material material;
         Camera cam;
         BachelorArbeitUnity.Mesh myMesh;
+        BachelorArbeitUnity.Mesh newMesh;
 
         // Start is called before the first frame update
         void Start()
@@ -23,21 +24,37 @@ namespace BachelorArbeitUnity
             InformationHolder.con = this;
             this.objName = InformationHolder.pathToMesh;
 
+            initializeOldMesh();
+
+            initializeNewMesh();
+        }
+
+        public void initializeOldMesh()
+        {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
             cam = GetComponent<Camera>();
             ObjMesh o = new ObjMesh("./Assets/Meshes/" + objName + ".obj");
 
-            MeshOB.GetComponent<MeshFilter>().mesh = new ObjLoader().load(o);
+            MeshOB.GetComponent<MeshFilter>().mesh = new ObjLoader().newLoad(o);
 
             MeshOB.AddComponent<MeshCollider>();
 
             MeshOB.GetComponent<MeshRenderer>().material = material;
 
-            myMesh = MeshOB.AddComponent<BachelorArbeitUnity.Mesh>();
+            myMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             myMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
             myMesh.loadMeshFromObj(o);
         }
 
+        private void initializeNewMesh()
+        {
+            GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
+
+            MeshOB.GetComponent<MeshRenderer>().material = material;
+
+            newMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
+            newMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
+        }
         // Update is called once per frame
         void Update()
         {
@@ -78,18 +95,20 @@ namespace BachelorArbeitUnity
                             float d1 = (impactPoint - p1).magnitude;
                             float d2 = (impactPoint - p2).magnitude;
 
+                            int vertexIndex = 0;
                             if (d0 < d1 && d0 < d2)
                             {
-                                myMesh.selectVertexAt(triangles[hit.triangleIndex * 3 + 0]);
+                                vertexIndex = InformationHolder.splitToNotSplitVertices[triangles[hit.triangleIndex * 3 + 0]];
                             }
                             else if (d1 < d0 && d1 < d2)
                             {
-                                myMesh.selectVertexAt(triangles[hit.triangleIndex * 3 + 1]);
+                                vertexIndex = InformationHolder.splitToNotSplitVertices[triangles[hit.triangleIndex * 3 + 1]];
                             }
                             else if (d2 < d0 && d2 < d1)
                             {
-                                myMesh.selectVertexAt(triangles[hit.triangleIndex * 3 + 2]);
+                                vertexIndex = InformationHolder.splitToNotSplitVertices[triangles[hit.triangleIndex * 3 + 2]];
                             }
+                            myMesh.selectVertexAt(vertexIndex);
 
                             Debug.DrawLine(p0, p1);
                             Debug.DrawLine(p1, p2);
@@ -109,6 +128,19 @@ namespace BachelorArbeitUnity
                         }
                     }
                 }
+            }
+        }
+
+        public void createFace()
+        {
+            List<Vertex> selectedVertices = myMesh.getSelectedVertices();
+            if (selectedVertices.Count > 2)
+            {
+
+            }
+            else
+            {
+                print("Not enough Verices selected");
             }
         }
     }

@@ -28,5 +28,9 @@ namespace BachelorArbeitUnity
                 InformationHolder.selectVertices = true;
             }
         }
+
+        public void createFace() {
+            InformationHolder.con.createFace();
+        }
     }
 }
