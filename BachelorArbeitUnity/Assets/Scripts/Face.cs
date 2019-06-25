@@ -4,45 +4,32 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Face : MonoBehaviour
+    public class Face
     {
         private List<Vertex> vertices;
         private List<Edge> edges;
         private List<HalfEdge> halfEdges;
         private List<Vertex> innerVertices;
-        private Boolean needToUpdateTransform;
 
         private int handleNumber;
         private Mesh mesh;
 
-        public void loadFace(Mesh m)
+        public Face(Mesh m)
         {
-            enabled = false;
             vertices = new List<Vertex>();
             edges = new List<Edge>();
             halfEdges = new List<HalfEdge>();
             innerVertices = new List<Vertex>();
-            needToUpdateTransform = false;
 
             setMesh(m);
             setHandleNumber(m.getFaceHandleNumber());
             m.getFaces().Add(this);
         }
-
-        public void Update()
-        {
-            if (needToUpdateTransform)
-            {
-                updateTransform();
-            }
-            print("asdf");
-        }
-
+        
         //adds vertex to this face
         public void addVertex(Vertex v)
         {
             vertices.Add(v);
-            needToUpdateTransform = true;
         }
 
         public void addVertex(int v)
@@ -59,31 +46,6 @@ namespace BachelorArbeitUnity
         public void addEdge(Edge e)
         {
             edges.Add(e);
-        }
-
-        public void setNeedToUpdateTransform()
-        {
-            needToUpdateTransform = true;
-        }
-
-        public void updateTransform()
-        {
-            UnityEngine.Mesh pol = GetComponent<MeshFilter>().mesh;
-            pol.vertices = getVertexPositions();
-            pol.triangles = getTriangles();
-            gameObject.GetComponent<MeshFilter>().mesh = pol;
-            needToUpdateTransform = false;
-        }
-
-        public int[] getTriangles() {
-            int[] tri = new int[vertices.Count*3];
-            for (int i = 0; i < vertices.Count-2; i++)
-            {
-                tri[i*3] = 0;
-                tri[i*3 + 1] = i + 1;
-                tri[i*3 + 2] = i + 2;
-            }
-            return tri;
         }
 
         public Vector3[] getVertexPositions()

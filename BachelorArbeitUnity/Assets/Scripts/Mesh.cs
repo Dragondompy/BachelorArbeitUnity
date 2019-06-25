@@ -72,15 +72,14 @@ namespace BachelorArbeitUnity
                 minZ = Mathf.Min(minZ, v.z);
             }
             float param = Mathf.Log(verts.Count, 2f);
-            return Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ)/(param);
+            return Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) / (param);
         }
 
         //adds a Vertex to the Mesh and sets the handlenumber for that vertex
         public Vertex addVertex(Vector3 pos)
         {
-            Vertex v = Instantiate(VertexObj, pos, Quaternion.identity).GetComponent<Vertex>();
-
-            v.loadVertex(this);
+            Vertex v = new Vertex(pos);
+            v.setPosition(pos);
             v.setHandleNumber(getVertexHandleNumber());
             vertices.Add(v);
 
@@ -97,10 +96,7 @@ namespace BachelorArbeitUnity
 
             if (e == null)
             {
-                Quaternion rot = Quaternion.LookRotation(utils.direction(vertex1, vertex2), new Vector3(0, 1, 0)); ;
-                Vector3 pos = utils.middlePoint(vertex1, vertex2);
-                e = Instantiate(EdgeObj, pos, rot).GetComponent<Edge>();
-                e.loadEdge(vertex1, vertex2, f, this);
+                e = new Edge(vertex1, vertex2, f, this);
                 e.setHandleNumber(getEdgeHandleNumber());
                 edges.Add(e);
             }
@@ -128,9 +124,7 @@ namespace BachelorArbeitUnity
 
         public Face addSimpleFace(List<int> vertices)
         {
-            GameObject fGo = Instantiate(FaceObj, new Vector3(0, 0, 0), Quaternion.identity);
-            Face face = fGo.GetComponent<Face>();
-            face.loadFace(this);
+            Face face = new Face(this);
             int prevVertex = vertices[vertices.Count - 1];
             foreach (int i in vertices)
             {
@@ -138,19 +132,18 @@ namespace BachelorArbeitUnity
                 face.addEdge(addEdge(face, prevVertex, i));
                 prevVertex = i;
             }
-            face.updateTransform();
             return face;
         }
 
-        internal void updateFaces(Face f1, Face f2)
+        internal void selectVertexAt(int v)
         {
-            if (f1 != null)
+            Vertex ver = getVertexAt(v);
+            if (ver.getVertexObject() == null)
             {
-                f1.setNeedToUpdateTransform();
+                ver.setVertexObject(Instantiate(VertexObj, ver.getPosition(), Quaternion.identity));
             }
-            if (f2 != null)
-            {
-                f2.setNeedToUpdateTransform();
+            else {
+                Destroy(ver.getVertexObject());
             }
         }
 

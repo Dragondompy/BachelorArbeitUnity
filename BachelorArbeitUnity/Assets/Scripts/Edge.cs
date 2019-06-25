@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Edge : MonoBehaviour
+    public class Edge
     {
         private HalfEdge h1;
         private HalfEdge h2;
@@ -14,14 +14,14 @@ namespace BachelorArbeitUnity
         private Vertex v2;
         private int sepNumber;
         private Mesh m;
+        private GameObject EdgeObject;
 
         private Vertex[] verticesOnEdge;
 
         private int handleNumber;
         
-        public void loadEdge(Vertex v1, Vertex v2, Face f, Mesh m)
+        public Edge(Vertex v1, Vertex v2, Face f, Mesh m)
         {
-            enabled = false;
             setV1(v1);
             setV2(v2);
             v1.addEdge(this);
@@ -29,7 +29,6 @@ namespace BachelorArbeitUnity
             f1 = f;
 
             this.m = m;
-            updateTransform();
         }
 
         //tests if this vertex connects v to any other vertex
@@ -130,14 +129,14 @@ namespace BachelorArbeitUnity
         }
 
         internal void updateTransform()
-        {
+        {/*
             Quaternion rot = Quaternion.LookRotation(direction()); ;
             Vector3 pos = middlePoint();
-            gameObject.transform.position = pos;
-            gameObject.transform.rotation = rot;
-            gameObject.transform.localScale = new Vector3(m.getSize(), m.getSize(), direction().magnitude / 2);
+            EdgeObject.transform.position = pos;
+            EdgeObject.transform.rotation = rot;
+            EdgeObject.transform.localScale = new Vector3(m.getSize(), m.getSize(), direction().magnitude / 2);
 
-            m.updateFaces(f1, f2);
+            m.updateFaces(f1, f2);*/
         }
 
         //Calculates the direction from v1 to v2

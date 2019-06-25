@@ -4,18 +4,18 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Vertex : MonoBehaviour
+    public class Vertex
     {
         private int handleNumber;
-        private Mesh m;
+        private Vector3 position;
+        private GameObject VertexObject;
 
         private List<Edge> edges;
 
-        public void loadVertex(Mesh m)
+        public Vertex(Vector3 pos)
         {
             edges = new List<Edge>();
-            gameObject.transform.localScale = new Vector3(m.getSize(), m.getSize(), m.getSize());
-            this.m = m;
+            setPosition(pos);
         }
 
         //returns edge that connects this vertex to vertex v, returns null if there is no connection
@@ -61,7 +61,11 @@ namespace BachelorArbeitUnity
 
         public Vector3 getPosition()
         {
-            return gameObject.transform.position;
+            return position;
+        }
+
+        public GameObject getVertexObject() {
+            return VertexObject;
         }
 
         public List<Edge> getEdges()
@@ -76,10 +80,14 @@ namespace BachelorArbeitUnity
 
         public void setPosition(Vector3 pos)
         {
+            position = pos;
+            //VertexObject.transform.position = pos;
 
-            gameObject.transform.position = pos;
+            //m.updateEdges(edges);
+        }
 
-            m.updateEdges(edges);
+        public void setVertexObject(GameObject vo) {
+            VertexObject = vo;
         }
 
         public void setHandleNumber(int handleNumber)
