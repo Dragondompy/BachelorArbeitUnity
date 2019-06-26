@@ -9,6 +9,8 @@ namespace BachelorArbeitUnity
         private int handleNumber;
         private Vector3 position;
         private GameObject VertexObject;
+        private bool isSelected;
+        private bool isCreated;
 
         private List<Edge> edges;
 
@@ -64,8 +66,19 @@ namespace BachelorArbeitUnity
             return position;
         }
 
-        public GameObject getVertexObject() {
+        public GameObject getVertexObject()
+        {
             return VertexObject;
+        }
+
+        public bool getIsSelected()
+        {
+            return isSelected;
+        }
+
+        public bool getIsCreated()
+        {
+            return isCreated;
         }
 
         public List<Edge> getEdges()
@@ -86,8 +99,34 @@ namespace BachelorArbeitUnity
             //m.updateEdges(edges);
         }
 
-        public void setVertexObject(GameObject vo) {
+        public void setVertexObject(GameObject vo)
+        {
             VertexObject = vo;
+        }
+
+        public void setIsSelected(bool s)
+        {
+            if (VertexObject != null)
+            {
+                GameObject cube = VertexObject.GetComponent<VertexObj>().cube;
+                isSelected = s;
+                if (isSelected)
+                {
+                    cube.GetComponent<MeshRenderer>().material = VertexObject.GetComponent<VertexObj>().select;
+                }
+                else
+                {
+                    if (isCreated)
+                    {
+                        cube.GetComponent<MeshRenderer>().material = VertexObject.GetComponent<VertexObj>().created;
+                    }
+                }
+            }
+        }
+
+        public void setIsCreated(bool c)
+        {
+            isCreated = c;
         }
 
         public void setHandleNumber(int handleNumber)

@@ -16,6 +16,7 @@ namespace BachelorArbeitUnity
         public Material material;
         Camera cam;
         BachelorArbeitUnity.Mesh myMesh;
+        BachelorArbeitUnity.Mesh patchHolder;
         BachelorArbeitUnity.Mesh newMesh;
 
         // Start is called before the first frame update
@@ -25,7 +26,7 @@ namespace BachelorArbeitUnity
             this.objName = InformationHolder.pathToMesh;
 
             initializeOldMesh();
-
+            initializePatchHolder();
             initializeNewMesh();
         }
 
@@ -46,6 +47,17 @@ namespace BachelorArbeitUnity
             myMesh.loadMeshFromObj(o);
         }
 
+        private void initializePatchHolder()
+        {
+            GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
+
+            MeshOB.GetComponent<MeshRenderer>().material = material;
+
+            patchHolder = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
+            patchHolder.addGameObjects(VertexObj, EdgeObj, FaceObj);
+            patchHolder.loadMeshFromMesh(myMesh);
+        }
+
         private void initializeNewMesh()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
@@ -54,7 +66,9 @@ namespace BachelorArbeitUnity
 
             newMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             newMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
+            newMesh.loadEmptyFromMesh(myMesh);
         }
+
         // Update is called once per frame
         void Update()
         {
@@ -131,17 +145,150 @@ namespace BachelorArbeitUnity
             }
         }
 
+        //Starts creating the Faces in the patch specified by the selected vertices
         public void createFace()
         {
             List<Vertex> selectedVertices = myMesh.getSelectedVertices();
+            List<int> verticesIndices = new List<int>();
             if (selectedVertices.Count > 2)
             {
+                for (int i = 0; i < selectedVertices.Count; i++)
+                {
+                    newMesh.addVertexAtIndex(selectedVertices[i].getHandleNumber(), selectedVertices[i].getPosition());
+                    verticesIndices.Add(selectedVertices[i].getHandleNumber());
+                }
+                Face f = patchHolder.addFace(verticesIndices);
 
+                foreach (Edge e in f.getEdges())
+                {
+                    e.setSepNumber(2);
+                    e.setVerticesOnEdge(addVerticesBetween(e.getV1(), e.getDirection(), e, newMesh));
+                }
+
+                executePatch(f, newMesh, myMesh);
+                myMesh.selectedVerticesCreated();
+                myMesh.clearSelectedVertices();
             }
             else
             {
                 print("Not enough Verices selected");
             }
+        }
+
+        //Adds the Vertices on the Edge
+        public Vertex[] addVerticesBetween(Vertex v1, Vector3 direction, Edge edge, Mesh newMesh)
+        {
+            if (edge.getSepNumber() > 0)
+            {
+                int sepNumber = edge.getSepNumber();
+
+                Vertex[] newVertices = new Vertex[edge.getSepNumber() - 1];
+
+                for (int i = 0; i < edge.getSepNumber() - 1; i++)
+                {
+                    Vector3 pos = v1.getPosition() + (direction / sepNumber * (i + 1));
+                    newVertices[i] = newMesh.addVertex(pos);
+                }
+                return newVertices;
+            }
+            else
+            {
+                print("choose sepNumber first");
+                return null;
+            }
+        }
+
+        //Adds new Faces to the New Mesh replacing the patchFace in the patchHolder
+        public void executePatch(Face face, Mesh newMesh, Mesh oldMesh)
+        {
+            int sumOfSepNumbers = 0;
+            foreach (Edge e in face.getEdges())
+            {
+                e.getHalfEdge(face).setReduced(e.getSepNumber());
+
+                sumOfSepNumbers += e.getSepNumber();
+            }
+
+            if (sumOfSepNumbers % 2 != 0)
+            {
+                throw new Exception("the Sum of Seperation in a face Must be even " + sumOfSepNumbers + " is not even");
+            }
+
+            reducePattern(face);
+
+            List<int> reducedValues = new List<int>();
+            foreach (HalfEdge he in face.getHalfEdges())
+            {
+                reducedValues.Add(he.getReduced());
+                Console.WriteLine(he.getReduced());
+            }
+            Patterndecider patDec = createPatterndecider(reducedValues);
+            Pattern p = new Pattern(patDec.choosePattern());
+            p.fillPatch(oldMesh, newMesh, face);
+        }
+
+        //Reduces the seperator count on each side by adding trivial quads in the  current patch
+        //Does not actually add the quads, just calculates the amount of seperations that remain
+        //Also adds the flow to each HalfEdge
+        //Provides better Pattern than the old Function
+        public void reducePattern(Face face)
+        {
+            List<HalfEdge> halfEdges = face.getHalfEdges();
+
+            int size = halfEdges.Count;
+            int noFlowCount = 0;
+            int counter = size;
+
+            while (noFlowCount < size)
+            {
+                int prevHe = counter % size;
+                int curHe = (counter + 1) % size;
+                int nextHe = (counter + 2) % size;
+
+                int rem = Math.Min(halfEdges[prevHe].getReduced(), halfEdges[nextHe].getReduced()) - 1;
+                if (rem > 0)
+                {
+                    halfEdges[curHe].addOuterFlow();
+                    halfEdges[prevHe].reduceSep();
+                    halfEdges[nextHe].reduceSep();
+                    noFlowCount = 0;
+                }
+                else
+                {
+                    noFlowCount++;
+                }
+                counter++;
+            }
+
+            foreach (HalfEdge he in halfEdges)
+            {
+                he.createVerticesArray();
+            }
+        }
+
+        //creates new class "Patterndecider" which has all the information
+        //to choose the right pattern for the current patch
+        //t contains the information on alhpa and beta
+        public Patterndecider createPatterndecider(List<int> reducedPattern)
+        {
+            int c = 0;
+            List<int> t = new List<int>();
+            foreach (int i in reducedPattern)
+            {
+                if (i > 1)
+                {
+                    t.Add(i);
+                    t.Add(c);
+                }
+                c++;
+            }
+            if (t.Count > 4)
+            {
+                throw new Exception("Error while reducing the pattern");
+            }
+            Patterndecider pat = new Patterndecider(reducedPattern.Count, t);
+            return pat;
+
         }
     }
 }

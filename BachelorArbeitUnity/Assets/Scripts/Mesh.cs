@@ -18,6 +18,7 @@ namespace BachelorArbeitUnity
         private List<Vertex> selectedVertices;
         private string comments;
         private float size;
+        private bool wasInitiatedEmpty;
 
         //initializes the Mesh struktur from objMesh by adding all vertices,edges and faces to lists
         public void loadMeshFromObj(ObjMesh obj)
@@ -42,17 +43,48 @@ namespace BachelorArbeitUnity
             }
 
             comments = obj.getComments();
+            wasInitiatedEmpty = false;
         }
 
         //initializes the Mesh struktur with only the Vertices of another Mesh
         public void loadMeshFromMesh(Mesh old)
         {
+            utils = new EmptyPattern();
+            vertices = new List<Vertex>();
+            faces = new List<Face>();
+            edges = new List<Edge>();
+            halfEdges = new List<HalfEdge>();
+            selectedVertices = new List<Vertex>();
+            comments = "";
+
+            size = old.getSize();
             foreach (Vertex v in old.getVertices())
             {
                 addVertex(v.getPosition());
             }
+            wasInitiatedEmpty = false;
         }
-        
+
+        //initializes with emptyVertices 
+        public void loadEmptyFromMesh(Mesh old)
+        {
+            utils = new EmptyPattern();
+            vertices = new List<Vertex>();
+            faces = new List<Face>();
+            edges = new List<Edge>();
+            halfEdges = new List<HalfEdge>();
+            selectedVertices = new List<Vertex>();
+            comments = "";
+
+            size = old.getSize(); ;
+            foreach (Vertex v in old.getVertices())
+            {
+                vertices.Add(null);
+            }
+            print(vertices.Count);
+            wasInitiatedEmpty = true;
+        }
+
         public void addGameObjects(GameObject vOb, GameObject eOb, GameObject fObj)
         {
             VertexObj = vOb;
@@ -93,6 +125,20 @@ namespace BachelorArbeitUnity
             vertices.Add(v);
 
             return v;
+        }
+        public void addVertexAtIndex(int vIndex, Vector3 pos)
+        {
+            if (wasInitiatedEmpty)
+            {
+                Vertex v = new Vertex(pos);
+                v.setPosition(pos);
+                v.setHandleNumber(vIndex);
+                vertices[vIndex] = v;
+            }
+            else
+            {
+                print("Mesh was not Initiated Empty. Use 'addVertex Method instead'");
+            }
         }
 
         //adds the edge between to vertices to the mesh if it doesnt exist already
@@ -147,13 +193,17 @@ namespace BachelorArbeitUnity
         internal void selectVertexAt(int v)
         {
             Vertex ver = getVertexAt(v);
-            if (ver.getVertexObject() == null)
+            if (!ver.getIsSelected())
             {
                 if (selectedVertices.Count < 6)
                 {
-                    GameObject vOb = Instantiate(VertexObj,transform.position+ ver.getPosition(), Quaternion.identity);
-                    vOb.GetComponent<VertexObj>().vertexIndex = v;
-                    ver.setVertexObject(vOb);
+                    if (ver.getVertexObject() == null)
+                    {
+                        GameObject vOb = Instantiate(VertexObj, transform.position + ver.getPosition(), Quaternion.identity);
+                        vOb.GetComponent<VertexObj>().vertexIndex = v;
+                        ver.setVertexObject(vOb);
+                    }
+                    ver.setIsSelected(true);
                     selectedVertices.Add(ver);
                 }
                 else
@@ -163,11 +213,37 @@ namespace BachelorArbeitUnity
             }
             else
             {
-                Destroy(ver.getVertexObject());
+                if (!ver.getIsCreated())
+                {
+                    Destroy(ver.getVertexObject());
+                }
+                else
+                {
+                    ver.setIsSelected(false);
+                }
                 selectedVertices.Remove(ver);
             }
 
         }
+
+        internal void selectedVerticesCreated()
+        {
+            foreach (Vertex v in selectedVertices)
+            {
+                v.setIsSelected(false);
+                v.setIsCreated(true);
+            }
+        }
+
+        internal void clearSelectedVertices()
+        {
+            foreach (Vertex v in selectedVertices)
+            {
+                v.setIsSelected(false);
+            }
+            selectedVertices.Clear();
+        }
+
         //deletes Vertex from Mesh TODO concatinate faces
         public void deleteVertex(int handleNumber)
         {
@@ -222,7 +298,8 @@ namespace BachelorArbeitUnity
             return comments;
         }
 
-        public List<Vertex> getSelectedVertices() {
+        public List<Vertex> getSelectedVertices()
+        {
             return selectedVertices;
         }
         public void setComments(string c)

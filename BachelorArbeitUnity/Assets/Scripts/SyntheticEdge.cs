@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class SyntheticEdge : MonoBehaviour
+    public class SyntheticEdge
 	{
 		int v1;
 		int v2;

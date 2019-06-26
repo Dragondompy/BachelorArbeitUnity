@@ -135,3 +135,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f494109c838bd0d42bdb6a20c01570c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cube: {fileID: 1561677580342613571}
+  select: {fileID: 2100000, guid: dbc54ad9e8e5b704b942f219948e1b19, type: 2}
+  created: {fileID: 2100000, guid: 95ddcf1b015cfba42a4c330366fdf69c, type: 2}
