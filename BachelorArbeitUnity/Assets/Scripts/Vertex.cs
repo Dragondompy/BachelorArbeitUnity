@@ -20,6 +20,14 @@ namespace BachelorArbeitUnity
             setPosition(pos);
         }
 
+        public Vertex(string isEmpty)
+        {
+            if (isEmpty.Equals("empty"))
+            {
+                handleNumber = -1;
+            }
+        }
+
         //returns edge that connects this vertex to vertex v, returns null if there is no connection
         public Edge isConnected(Vertex v)
         {

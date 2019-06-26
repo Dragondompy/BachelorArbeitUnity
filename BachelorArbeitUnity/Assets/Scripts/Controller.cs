@@ -13,7 +13,10 @@ namespace BachelorArbeitUnity
         public GameObject EdgeObj;
         public GameObject FaceObj;
 
-        public Material material;
+        public Material myMeshMaterial;
+        public Material patchesMaterial;
+        public Material newMeshMaterial;
+
         Camera cam;
         BachelorArbeitUnity.Mesh myMesh;
         BachelorArbeitUnity.Mesh patchHolder;
@@ -33,14 +36,14 @@ namespace BachelorArbeitUnity
         public void initializeOldMesh()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
-            cam = GetComponent<Camera>();
+
             ObjMesh o = new ObjMesh("./Assets/Meshes/" + objName + ".obj");
 
             MeshOB.GetComponent<MeshFilter>().mesh = new ObjLoader().newLoad(o);
 
             MeshOB.AddComponent<MeshCollider>();
 
-            MeshOB.GetComponent<MeshRenderer>().material = material;
+            MeshOB.GetComponent<MeshRenderer>().material = myMeshMaterial;
 
             myMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             myMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
@@ -50,23 +53,27 @@ namespace BachelorArbeitUnity
         private void initializePatchHolder()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
-
-            MeshOB.GetComponent<MeshRenderer>().material = material;
+            
+            MeshOB.GetComponent<MeshRenderer>().material = patchesMaterial;
 
             patchHolder = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             patchHolder.addGameObjects(VertexObj, EdgeObj, FaceObj);
             patchHolder.loadMeshFromMesh(myMesh);
+
+            MeshOB.AddComponent<MeshCollider>();
         }
 
         private void initializeNewMesh()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
 
-            MeshOB.GetComponent<MeshRenderer>().material = material;
+            MeshOB.GetComponent<MeshRenderer>().material = newMeshMaterial;
 
             newMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             newMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
             newMesh.loadEmptyFromMesh(myMesh);
+
+            MeshOB.AddComponent<MeshCollider>();
         }
 
         // Update is called once per frame
@@ -145,6 +152,27 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void showOriginal(bool v)
+        {
+            myMesh.gameObject.SetActive(v);
+        }
+
+        public void showPatches(bool v)
+        {
+            patchHolder.gameObject.SetActive(v);
+        }
+
+        public void showNewMesh(bool v)
+        {
+            newMesh.gameObject.SetActive(v);
+        }
+
+        public void saveMesh(string name)
+        {
+            ObjMesh saver = new ObjMesh(newMesh);
+            saver.writeToFile(name,true);
+        }
+
         //Starts creating the Faces in the patch specified by the selected vertices
         public void createFace()
         {
@@ -165,7 +193,9 @@ namespace BachelorArbeitUnity
                     e.setVerticesOnEdge(addVerticesBetween(e.getV1(), e.getDirection(), e, newMesh));
                 }
 
-                executePatch(f, newMesh, myMesh);
+                executePatch(f, newMesh, patchHolder);
+                patchHolder.updateMesh();
+                newMesh.updateMesh();
                 myMesh.selectedVerticesCreated();
                 myMesh.clearSelectedVertices();
             }

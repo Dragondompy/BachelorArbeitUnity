@@ -20,7 +20,33 @@ namespace BachelorArbeitUnity
         }
 
         //creates the objmesh from an Mesh m
-        public ObjMesh(Mesh m)//TODO handle deleted vertices and meshes !!!
+        public ObjMesh(Mesh m) {
+            int newIndex = 0;
+            int[] oldToNewIndices = new int[m.getVertices().Count];
+            foreach (Vertex vertex in m.getVertices()) {
+                if (vertex.isValid()) {
+                    vertices.Add(vertex.getPosition());
+                    oldToNewIndices[vertex.getHandleNumber()] = newIndex;
+                    newIndex++;
+                }
+            }
+            foreach (Face face in m.getFaces())
+            {
+                if (face.isValid())
+                {
+                    List<int> fVertices = new List<int>();
+                    foreach (Vertex vertex in face.getVertices())
+                    {
+                        fVertices.Add(oldToNewIndices[vertex.getHandleNumber()]);
+                    }
+                    faces.Add(fVertices);
+                }
+            }
+            comments += "# " + m.getVertexHandleNumber() + " Vertices " + m.getFaceHandleNumber() + " Faces\n";
+        }
+
+        //creates the objmesh from an Mesh m
+        public ObjMesh(Mesh m,int old)//TODO handle deleted vertices and meshes !!!
         {
             foreach (Vertex vertex in m.getVertices())
             {
@@ -98,14 +124,12 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void writeToFile(String fileName)
+        public void writeToFile(String fileName,bool overwrite)
         {
-            String path = "./Assets/Data/" + fileName + ".obj";
+            String path = "./Assets/Meshes/" + fileName + ".obj";
             if (File.Exists(path))
             {
-                Console.WriteLine("File already exists. Override File ? y/n");
-                String answer = Console.ReadLine();
-                if (!answer.Equals("y") && !answer.Equals("yes"))
+                if (!overwrite)
                 {
                     Console.WriteLine("Mesh not saved");
                     return;

@@ -79,7 +79,7 @@ namespace BachelorArbeitUnity
             size = old.getSize(); ;
             foreach (Vertex v in old.getVertices())
             {
-                vertices.Add(null);
+                vertices.Add(new Vertex("empty"));
             }
             print(vertices.Count);
             wasInitiatedEmpty = true;
@@ -190,7 +190,7 @@ namespace BachelorArbeitUnity
             return face;
         }
 
-        internal void selectVertexAt(int v)
+        public void selectVertexAt(int v)
         {
             Vertex ver = getVertexAt(v);
             if (!ver.getIsSelected())
@@ -217,16 +217,13 @@ namespace BachelorArbeitUnity
                 {
                     Destroy(ver.getVertexObject());
                 }
-                else
-                {
-                    ver.setIsSelected(false);
-                }
+                ver.setIsSelected(false);
                 selectedVertices.Remove(ver);
             }
 
         }
 
-        internal void selectedVerticesCreated()
+        public void selectedVerticesCreated()
         {
             foreach (Vertex v in selectedVertices)
             {
@@ -235,7 +232,7 @@ namespace BachelorArbeitUnity
             }
         }
 
-        internal void clearSelectedVertices()
+        public void clearSelectedVertices()
         {
             foreach (Vertex v in selectedVertices)
             {
@@ -244,6 +241,13 @@ namespace BachelorArbeitUnity
             selectedVertices.Clear();
         }
 
+        public void updateMesh()
+        {
+            ObjMesh helper = new ObjMesh(this);
+            UnityEngine.Mesh ownMesh = new ObjLoader().newLoad(helper);
+            gameObject.GetComponent<MeshFilter>().mesh = ownMesh;
+            gameObject.GetComponent<MeshCollider>().sharedMesh = ownMesh;
+        }
         //deletes Vertex from Mesh TODO concatinate faces
         public void deleteVertex(int handleNumber)
         {
