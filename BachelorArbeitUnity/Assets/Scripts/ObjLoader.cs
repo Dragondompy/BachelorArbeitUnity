@@ -7,12 +7,13 @@ namespace BachelorArbeitUnity
 {
     public class ObjLoader
     {
+        private List<int> splitToNotSplitVertices;
         public UnityEngine.Mesh newLoad(ObjMesh o)
         {
             List<List<int>> faces = o.getFaces();
             List<Vector3> oldVertices = o.getVertices();
             List<Vector3> vertices = new List<Vector3>();
-            List<int> splitToNotSplitVertices = new List<int>();
+            splitToNotSplitVertices = new List<int>();
             int[] triangles = new int[calcTri(faces) * 3];
 
             int highest = 0;
@@ -40,8 +41,6 @@ namespace BachelorArbeitUnity
                     }
                 }
             }
-
-            InformationHolder.splitToNotSplitVertices = splitToNotSplitVertices;
 
             UnityEngine.Mesh mesh = new UnityEngine.Mesh();
             mesh.vertices = getArrayfromList(vertices);
@@ -115,6 +114,15 @@ namespace BachelorArbeitUnity
             }
             Debug.Log(count);
             return count;
+        }
+
+        public void setSplitToNotSplitVertices(List<int> s) {
+            splitToNotSplitVertices = s;
+        }
+
+        public List<int> getSplitToNotSplitVertices()
+        {
+            return splitToNotSplitVertices;
         }
     }
 }

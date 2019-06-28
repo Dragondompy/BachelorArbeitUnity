@@ -19,6 +19,7 @@ namespace BachelorArbeitUnity
         private string comments;
         private float size;
         private bool wasInitiatedEmpty;
+        private List<int> splitToNotSplitVertices;
 
         //initializes the Mesh struktur from objMesh by adding all vertices,edges and faces to lists
         public void loadMeshFromObj(ObjMesh obj)
@@ -81,7 +82,6 @@ namespace BachelorArbeitUnity
             {
                 vertices.Add(new Vertex("empty"));
             }
-            print(vertices.Count);
             wasInitiatedEmpty = true;
         }
 
@@ -223,20 +223,12 @@ namespace BachelorArbeitUnity
 
         }
 
-        public void selectedVerticesCreated()
-        {
-            foreach (Vertex v in selectedVertices)
-            {
-                v.setIsSelected(false);
-                v.setIsCreated(true);
-            }
-        }
-
         public void clearSelectedVertices()
         {
             foreach (Vertex v in selectedVertices)
             {
                 v.setIsSelected(false);
+                Destroy(v.getVertexObject());
             }
             selectedVertices.Clear();
         }
@@ -244,10 +236,13 @@ namespace BachelorArbeitUnity
         public void updateMesh()
         {
             ObjMesh helper = new ObjMesh(this);
-            UnityEngine.Mesh ownMesh = new ObjLoader().newLoad(helper);
+            ObjLoader loader = new ObjLoader();
+            UnityEngine.Mesh ownMesh = loader.newLoad(helper);
             gameObject.GetComponent<MeshFilter>().mesh = ownMesh;
             gameObject.GetComponent<MeshCollider>().sharedMesh = ownMesh;
+            splitToNotSplitVertices = loader.getSplitToNotSplitVertices();
         }
+
         //deletes Vertex from Mesh TODO concatinate faces
         public void deleteVertex(int handleNumber)
         {
@@ -329,6 +324,16 @@ namespace BachelorArbeitUnity
         public int getHalfEdgeHandleNumber()
         {
             return halfEdges.Count;
+        }
+
+        public void setSplitToNotSplitVertices(List<int> s)
+        {
+            splitToNotSplitVertices = s;
+        }
+
+        public List<int> getSplitToNotSplitVertices()
+        {
+            return splitToNotSplitVertices;
         }
     }
 }

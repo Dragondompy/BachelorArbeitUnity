@@ -13,6 +13,8 @@ namespace BachelorArbeitUnity
         public GameObject EdgeObj;
         public GameObject FaceObj;
 
+        public LayerMask mask;
+
         public Material myMeshMaterial;
         public Material patchesMaterial;
         public Material newMeshMaterial;
@@ -36,44 +38,44 @@ namespace BachelorArbeitUnity
         public void initializeOldMesh()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
+            MeshOB.layer = 8;
 
             ObjMesh o = new ObjMesh("./Assets/Meshes/" + objName + ".obj");
 
-            MeshOB.GetComponent<MeshFilter>().mesh = new ObjLoader().newLoad(o);
-
-            MeshOB.AddComponent<MeshCollider>();
+            MeshOB.name = "Original";
 
             MeshOB.GetComponent<MeshRenderer>().material = myMeshMaterial;
 
             myMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             myMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
             myMesh.loadMeshFromObj(o);
+            myMesh.updateMesh();
         }
 
         private void initializePatchHolder()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
-            
+
+            MeshOB.name = "PatchHolder";
+
             MeshOB.GetComponent<MeshRenderer>().material = patchesMaterial;
 
             patchHolder = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             patchHolder.addGameObjects(VertexObj, EdgeObj, FaceObj);
             patchHolder.loadMeshFromMesh(myMesh);
-
-            MeshOB.AddComponent<MeshCollider>();
         }
 
         private void initializeNewMesh()
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
 
+            MeshOB.name = "NewMesh";
+
             MeshOB.GetComponent<MeshRenderer>().material = newMeshMaterial;
 
             newMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             newMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
             newMesh.loadEmptyFromMesh(myMesh);
-
-            MeshOB.AddComponent<MeshCollider>();
         }
 
         // Update is called once per frame
@@ -85,7 +87,7 @@ namespace BachelorArbeitUnity
                 {
                     RaycastHit hit;
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    if (!Physics.Raycast(ray, out hit, 100.0f))
+                    if (!Physics.Raycast(ray, out hit, 100.0f,mask))
                     {
                         return;
                     }
@@ -97,7 +99,7 @@ namespace BachelorArbeitUnity
                         GameObject objhit = meshCollider.gameObject;
                         if (objhit.CompareTag("MeshObject"))
                         {
-                            print("mesh hit");
+                            print(objhit.name);
                             UnityEngine.Mesh mesh = meshCollider.sharedMesh;
                             Vector3[] vertices = mesh.vertices;
                             int[] triangles = mesh.triangles;
@@ -112,6 +114,10 @@ namespace BachelorArbeitUnity
                             p1 = hitTransform.TransformPoint(p1);
                             p2 = hitTransform.TransformPoint(p2);
 
+                            Debug.DrawLine(p0, p1, Color.red,10f);
+                            Debug.DrawLine(p1, p2, Color.red, 10f);
+                            Debug.DrawLine(p2, p0, Color.red, 10f);
+
                             float d0 = (impactPoint - p0).magnitude;
                             float d1 = (impactPoint - p1).magnitude;
                             float d2 = (impactPoint - p2).magnitude;
@@ -119,16 +125,17 @@ namespace BachelorArbeitUnity
                             int vertexIndex = 0;
                             if (d0 < d1 && d0 < d2)
                             {
-                                vertexIndex = InformationHolder.splitToNotSplitVertices[triangles[hit.triangleIndex * 3 + 0]];
+                                vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 0]];
                             }
                             else if (d1 < d0 && d1 < d2)
                             {
-                                vertexIndex = InformationHolder.splitToNotSplitVertices[triangles[hit.triangleIndex * 3 + 1]];
+                                vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 1]];
                             }
                             else if (d2 < d0 && d2 < d1)
                             {
-                                vertexIndex = InformationHolder.splitToNotSplitVertices[triangles[hit.triangleIndex * 3 + 2]];
+                                vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 2]];
                             }
+                            print(vertexIndex);
                             myMesh.selectVertexAt(vertexIndex);
 
                             Debug.DrawLine(p0, p1);
@@ -196,7 +203,6 @@ namespace BachelorArbeitUnity
                 executePatch(f, newMesh, patchHolder);
                 patchHolder.updateMesh();
                 newMesh.updateMesh();
-                myMesh.selectedVerticesCreated();
                 myMesh.clearSelectedVertices();
             }
             else

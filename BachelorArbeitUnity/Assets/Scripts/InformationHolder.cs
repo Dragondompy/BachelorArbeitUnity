@@ -10,6 +10,7 @@ public static class InformationHolder {
     public static bool showOriginal;
     public static bool showPatches;
     public static bool showNewMesh;
+    public static float camSpeed;
+    public static float camRotSpeed;
     public static Controller con;
-    public static List<int> splitToNotSplitVertices;
 }

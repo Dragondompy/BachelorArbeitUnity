@@ -14,8 +14,10 @@ namespace BachelorArbeitUnity
         public Button btnShowOriginal;
         public Button btnShowPatches;
         public Button btnShowNewMesh;
+        public Slider sliCamSpeed;
+        public Slider sliCamRotSpeed;
         public Button btnSaveNewMesh;
-        public InputField ipfSaveMeshName;
+        public InputField itfSaveMeshName;
 
         // Start is called before the first frame update
         void Start()
@@ -31,6 +33,9 @@ namespace BachelorArbeitUnity
 
             InformationHolder.showNewMesh = true;
             setBtnActive(btnShowNewMesh, true);
+
+            setCamSpeed();
+            setCamRotSpeed();
         }
 
         public void setSelectVertex()
@@ -99,6 +104,16 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void setCamSpeed()
+        {
+            InformationHolder.camSpeed = sliCamSpeed.value;
+        }
+
+        public void setCamRotSpeed()
+        {
+            InformationHolder.camRotSpeed = sliCamRotSpeed.value;
+        }
+
         public void createFace()
         {
             InformationHolder.con.createFace();
@@ -106,7 +121,10 @@ namespace BachelorArbeitUnity
 
         public void saveNewMesh()
         {
-            InformationHolder.con.saveMesh(ipfSaveMeshName.text);
+            if (!itfSaveMeshName.text.Equals(""))
+            {
+                InformationHolder.con.saveMesh(itfSaveMeshName.text);
+            }
         }
 
 
