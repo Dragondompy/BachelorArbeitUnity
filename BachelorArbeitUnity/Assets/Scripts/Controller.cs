@@ -81,48 +81,48 @@ namespace BachelorArbeitUnity
         // Update is called once per frame
         void Update()
         {
-            if (InformationHolder.selectVertices)
+            if (Input.GetMouseButtonDown(0))
             {
-                if (Input.GetMouseButtonDown(0))
+
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                if (!Physics.Raycast(ray, out hit, 100.0f, mask))
                 {
-                    RaycastHit hit;
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    if (!Physics.Raycast(ray, out hit, 100.0f,mask))
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    MeshCollider meshCollider = hit.collider as MeshCollider;
-                    BoxCollider boxCollider = hit.collider as BoxCollider;
-                    if (meshCollider != null && meshCollider.sharedMesh != null)
+                MeshCollider meshCollider = hit.collider as MeshCollider;
+                BoxCollider boxCollider = hit.collider as BoxCollider;
+                if (meshCollider != null && meshCollider.sharedMesh != null)
+                {
+                    GameObject objhit = meshCollider.gameObject;
+                    if (objhit.CompareTag("MeshObject"))
                     {
-                        GameObject objhit = meshCollider.gameObject;
-                        if (objhit.CompareTag("MeshObject"))
+                        UnityEngine.Mesh mesh = meshCollider.sharedMesh;
+                        Transform hitTransform = hit.collider.transform;
+                        Vector3 impactPoint = hit.point;
+
+                        Vector3[] vertices = mesh.vertices;
+                        int[] triangles = mesh.triangles;
+                        Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
+                        Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
+                        Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
+
+                        p0 = hitTransform.TransformPoint(p0);
+                        p1 = hitTransform.TransformPoint(p1);
+                        p2 = hitTransform.TransformPoint(p2);
+
+                        float d0 = (impactPoint - p0).magnitude;
+                        float d1 = (impactPoint - p1).magnitude;
+                        float d2 = (impactPoint - p2).magnitude;
+
+                        int v0 = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 1]];
+                        int v1 = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 1]];
+                        int v2 = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 2]];
+
+                        if (InformationHolder.selectVertices)
                         {
-                            print(objhit.name);
-                            UnityEngine.Mesh mesh = meshCollider.sharedMesh;
-                            Vector3[] vertices = mesh.vertices;
-                            int[] triangles = mesh.triangles;
-                            Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
-                            Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
-                            Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
-                            Transform hitTransform = hit.collider.transform;
-
-                            Vector3 impactPoint = hit.point;
-
-                            p0 = hitTransform.TransformPoint(p0);
-                            p1 = hitTransform.TransformPoint(p1);
-                            p2 = hitTransform.TransformPoint(p2);
-
-                            Debug.DrawLine(p0, p1, Color.red,10f);
-                            Debug.DrawLine(p1, p2, Color.red, 10f);
-                            Debug.DrawLine(p2, p0, Color.red, 10f);
-
-                            float d0 = (impactPoint - p0).magnitude;
-                            float d1 = (impactPoint - p1).magnitude;
-                            float d2 = (impactPoint - p2).magnitude;
-
-                            int vertexIndex = 0;
+                            int vertexIndex = -1;
                             if (d0 < d1 && d0 < d2)
                             {
                                 vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 0]];
@@ -135,24 +135,38 @@ namespace BachelorArbeitUnity
                             {
                                 vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 2]];
                             }
-                            print(vertexIndex);
-                            myMesh.selectVertexAt(vertexIndex);
 
-                            Debug.DrawLine(p0, p1);
-                            Debug.DrawLine(p1, p2);
-                            Debug.DrawLine(p2, p0);
+                            myMesh.selectVertexAt(vertexIndex);
                         }
-                    }
-                    else if (boxCollider != null)
-                    {
-                        if (boxCollider.transform.parent != null)
+                        else if (InformationHolder.selectEdge)
                         {
-                            GameObject objhit = boxCollider.transform.parent.gameObject;
-                            if (objhit.CompareTag("Vertex"))
+                            Edge e;
+                            if (d1 < d0 && d2 < d0)
                             {
-                                print("vertex hit");
-                                myMesh.selectVertexAt(objhit.GetComponent<VertexObj>().vertexIndex);
+                                e = myMesh.getVertexAt(v1).isConnected(myMesh.getVertexAt(v2));
                             }
+                            else if (d0 < d1 && d2 < d1)
+                            {
+                                e = myMesh.getVertexAt(v0).isConnected(myMesh.getVertexAt(v2));
+                            }
+                            else if (d0 < d2 && d1 < d2)
+                            {
+                                e = myMesh.getVertexAt(v0).isConnected(myMesh.getVertexAt(v1));
+                            }
+                            else
+                            {
+                                e = null;
+                            }
+
+                            if (e != null)
+                            {
+                                myMesh.selectEdgeAt(e.getHandleNumber());
+                            }
+
+                        }
+                        else if (InformationHolder.selectFace)
+                        {
+                            patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                         }
                     }
                 }
@@ -177,7 +191,7 @@ namespace BachelorArbeitUnity
         public void saveMesh(string name)
         {
             ObjMesh saver = new ObjMesh(newMesh);
-            saver.writeToFile(name,true);
+            saver.writeToFile(name, true);
         }
 
         //Starts creating the Faces in the patch specified by the selected vertices

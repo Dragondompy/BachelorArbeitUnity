@@ -25,7 +25,7 @@ namespace BachelorArbeitUnity
             setHandleNumber(m.getFaceHandleNumber());
             m.getFaces().Add(this);
         }
-        
+
         //adds vertex to this face
         public void addVertex(Vertex v)
         {
@@ -40,6 +40,18 @@ namespace BachelorArbeitUnity
         public void addInnerVertex(Vertex v)
         {
             innerVertices.Add(v);
+        }
+
+        public int containsVertex(int p)
+        {
+            foreach (Vertex v in vertices)
+            {
+                if (v.getHandleNumber() == p)
+                {
+                    return p;
+                }
+            }
+            return -1;
         }
 
         //adds edge to this face

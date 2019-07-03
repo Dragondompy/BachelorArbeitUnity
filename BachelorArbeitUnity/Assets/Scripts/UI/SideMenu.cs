@@ -11,6 +11,8 @@ namespace BachelorArbeitUnity
         public Button btnSelectVert;
         public Button btnCreateFace;
         public Button btnSelectEdge;
+        public Button btnSelectFace;
+        public Button btnDeleteFace;
         public Button btnShowOriginal;
         public Button btnShowPatches;
         public Button btnShowNewMesh;
@@ -49,11 +51,53 @@ namespace BachelorArbeitUnity
             {
                 InformationHolder.selectVertices = true;
                 setBtnActive(btnSelectVert, true);
+
+                InformationHolder.selectEdge = false;
+                setBtnActive(btnSelectEdge, false);
+
+                InformationHolder.selectFace = false;
+                setBtnActive(btnSelectFace, false);
             }
         }
 
         public void setSelectEdge()
         {
+            if (InformationHolder.selectEdge)
+            {
+                InformationHolder.selectEdge = false;
+                setBtnActive(btnSelectEdge, false);
+            }
+            else
+            {
+                InformationHolder.selectEdge = true;
+                setBtnActive(btnSelectEdge, true);
+
+                InformationHolder.selectVertices = false;
+                setBtnActive(btnSelectVert, false);
+
+                InformationHolder.selectFace = false;
+                setBtnActive(btnSelectFace, false);
+            }
+        }
+
+        public void setSelectFace()
+        {
+            if (InformationHolder.selectFace)
+            {
+                InformationHolder.selectFace = false;
+                setBtnActive(btnSelectFace, false);
+            }
+            else
+            {
+                InformationHolder.selectFace = true;
+                setBtnActive(btnSelectFace, true);
+
+                InformationHolder.selectVertices = false;
+                setBtnActive(btnSelectVert, false);
+
+                InformationHolder.selectEdge = false;
+                setBtnActive(btnSelectEdge, false);
+            }
         }
 
         public void showOriginal()
@@ -117,6 +161,10 @@ namespace BachelorArbeitUnity
         public void createFace()
         {
             InformationHolder.con.createFace();
+        }
+
+        public void deleteFace() {
+
         }
 
         public void saveNewMesh()

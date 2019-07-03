@@ -16,10 +16,13 @@ namespace BachelorArbeitUnity
         private List<Edge> edges;
         private List<HalfEdge> halfEdges;
         private List<Vertex> selectedVertices;
+        private Edge selectedEdge;
+        private Face selectedFace;
         private string comments;
         private float size;
         private bool wasInitiatedEmpty;
         private List<int> splitToNotSplitVertices;
+        private List<int> splitToNotSplitFaces;
 
         //initializes the Mesh struktur from objMesh by adding all vertices,edges and faces to lists
         public void loadMeshFromObj(ObjMesh obj)
@@ -189,7 +192,7 @@ namespace BachelorArbeitUnity
             }
             return face;
         }
-
+        
         public void selectVertexAt(int v)
         {
             Vertex ver = getVertexAt(v);
@@ -233,6 +236,21 @@ namespace BachelorArbeitUnity
             selectedVertices.Clear();
         }
 
+
+        public void selectEdgeAt(int e)
+        {
+            selectedEdge = edges[e];
+        }
+
+        public void selectFaceAt(int f)
+        {
+            selectedFace = faces[f];
+            print(selectedFace);
+            foreach (Edge e in selectedFace.getEdges()) {
+                Debug.DrawLine(e.getV1().getPosition(), e.getV2().getPosition(),Color.red,1f);
+            }
+        }
+
         public void updateMesh()
         {
             ObjMesh helper = new ObjMesh(this);
@@ -241,6 +259,7 @@ namespace BachelorArbeitUnity
             gameObject.GetComponent<MeshFilter>().mesh = ownMesh;
             gameObject.GetComponent<MeshCollider>().sharedMesh = ownMesh;
             splitToNotSplitVertices = loader.getSplitToNotSplitVertices();
+            splitToNotSplitFaces = loader.getSplitToNotSplitFaces();
         }
 
         //deletes Vertex from Mesh TODO concatinate faces
@@ -334,6 +353,16 @@ namespace BachelorArbeitUnity
         public List<int> getSplitToNotSplitVertices()
         {
             return splitToNotSplitVertices;
+        }
+
+        public void setSplitToNotSplitFaces(List<int> s)
+        {
+            splitToNotSplitFaces = s;
+        }
+
+        public List<int> getSplitToNotSplitFaces()
+        {
+            return splitToNotSplitFaces;
         }
     }
 }

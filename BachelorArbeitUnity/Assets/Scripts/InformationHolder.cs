@@ -6,7 +6,8 @@ using BachelorArbeitUnity;
 public static class InformationHolder {
     public static string pathToMesh;
     public static bool selectVertices;
-    public static bool selectEdges;
+    public static bool selectEdge;
+    public static bool selectFace;
     public static bool showOriginal;
     public static bool showPatches;
     public static bool showNewMesh;

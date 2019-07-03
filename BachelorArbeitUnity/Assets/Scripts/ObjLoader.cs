@@ -8,6 +8,7 @@ namespace BachelorArbeitUnity
     public class ObjLoader
     {
         private List<int> splitToNotSplitVertices;
+        private List<int> splitToNotSplitFaces;
         public UnityEngine.Mesh newLoad(ObjMesh o)
         {
             List<List<int>> faces = o.getFaces();
@@ -22,6 +23,7 @@ namespace BachelorArbeitUnity
                 if (faces[i].Count > 2)
                 {
                     List<int> faceVerticesNewIndex = new List<int>();
+                    List<int> splitToNotSplitFaces = new List<int>();
                     for (int k = 0; k < faces[i].Count; k++)
                     {
                         vertices.Add(oldVertices[faces[i][k]]);
@@ -31,6 +33,7 @@ namespace BachelorArbeitUnity
 
                     for (int j = 0; j < faces[i].Count - 2; j++)
                     {
+                        splitToNotSplitFaces.Add(i);
                         triangles[highest + 0] = faceVerticesNewIndex[0];
 
                         triangles[highest + 1] = faceVerticesNewIndex[j + 1];
@@ -116,13 +119,24 @@ namespace BachelorArbeitUnity
             return count;
         }
 
-        public void setSplitToNotSplitVertices(List<int> s) {
+        public void setSplitToNotSplitVertices(List<int> s)
+        {
             splitToNotSplitVertices = s;
         }
 
         public List<int> getSplitToNotSplitVertices()
         {
             return splitToNotSplitVertices;
+        }
+
+        public void setSplitToNotSplitFaces(List<int> s)
+        {
+            splitToNotSplitFaces = s;
+        }
+
+        public List<int> getSplitToNotSplitFaces()
+        {
+            return splitToNotSplitFaces;
         }
     }
 }
