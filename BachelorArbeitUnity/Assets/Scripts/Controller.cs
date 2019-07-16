@@ -13,7 +13,9 @@ namespace BachelorArbeitUnity
         public GameObject EdgeObj;
         public GameObject FaceObj;
 
-        public LayerMask mask;
+        public LayerMask maskOrg;
+        public LayerMask maskPH;
+        public LayerMask maskNM;
 
         public Material myMeshMaterial;
         public Material patchesMaterial;
@@ -43,6 +45,7 @@ namespace BachelorArbeitUnity
             ObjMesh o = new ObjMesh("./Assets/Meshes/" + objName + ".obj");
 
             MeshOB.name = "Original";
+            MeshOB.layer = 10;
 
             MeshOB.GetComponent<MeshRenderer>().material = myMeshMaterial;
 
@@ -50,6 +53,11 @@ namespace BachelorArbeitUnity
             myMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
             myMesh.loadMeshFromObj(o);
             myMesh.updateMesh();
+
+            InformationHolder.myMeshToPatchHolder = new int[myMesh.getVertices().Count];
+            for (int i = 0; i < InformationHolder.myMeshToPatchHolder.Length; i++) {
+                InformationHolder.myMeshToPatchHolder[i] = -1;
+            }
         }
 
         private void initializePatchHolder()
@@ -57,12 +65,13 @@ namespace BachelorArbeitUnity
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
 
             MeshOB.name = "PatchHolder";
+            MeshOB.layer = 11;
 
             MeshOB.GetComponent<MeshRenderer>().material = patchesMaterial;
 
             patchHolder = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
             patchHolder.addGameObjects(VertexObj, EdgeObj, FaceObj);
-            patchHolder.loadMeshFromMesh(myMesh);
+            patchHolder.loadEmptyFromMesh(myMesh);
         }
 
         private void initializeNewMesh()
@@ -70,6 +79,7 @@ namespace BachelorArbeitUnity
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
 
             MeshOB.name = "NewMesh";
+            MeshOB.layer = 12;
 
             MeshOB.GetComponent<MeshRenderer>().material = newMeshMaterial;
 
@@ -86,6 +96,19 @@ namespace BachelorArbeitUnity
 
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                LayerMask mask = new LayerMask();
+                if (InformationHolder.selectVertices)
+                {
+                    mask = maskOrg;
+                }
+                else if (InformationHolder.selectEdge)
+                {
+                    mask = maskPH;
+                }
+                else if (InformationHolder.selectFace)
+                {
+                    mask = maskPH;
+                }
                 if (!Physics.Raycast(ray, out hit, 100.0f, mask))
                 {
                     return;
@@ -160,7 +183,7 @@ namespace BachelorArbeitUnity
 
                             if (e != null)
                             {
-                                myMesh.selectEdgeAt(e.getHandleNumber());
+                                patchHolder.selectEdgeAt(e.getHandleNumber());
                             }
 
                         }
@@ -199,12 +222,24 @@ namespace BachelorArbeitUnity
         {
             List<Vertex> selectedVertices = myMesh.getSelectedVertices();
             List<int> verticesIndices = new List<int>();
+
             if (selectedVertices.Count > 2)
             {
                 for (int i = 0; i < selectedVertices.Count; i++)
                 {
-                    newMesh.addVertexAtIndex(selectedVertices[i].getHandleNumber(), selectedVertices[i].getPosition());
-                    verticesIndices.Add(selectedVertices[i].getHandleNumber());
+                    int vHnMyMesh = selectedVertices[i].getHandleNumber();
+                    int vHnPatchHolder = InformationHolder.myMeshToPatchHolder[vHnMyMesh];
+                    Vertex v;
+
+                    //Test if Vertex already Exists
+                    if (patchHolder.vertexExists(vHnPatchHolder)) {
+                        v = patchHolder.getVertexAt(vHnPatchHolder);
+                    }
+                    else{ 
+                        v = patchHolder.addVertex(selectedVertices[i].getPosition());
+                        verticesIndices.Add(v.getHandleNumber());
+                        InformationHolder.myMeshToPatchHolder[vHnMyMesh] = v.getHandleNumber();
+                    }
                 }
                 Face f = patchHolder.addFace(verticesIndices);
 
@@ -223,6 +258,12 @@ namespace BachelorArbeitUnity
             {
                 print("Not enough Verices selected");
             }
+        }
+
+        public void deleteSelectedFace() {
+            patchHolder.deleteSelectedFace(newMesh);
+            patchHolder.updateMesh();
+            newMesh.updateMesh();
         }
 
         //Adds the Vertices on the Edge

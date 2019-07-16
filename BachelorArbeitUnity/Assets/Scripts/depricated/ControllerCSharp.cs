@@ -11,10 +11,11 @@ namespace BachelorArbeitUnity
 		{
 		}
 
+        //DEPRICATED
 		public Mesh refine (Mesh oldMesh, double fine)
 		{
 			Mesh newMesh = new Mesh ();
-            newMesh.loadMeshFromMesh(oldMesh);
+            //newMesh.loadMeshFromMesh(oldMesh);
 			foreach (Edge e in oldMesh.getEdges()) {
 				Vertex v1 = e.getV1 ();
 				Vertex v2 = e.getV2 ();
@@ -31,10 +32,11 @@ namespace BachelorArbeitUnity
 			return newMesh;
 		}
 
-		public Mesh refine (Mesh oldMesh)
+        //DEPRICATED
+        public Mesh refine (Mesh oldMesh)
         {
             Mesh newMesh = new Mesh();
-            newMesh.loadMeshFromMesh(oldMesh);
+            //newMesh.loadMeshFromMesh(oldMesh);
             Console.WriteLine ("Specify the Number for each Edge or random or all the same ? (each/random/same)");
             String line = "same";//Console.ReadLine ();
 			if (line.Equals ("each")) {

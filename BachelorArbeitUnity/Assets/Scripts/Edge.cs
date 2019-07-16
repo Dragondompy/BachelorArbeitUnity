@@ -19,7 +19,7 @@ namespace BachelorArbeitUnity
         private Vertex[] verticesOnEdge;
 
         private int handleNumber;
-        
+
         public Edge(Vertex v1, Vertex v2, Face f, Mesh m)
         {
             setV1(v1);
@@ -48,9 +48,9 @@ namespace BachelorArbeitUnity
 
         public void addHalfEdge(HalfEdge he)
         {
-            if (h1 == null)
+            if (h1 == null || !h1.isValid())
                 h1 = he;
-            else if (h2 == null)
+            else if (h2 == null || !h2.isValid())
                 h2 = he;
             else
                 throw new Exception("This Edge already has 2 Halfedges");
@@ -60,18 +60,48 @@ namespace BachelorArbeitUnity
         public void delete()
         {
             handleNumber = -1;
-            if (f1.getHandleNumber() < 0 || f2.getHandleNumber() < 0)
+            if (f1 != null && f1.isValid())
             {
                 f1.delete();
-                f2.delete();
             }
-            else
+            if (f2 != null && f2.isValid())
             {
-                f1.connectFace(f2, this);
                 f2.delete();
             }
-            h1.delete();
-            h2.delete();
+            if (h1 != null && h1.isValid())
+            {
+                h1.delete();
+            }
+            if (h2 != null && h2.isValid())
+            {
+                h2.delete();
+            }
+            if (verticesOnEdge != null)
+            {
+                foreach (Vertex v in verticesOnEdge)
+                {
+                    if (v != null && v.isValid())
+                    {
+                        v.delete();
+                    }
+                }
+            }
+            if (v1 != null && v1.isValid())
+            {
+                v1.remEdge(this);
+            }
+            if (v2 != null && v2.isValid())
+            {
+                v2.remEdge(this);
+            }
+        }
+
+        public void remHalfEdge(HalfEdge he)
+        {
+            if ((h1 == null||!h1.isValid()) && (h2 == null || !h2.isValid()))
+            {
+                delete();
+            }
         }
 
         //returns the Vector from Vertex v1 to Vertex v2

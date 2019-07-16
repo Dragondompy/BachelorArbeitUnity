@@ -14,4 +14,6 @@ public static class InformationHolder {
     public static float camSpeed;
     public static float camRotSpeed;
     public static Controller con;
+    public static int[] myMeshToPatchHolder;
+    public static List<int> PatchHolderToNewMesh;
 }

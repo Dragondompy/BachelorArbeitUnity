@@ -15,15 +15,15 @@ namespace BachelorArbeitUnity
             List<Vector3> oldVertices = o.getVertices();
             List<Vector3> vertices = new List<Vector3>();
             splitToNotSplitVertices = new List<int>();
+            splitToNotSplitFaces = new List<int>();
             int[] triangles = new int[calcTri(faces) * 3];
 
             int highest = 0;
-            for (int i = 0; i < o.getFaces().Count; i++)
+            for (int i = 0; i < faces.Count; i++)
             {
                 if (faces[i].Count > 2)
                 {
                     List<int> faceVerticesNewIndex = new List<int>();
-                    List<int> splitToNotSplitFaces = new List<int>();
                     for (int k = 0; k < faces[i].Count; k++)
                     {
                         vertices.Add(oldVertices[faces[i][k]]);
@@ -115,7 +115,6 @@ namespace BachelorArbeitUnity
                     count += f.Count - 2;
                 }
             }
-            Debug.Log(count);
             return count;
         }
 

@@ -20,7 +20,6 @@ namespace BachelorArbeitUnity
         private Face selectedFace;
         private string comments;
         private float size;
-        private bool wasInitiatedEmpty;
         private List<int> splitToNotSplitVertices;
         private List<int> splitToNotSplitFaces;
 
@@ -47,26 +46,6 @@ namespace BachelorArbeitUnity
             }
 
             comments = obj.getComments();
-            wasInitiatedEmpty = false;
-        }
-
-        //initializes the Mesh struktur with only the Vertices of another Mesh
-        public void loadMeshFromMesh(Mesh old)
-        {
-            utils = new EmptyPattern();
-            vertices = new List<Vertex>();
-            faces = new List<Face>();
-            edges = new List<Edge>();
-            halfEdges = new List<HalfEdge>();
-            selectedVertices = new List<Vertex>();
-            comments = "";
-
-            size = old.getSize();
-            foreach (Vertex v in old.getVertices())
-            {
-                addVertex(v.getPosition());
-            }
-            wasInitiatedEmpty = false;
         }
 
         //initializes with emptyVertices 
@@ -81,11 +60,10 @@ namespace BachelorArbeitUnity
             comments = "";
 
             size = old.getSize(); ;
-            foreach (Vertex v in old.getVertices())
+            /*foreach (Vertex v in old.getVertices())
             {
                 vertices.Add(new Vertex("empty"));
-            }
-            wasInitiatedEmpty = true;
+            }*/
         }
 
         public void addGameObjects(GameObject vOb, GameObject eOb, GameObject fObj)
@@ -129,19 +107,14 @@ namespace BachelorArbeitUnity
 
             return v;
         }
-        public void addVertexAtIndex(int vIndex, Vector3 pos)
+
+        public Boolean vertexExists(int hn)
         {
-            if (wasInitiatedEmpty)
+            if (hn < getVertexHandleNumber() && hn >= 0 && vertices[hn].getHandleNumber() >= 0)
             {
-                Vertex v = new Vertex(pos);
-                v.setPosition(pos);
-                v.setHandleNumber(vIndex);
-                vertices[vIndex] = v;
+                return true;
             }
-            else
-            {
-                print("Mesh was not Initiated Empty. Use 'addVertex Method instead'");
-            }
+            return false;
         }
 
         //adds the edge between to vertices to the mesh if it doesnt exist already
@@ -192,7 +165,7 @@ namespace BachelorArbeitUnity
             }
             return face;
         }
-        
+
         public void selectVertexAt(int v)
         {
             Vertex ver = getVertexAt(v);
@@ -236,7 +209,6 @@ namespace BachelorArbeitUnity
             selectedVertices.Clear();
         }
 
-
         public void selectEdgeAt(int e)
         {
             selectedEdge = edges[e];
@@ -244,10 +216,31 @@ namespace BachelorArbeitUnity
 
         public void selectFaceAt(int f)
         {
-            selectedFace = faces[f];
-            print(selectedFace);
-            foreach (Edge e in selectedFace.getEdges()) {
-                Debug.DrawLine(e.getV1().getPosition(), e.getV2().getPosition(),Color.red,1f);
+            if (selectedFace != null && selectedFace.Equals(faces[f]))
+            {
+                selectedFace = null;
+            }
+            else
+            {
+                selectedFace = faces[f];
+                print(selectedFace);
+                foreach (Edge e in selectedFace.getEdges())
+                {
+                    Debug.DrawLine(e.getV1().getPosition(), e.getV2().getPosition(), Color.red, 1f);
+                }
+            }
+        }
+
+        public void deleteSelectedFace(Mesh newMesh)
+        {
+            if (selectedFace != null)
+            {
+                selectedFace.delete();
+                selectedFace = null;
+            }
+            else
+            {
+                print("No Face Selected");
             }
         }
 
@@ -270,7 +263,12 @@ namespace BachelorArbeitUnity
 
         public Vertex getVertexAt(int v)
         {
-            return vertices[v];
+            if (vertexExists(v))
+            {
+                return vertices[v];
+            }
+            Debug.Log("There is no Vertex at " + v);
+            return new Vertex("Empty");
         }
         public Edge getEdgeAt(int e)
         {
@@ -320,6 +318,7 @@ namespace BachelorArbeitUnity
         {
             return selectedVertices;
         }
+
         public void setComments(string c)
         {
             comments = c;

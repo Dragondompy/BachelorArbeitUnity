@@ -104,11 +104,21 @@ namespace BachelorArbeitUnity
 			}
 			output += v2;
 			return output;
-		}
+        }
 
-		public void delete ()
+        //returns if the HalfEdge is valid or deleted
+        public Boolean isValid()
+        {
+            return handleNumber >= 0;
+        }
+
+        public void delete ()
 		{
 			handleNumber = -1;
+            if (e != null && e.isValid())
+            {
+                e.remHalfEdge(this);
+            }
 		}
 
 		public Face getF ()

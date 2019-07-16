@@ -164,7 +164,7 @@ namespace BachelorArbeitUnity
         }
 
         public void deleteFace() {
-
+            InformationHolder.con.deleteSelectedFace();
         }
 
         public void saveNewMesh()

@@ -96,16 +96,23 @@ namespace BachelorArbeitUnity
             throw new Exception("the given Halfedge \n" + he + "\n is not in this Face \n" + this);
         }
 
-        //connects face f with this face TODO concatinate faces
-        // TODO remove the halfedge from the list? done with handlenumber = -1 ?
-        public void connectFace(Face f, Edge e)
-        {
-            edges.Remove(e);
-        }
-
         public void delete()
         {
             handleNumber = -1;
+            foreach (Vertex v in innerVertices)
+            {
+                if (v != null && v.isValid())
+                {
+                    v.delete();
+                }
+            }
+            foreach (HalfEdge he in halfEdges)
+            {
+                if (he != null && he.isValid())
+                {
+                    he.delete();
+                }
+            }
         }
 
         //returns if the face is valid or deleted

@@ -46,14 +46,20 @@ namespace BachelorArbeitUnity
         }
 
         //creates the objmesh from an Mesh m
-        public ObjMesh(Mesh m,int old)//TODO handle deleted vertices and meshes !!!
+        public ObjMesh(Mesh m,int old)
         {
+            List<int> delVertexHandler = new List<int>();
+            int validCount = 0;
+
             foreach (Vertex vertex in m.getVertices())
             {
                 if (vertex.isValid())
                 {
+                    delVertexHandler.Add(validCount);
                     vertices.Add(vertex.getPosition());
+                    validCount++;
                 }
+                delVertexHandler.Add(-1);
             }
             foreach (Face face in m.getFaces())
             {
@@ -62,7 +68,7 @@ namespace BachelorArbeitUnity
                     List<int> fVertices = new List<int>();
                     foreach (Vertex vertex in face.getVertices())
                     {
-                        fVertices.Add(vertex.getHandleNumber());
+                        fVertices.Add(delVertexHandler[vertex.getHandleNumber()]);
                     }
                     faces.Add(fVertices);
                 }

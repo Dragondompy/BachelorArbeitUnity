@@ -53,7 +53,19 @@ namespace BachelorArbeitUnity
             handleNumber = -1;
             foreach (Edge e in edges)
             {
-                e.delete();
+                if (e != null && e.isValid())
+                {
+                    e.delete();
+                }
+            }
+            edges.Clear();
+        }
+
+        public void remEdge(Edge edge)
+        {
+            edges.Remove(edge);
+            if (edges.Count <= 0) {
+                delete();
             }
         }
 
