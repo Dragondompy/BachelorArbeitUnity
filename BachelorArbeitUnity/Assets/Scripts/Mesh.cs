@@ -117,6 +117,24 @@ namespace BachelorArbeitUnity
             return false;
         }
 
+        public Boolean edgeExists(int hn)
+        {
+            if (hn < getEdgeHandleNumber() && hn >= 0 && edges[hn].getHandleNumber() >= 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public Boolean faceExists(int hn)
+        {
+            if (hn < getFaceHandleNumber() && hn >= 0 && faces[hn].getHandleNumber() >= 0)
+            {
+                return true;
+            }
+            return false;
+        }
+
         //adds the edge between to vertices to the mesh if it doesnt exist already
         //also adds the face to the edge
         public Edge addEdge(Face f, int v1, int v2)
@@ -231,12 +249,11 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void deleteSelectedFace(Mesh newMesh)
+        public void deleteSelectedFace()
         {
-            if (selectedFace != null)
+            if (faceExists(selectedFace.getHandleNumber()))
             {
                 selectedFace.delete();
-                selectedFace = null;
             }
             else
             {
@@ -272,11 +289,21 @@ namespace BachelorArbeitUnity
         }
         public Edge getEdgeAt(int e)
         {
-            return edges[e];
+            if (edgeExists(e))
+            {
+                return edges[e];
+            }
+            Debug.Log("There is no Edge at " + e);
+            return new Edge("Empty");
         }
         public Face getFaceAt(int f)
         {
-            return faces[f];
+            if (faceExists(f))
+            {
+                return faces[f];
+            }
+            Debug.Log("There is no Face at " + f);
+            return new Face("Empty");
         }
 
         public List<Vertex> getVertices()
@@ -317,6 +344,11 @@ namespace BachelorArbeitUnity
         public List<Vertex> getSelectedVertices()
         {
             return selectedVertices;
+        }
+
+        public Face getSelectedFace()
+        {
+            return selectedFace;
         }
 
         public void setComments(string c)

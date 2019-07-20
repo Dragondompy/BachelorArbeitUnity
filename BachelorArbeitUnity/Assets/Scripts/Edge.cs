@@ -31,6 +31,14 @@ namespace BachelorArbeitUnity
             this.m = m;
         }
 
+        public Edge(String isEmpty)
+        {
+            if (isEmpty.Equals("empty"))
+            {
+                handleNumber = -1;
+            }
+        }
+
         //tests if this vertex connects v to any other vertex
         public Boolean contains(Vertex v)
         {

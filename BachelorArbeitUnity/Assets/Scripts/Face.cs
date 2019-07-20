@@ -26,6 +26,14 @@ namespace BachelorArbeitUnity
             m.getFaces().Add(this);
         }
 
+        public Face(String isEmpty)
+        {
+            if (isEmpty.Equals("empty"))
+            {
+                handleNumber = -1;
+            }
+        }
+
         //adds vertex to this face
         public void addVertex(Vertex v)
         {
@@ -168,7 +176,7 @@ namespace BachelorArbeitUnity
 
         public override string ToString()
         {
-            string output = "Face\n";
+            string output = "Face " +handleNumber+"\n";
             foreach (Vertex v in vertices)
             {
                 output += v + "\n";

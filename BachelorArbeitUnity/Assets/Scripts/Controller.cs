@@ -29,6 +29,7 @@ namespace BachelorArbeitUnity
         // Start is called before the first frame update
         void Start()
         {
+            GameObject MeshOB = Instantiate()
             InformationHolder.con = this;
             this.objName = InformationHolder.pathToMesh;
 
@@ -237,9 +238,9 @@ namespace BachelorArbeitUnity
                     }
                     else{ 
                         v = patchHolder.addVertex(selectedVertices[i].getPosition());
-                        verticesIndices.Add(v.getHandleNumber());
                         InformationHolder.myMeshToPatchHolder[vHnMyMesh] = v.getHandleNumber();
                     }
+                    verticesIndices.Add(v.getHandleNumber());
                 }
                 Face f = patchHolder.addFace(verticesIndices);
 
@@ -261,7 +262,8 @@ namespace BachelorArbeitUnity
         }
 
         public void deleteSelectedFace() {
-            patchHolder.deleteSelectedFace(newMesh);
+            patchHolder.deleteSelectedFace();
+            patchHolder.getFaces().Remove(patchHolder.getSelectedFace());
             patchHolder.updateMesh();
             newMesh.updateMesh();
         }

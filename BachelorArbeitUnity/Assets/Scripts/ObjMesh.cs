@@ -42,7 +42,7 @@ namespace BachelorArbeitUnity
                     faces.Add(fVertices);
                 }
             }
-            comments += "# " + m.getVertexHandleNumber() + " Vertices " + m.getFaceHandleNumber() + " Faces\n";
+            comments += "# " + vertices.Count + " Vertices " + faces.Count + " Faces\n";
         }
 
         //creates the objmesh from an Mesh m
