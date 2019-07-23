@@ -15,7 +15,7 @@ namespace BachelorArbeitUnity
 		{
 		}
 
-		public virtual void createFaces (Mesh newMesh, Face f, List<List<int>> innerListVertices)
+		public virtual void createFaces (MeshStruct newMesh, Face f, List<List<int>> innerListVertices)
 		{
 			
 		}
@@ -41,7 +41,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//creates new Quad with vertices 1,2,3,4
-		public Face createFace(int v1,int v2,int v3,int v4, Mesh newMesh){
+		public Face createFace(int v1,int v2,int v3,int v4, MeshStruct newMesh){
 			List<int> f = new List<int> ();
 			f.Add (v1);
 			f.Add (v2);
@@ -52,7 +52,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//Creates new Vertex at with position at pos + (number/max)*dir
-		public int createVertex(Vector3 pos, Vector3 dir,int max, int number,Face f,Mesh newMesh){
+		public int createVertex(Vector3 pos, Vector3 dir,int max, int number,Face f,MeshStruct newMesh){
             Vector3 d = pos + (number * dir / max);
 
 			Vertex ver = newMesh.addVertex (pos);
@@ -61,7 +61,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//calculatess the middlePoint of to Vertices
-		public Vector3 middlePoint (int v1, int v2, Mesh newMesh)
+		public Vector3 middlePoint (int v1, int v2, MeshStruct newMesh)
 		{
 			Vertex vertex1 = newMesh.getVertexAt (v1);
 			Vertex vertex2 = newMesh.getVertexAt (v2);
@@ -76,7 +76,7 @@ namespace BachelorArbeitUnity
         }
 
         //Calculates the direction from f to t
-        public Vector3 direction (int f, int t, Mesh newMesh)
+        public Vector3 direction (int f, int t, MeshStruct newMesh)
 		{
 			Vertex from = newMesh.getVertexAt (f);
 			Vertex to = newMesh.getVertexAt (t);
@@ -91,7 +91,7 @@ namespace BachelorArbeitUnity
         }
 
         //Calculates the direction from v to p
-        public Vector3 direction (int v, Vector3 p,Mesh newMesh)
+        public Vector3 direction (int v, Vector3 p,MeshStruct newMesh)
 		{
 			Vertex vertex = newMesh.getVertexAt (v);
 			return p-vertex.getPosition();
@@ -112,7 +112,7 @@ namespace BachelorArbeitUnity
 			return alphaPos;
 		}
 
-		public void fillMatrixwithFaces (int[,] VertexMatrix,Face f,Mesh newMesh){
+		public void fillMatrixwithFaces (int[,] VertexMatrix,Face f,MeshStruct newMesh){
 			int length0 = VertexMatrix.GetLength (0);
 			int length1 = VertexMatrix.GetLength (1);
 

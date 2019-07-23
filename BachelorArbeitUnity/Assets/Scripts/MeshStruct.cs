@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class Mesh : MonoBehaviour
+    public class MeshStruct : MonoBehaviour
     {
         private GameObject VertexObj;
         private GameObject EdgeObj;
@@ -48,8 +48,8 @@ namespace BachelorArbeitUnity
             comments = obj.getComments();
         }
 
-        //initializes with emptyVertices 
-        public void loadEmptyFromMesh(Mesh old)
+        //initializes with vertices from old Mesh
+        public void loadVerticesFromMesh(MeshStruct old)
         {
             utils = new EmptyPattern();
             vertices = new List<Vertex>();
@@ -60,10 +60,24 @@ namespace BachelorArbeitUnity
             comments = "";
 
             size = old.getSize(); ;
-            /*foreach (Vertex v in old.getVertices())
+            foreach (Vertex v in old.getVertices())
             {
-                vertices.Add(new Vertex("empty"));
-            }*/
+                addVertex(v.getPosition());
+            }
+        }
+        
+        //initializes Empty Mesh
+        public void loadEmptyFromMesh(MeshStruct old)
+        {
+            utils = new EmptyPattern();
+            vertices = new List<Vertex>();
+            faces = new List<Face>();
+            edges = new List<Edge>();
+            halfEdges = new List<HalfEdge>();
+            selectedVertices = new List<Vertex>();
+            comments = "";
+
+            size = old.getSize(); ;
         }
 
         public void addGameObjects(GameObject vOb, GameObject eOb, GameObject fObj)
@@ -156,14 +170,6 @@ namespace BachelorArbeitUnity
             return e;
         }
 
-        internal void updateEdges(List<Edge> edgesOfVertex)
-        {
-            foreach (Edge e in edgesOfVertex)
-            {
-                e.updateTransform();
-            }
-        }
-
         public Face addFace(List<int> vertices)
         {
             Face face = addSimpleFace(vertices);
@@ -232,7 +238,7 @@ namespace BachelorArbeitUnity
             selectedEdge = edges[e];
         }
 
-        public void selectFaceAt(int f)
+        public Face selectFaceAt(int f)
         {
             if (selectedFace != null && selectedFace.Equals(faces[f]))
             {
@@ -247,6 +253,7 @@ namespace BachelorArbeitUnity
                     Debug.DrawLine(e.getV1().getPosition(), e.getV2().getPosition(), Color.red, 1f);
                 }
             }
+            return selectedFace;
         }
 
         public void deleteSelectedFace()

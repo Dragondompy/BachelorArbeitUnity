@@ -20,7 +20,7 @@ namespace BachelorArbeitUnity
         }
 
         //creates the objmesh from an Mesh m
-        public ObjMesh(Mesh m) {
+        public ObjMesh(MeshStruct m) {
             int newIndex = 0;
             int[] oldToNewIndices = new int[m.getVertices().Count];
             foreach (Vertex vertex in m.getVertices()) {
@@ -46,7 +46,7 @@ namespace BachelorArbeitUnity
         }
 
         //creates the objmesh from an Mesh m
-        public ObjMesh(Mesh m,int old)
+        public ObjMesh(MeshStruct m,int old)
         {
             List<int> delVertexHandler = new List<int>();
             int validCount = 0;

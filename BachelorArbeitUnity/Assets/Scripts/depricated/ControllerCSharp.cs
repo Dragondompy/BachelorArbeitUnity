@@ -12,9 +12,9 @@ namespace BachelorArbeitUnity
 		}
 
         //DEPRICATED
-		public Mesh refine (Mesh oldMesh, double fine)
+		public MeshStruct refine (MeshStruct oldMesh, double fine)
 		{
-			Mesh newMesh = new Mesh ();
+			MeshStruct newMesh = new MeshStruct ();
             //newMesh.loadMeshFromMesh(oldMesh);
 			foreach (Edge e in oldMesh.getEdges()) {
 				Vertex v1 = e.getV1 ();
@@ -33,9 +33,9 @@ namespace BachelorArbeitUnity
 		}
 
         //DEPRICATED
-        public Mesh refine (Mesh oldMesh)
+        public MeshStruct refine (MeshStruct oldMesh)
         {
-            Mesh newMesh = new Mesh();
+            MeshStruct newMesh = new MeshStruct();
             //newMesh.loadMeshFromMesh(oldMesh);
             Console.WriteLine ("Specify the Number for each Edge or random or all the same ? (each/random/same)");
             String line = "same";//Console.ReadLine ();
@@ -75,7 +75,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//Fits all Vertices to the given function
-		public void fitToFunction (Mesh refinedMesh)
+		public void fitToFunction (MeshStruct refinedMesh)
 		{
 			foreach (Vertex v in refinedMesh.getVertices()) {
                 Vector3 pos = v.getPosition();
@@ -85,7 +85,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//Adds new Faces to the New Mesh replacing the old Face in the Old Mesh
-		public void executePatch (Face face, Mesh newMesh, Mesh oldMesh)
+		public void executePatch (Face face, MeshStruct newMesh, MeshStruct oldMesh)
 		{
 			int sumOfSepNumbers = 0;
 			foreach (Edge e in face.getEdges()) {
@@ -111,7 +111,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//Adds all vertices on All Edges
-		public void addVerticesOnEdge (Mesh oldMesh, Mesh newMesh)
+		public void addVerticesOnEdge (MeshStruct oldMesh, MeshStruct newMesh)
 		{
 			List<Edge> edges = oldMesh.getEdges ();
 
@@ -121,7 +121,7 @@ namespace BachelorArbeitUnity
 		}
 
 		//Adds the Vertices on the Edge
-		public Vertex[] addVerticesBetween (Vertex v1, Vector3 direction, Edge edge, Mesh newMesh)
+		public Vertex[] addVerticesBetween (Vertex v1, Vector3 direction, Edge edge, MeshStruct newMesh)
 		{
 			int sepNumber = edge.getSepNumber ();
 

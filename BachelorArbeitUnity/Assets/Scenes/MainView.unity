@@ -294,7 +294,7 @@ Transform:
   m_Children:
   - {fileID: 856078814}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1049180346
 MonoBehaviour:
@@ -642,6 +642,12 @@ PrefabInstance:
       propertyPath: maskNM.m_Bits
       value: 4096
       objectReference: {fileID: 0}
+    - target: {fileID: 2861583260942087660, guid: 0bc59d2caf43fc24d9283168e1ee6dda,
+        type: 3}
+      propertyPath: LineObj
+      value: 
+      objectReference: {fileID: 7816491887593866208, guid: 7e48a77e257d4f14c912d08aba26ebbd,
+        type: 3}
     - target: {fileID: 2861583260942087661, guid: 0bc59d2caf43fc24d9283168e1ee6dda,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -680,7 +686,7 @@ PrefabInstance:
     - target: {fileID: 2861583260942087661, guid: 0bc59d2caf43fc24d9283168e1ee6dda,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2861583260942087661, guid: 0bc59d2caf43fc24d9283168e1ee6dda,
         type: 3}

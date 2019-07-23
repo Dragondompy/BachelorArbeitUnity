@@ -12,6 +12,8 @@ namespace BachelorArbeitUnity
         public GameObject VertexObj;
         public GameObject EdgeObj;
         public GameObject FaceObj;
+        public GameObject LineObj;
+        public List<GameObject> lines;
 
         public LayerMask maskOrg;
         public LayerMask maskPH;
@@ -22,14 +24,21 @@ namespace BachelorArbeitUnity
         public Material newMeshMaterial;
 
         Camera cam;
-        BachelorArbeitUnity.Mesh myMesh;
-        BachelorArbeitUnity.Mesh patchHolder;
-        BachelorArbeitUnity.Mesh newMesh;
+        MeshStruct myMesh;
+        MeshStruct patchHolder;
+        MeshStruct refinedMesh;
 
         // Start is called before the first frame update
         void Start()
         {
-            GameObject MeshOB = Instantiate()
+            /*for (int i = 0; i < 1000; i++)
+            {
+                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                lineRend.positionCount = 2;
+                lineRend.SetPosition(0, new Vector3(0, i * 0.01f, 0));
+                lineRend.SetPosition(1, new Vector3(1, i * 0.01f, 0));
+            }*/
             InformationHolder.con = this;
             this.objName = InformationHolder.pathToMesh;
 
@@ -50,13 +59,14 @@ namespace BachelorArbeitUnity
 
             MeshOB.GetComponent<MeshRenderer>().material = myMeshMaterial;
 
-            myMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
+            myMesh = MeshOB.GetComponent<MeshStruct>();
             myMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
             myMesh.loadMeshFromObj(o);
             myMesh.updateMesh();
 
             InformationHolder.myMeshToPatchHolder = new int[myMesh.getVertices().Count];
-            for (int i = 0; i < InformationHolder.myMeshToPatchHolder.Length; i++) {
+            for (int i = 0; i < InformationHolder.myMeshToPatchHolder.Length; i++)
+            {
                 InformationHolder.myMeshToPatchHolder[i] = -1;
             }
         }
@@ -70,7 +80,7 @@ namespace BachelorArbeitUnity
 
             MeshOB.GetComponent<MeshRenderer>().material = patchesMaterial;
 
-            patchHolder = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
+            patchHolder = MeshOB.GetComponent<MeshStruct>();
             patchHolder.addGameObjects(VertexObj, EdgeObj, FaceObj);
             patchHolder.loadEmptyFromMesh(myMesh);
         }
@@ -84,9 +94,30 @@ namespace BachelorArbeitUnity
 
             MeshOB.GetComponent<MeshRenderer>().material = newMeshMaterial;
 
-            newMesh = MeshOB.GetComponent<BachelorArbeitUnity.Mesh>();
-            newMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
-            newMesh.loadEmptyFromMesh(myMesh);
+            refinedMesh = MeshOB.GetComponent<MeshStruct>();
+            refinedMesh.addGameObjects(VertexObj, EdgeObj, FaceObj);
+            refinedMesh.loadEmptyFromMesh(myMesh);
+        }
+
+        public void showOriginal(bool v)
+        {
+            myMesh.gameObject.SetActive(v);
+        }
+
+        public void showPatches(bool v)
+        {
+            patchHolder.gameObject.SetActive(v);
+        }
+
+        public void showNewMesh(bool v)
+        {
+            refinedMesh.gameObject.SetActive(v);
+        }
+
+        public void saveMesh(string name)
+        {
+            ObjMesh saver = new ObjMesh(refinedMesh);
+            saver.writeToFile(name, true);
         }
 
         // Update is called once per frame
@@ -190,37 +221,30 @@ namespace BachelorArbeitUnity
                         }
                         else if (InformationHolder.selectFace)
                         {
-                            patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
+                            Face f = patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
+                            removeLines();
+                            if (f != null)
+                            {
+                                foreach (Edge e in f.getEdges())
+                                {
+                                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                                    lineRend.positionCount = 2;
+                                    lineRend.SetPosition(0, e.getV1().getPosition());
+                                    lineRend.SetPosition(1, e.getV2().getPosition());
+                                    lines.Add(Liner);
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        public void showOriginal(bool v)
-        {
-            myMesh.gameObject.SetActive(v);
-        }
-
-        public void showPatches(bool v)
-        {
-            patchHolder.gameObject.SetActive(v);
-        }
-
-        public void showNewMesh(bool v)
-        {
-            newMesh.gameObject.SetActive(v);
-        }
-
-        public void saveMesh(string name)
-        {
-            ObjMesh saver = new ObjMesh(newMesh);
-            saver.writeToFile(name, true);
-        }
-
         //Starts creating the Faces in the patch specified by the selected vertices
         public void createFace()
         {
+            removeLines();
             List<Vertex> selectedVertices = myMesh.getSelectedVertices();
             List<int> verticesIndices = new List<int>();
 
@@ -233,10 +257,12 @@ namespace BachelorArbeitUnity
                     Vertex v;
 
                     //Test if Vertex already Exists
-                    if (patchHolder.vertexExists(vHnPatchHolder)) {
+                    if (patchHolder.vertexExists(vHnPatchHolder))
+                    {
                         v = patchHolder.getVertexAt(vHnPatchHolder);
                     }
-                    else{ 
+                    else
+                    {
                         v = patchHolder.addVertex(selectedVertices[i].getPosition());
                         InformationHolder.myMeshToPatchHolder[vHnMyMesh] = v.getHandleNumber();
                     }
@@ -244,16 +270,21 @@ namespace BachelorArbeitUnity
                 }
                 Face f = patchHolder.addFace(verticesIndices);
 
-                foreach (Edge e in f.getEdges())
+                List<Edge> edges = f.getEdges();
+                int count = 0;
+                for (int i = 0; i < edges.Count - 1; i++)
                 {
-                    e.setSepNumber(2);
-                    e.setVerticesOnEdge(addVerticesBetween(e.getV1(), e.getDirection(), e, newMesh));
+                    if (edges[i].getSepNumber() <= 0)
+                    {
+                        edges[i].setSepNumber(2);
+                    }
+                    count += edges[i].getSepNumber();
                 }
-
-                executePatch(f, newMesh, patchHolder);
-                patchHolder.updateMesh();
-                newMesh.updateMesh();
+                edges[edges.Count - 1].setSepNumber(2 + count % 2);
                 myMesh.clearSelectedVertices();
+                patchHolder.updateMesh();
+
+                refreshRefinedMesh();
             }
             else
             {
@@ -261,15 +292,126 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void deleteSelectedFace() {
+        public void deleteSelectedFace()
+        {
             patchHolder.deleteSelectedFace();
             patchHolder.getFaces().Remove(patchHolder.getSelectedFace());
             patchHolder.updateMesh();
-            newMesh.updateMesh();
+            refinedMesh.updateMesh();
+            removeLines();
+        }
+
+        public void removeLines()
+        {
+            foreach (GameObject o in lines)
+            {
+                Destroy(o);
+            }
+            lines.Clear();
+        }
+
+        public void refreshRefinedMesh()
+        {
+            foreach (HalfEdge he in patchHolder.getHalfEdges())
+            {
+                he.resetValues();
+            }
+            foreach (Edge e in patchHolder.getEdges())
+            {
+                e.resetValues();
+            }
+            foreach (Face f in patchHolder.getFaces())
+            {
+                f.resetValues();
+            }
+
+            refinedMesh.loadEmptyFromMesh(patchHolder);
+
+            addCornerVertices(refinedMesh, patchHolder);
+
+            addVerticesOnEdge(refinedMesh, patchHolder);
+
+            foreach (Face f in patchHolder.getFaces())
+            {
+                if (f.isValid())
+                {
+                    executePatch(f, refinedMesh, patchHolder);
+                }
+            }
+            refinedMesh.updateMesh();
+        }
+
+        public void addCornerVertices(MeshStruct newMesh, MeshStruct oldMesh)
+        {
+            foreach (Vertex v in oldMesh.getVertices())
+            {
+                if (v.isValid())
+                {
+                    Vertex newV = newMesh.addVertex(v.getPosition());
+                    foreach (Edge e in v.getEdges())
+                    {
+                        if (e.isValid())
+                        {
+                            if (e.getV1().Equals(v))
+                            {
+                                e.setNewV1(newV);
+                            }
+                            else if (e.getV2().Equals(v))
+                            {
+                                e.setNewV2(newV);
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (Edge e in oldMesh.getEdges())
+            {
+                if (e.isValid())
+                {
+                    HalfEdge h = e.getH1();
+                    if (h != null && h.isValid())
+                    {
+                        if (h.getV1().Equals(e.getV1()))
+                        {
+                            h.setNewV1(e.getNewV1());
+                            h.setNewV2(e.getNewV2());
+                        }
+                        else if (h.getV2().Equals(e.getV1()))
+                        {
+                            h.setNewV2(e.getNewV1());
+                            h.setNewV1(e.getNewV2());
+                        }
+                    }
+
+                    h = e.getH2();
+                    if (h != null && h.isValid())
+                    {
+                        if (h.getV1().Equals(e.getV1()))
+                        {
+                            h.setNewV1(e.getNewV1());
+                            h.setNewV2(e.getNewV2());
+                        }
+                        else if (h.getV2().Equals(e.getV1()))
+                        {
+                            h.setNewV2(e.getNewV1());
+                            h.setNewV1(e.getNewV2());
+                        }
+                    }
+                }
+            }
+        }
+
+        //Adds all vertices on All Edges
+        public void addVerticesOnEdge(MeshStruct newMesh, MeshStruct oldMesh)
+        {
+            foreach (Edge e in oldMesh.getEdges())
+            {
+                e.setVerticesOnEdge(addVerticesBetween(e.getV1(), e.getDirection(), e, newMesh));
+            }
         }
 
         //Adds the Vertices on the Edge
-        public Vertex[] addVerticesBetween(Vertex v1, Vector3 direction, Edge edge, Mesh newMesh)
+        public Vertex[] addVerticesBetween(Vertex v1, Vector3 direction, Edge edge, MeshStruct newMesh)
         {
             if (edge.getSepNumber() > 0)
             {
@@ -292,7 +434,7 @@ namespace BachelorArbeitUnity
         }
 
         //Adds new Faces to the New Mesh replacing the patchFace in the patchHolder
-        public void executePatch(Face face, Mesh newMesh, Mesh oldMesh)
+        public void executePatch(Face face, MeshStruct newMesh, MeshStruct oldMesh)
         {
             int sumOfSepNumbers = 0;
             foreach (Edge e in face.getEdges())

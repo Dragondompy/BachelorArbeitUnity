@@ -13,20 +13,23 @@ namespace BachelorArbeitUnity
         private Vertex v1;
         private Vertex v2;
         private int sepNumber;
-        private Mesh m;
+        private MeshStruct m;
         private GameObject EdgeObject;
 
         private Vertex[] verticesOnEdge;
+        private Vertex newV1;
+        private Vertex newV2;
 
         private int handleNumber;
 
-        public Edge(Vertex v1, Vertex v2, Face f, Mesh m)
+        public Edge(Vertex v1, Vertex v2, Face f, MeshStruct m)
         {
             setV1(v1);
             setV2(v2);
             v1.addEdge(this);
             v2.addEdge(this);
             f1 = f;
+            sepNumber = -1;
 
             this.m = m;
         }
@@ -49,7 +52,7 @@ namespace BachelorArbeitUnity
 
         //adds face to the list of faces of this edge
         //also adds the vertices in different order to the edges
-        public void addFace(Face f, Mesh m)
+        public void addFace(Face f, MeshStruct m)
         {
             f2 = f;
         }
@@ -106,7 +109,7 @@ namespace BachelorArbeitUnity
 
         public void remHalfEdge(HalfEdge he)
         {
-            if ((h1 == null||!h1.isValid()) && (h2 == null || !h2.isValid()))
+            if ((h1 == null || !h1.isValid()) && (h2 == null || !h2.isValid()))
             {
                 delete();
             }
@@ -166,17 +169,6 @@ namespace BachelorArbeitUnity
             }
         }
 
-        internal void updateTransform()
-        {/*
-            Quaternion rot = Quaternion.LookRotation(direction()); ;
-            Vector3 pos = middlePoint();
-            EdgeObject.transform.position = pos;
-            EdgeObject.transform.rotation = rot;
-            EdgeObject.transform.localScale = new Vector3(m.getSize(), m.getSize(), direction().magnitude / 2);
-
-            m.updateFaces(f1, f2);*/
-        }
-
         //Calculates the direction from v1 to v2
         public Vector3 direction()
         {
@@ -201,6 +193,13 @@ namespace BachelorArbeitUnity
             return output;
         }
 
+        public void resetValues()
+        {
+            verticesOnEdge = null;
+            newV1 = null;
+            newV2 = null;
+        }
+        
         //returns if the edge is valid or deleted
         public Boolean isValid()
         {
@@ -225,6 +224,26 @@ namespace BachelorArbeitUnity
         public Face getF2()
         {
             return f2;
+        }
+
+        public HalfEdge getH1()
+        {
+            return h1;
+        }
+
+        public HalfEdge getH2()
+        {
+            return h2;
+        }
+
+        public Vertex getNewV1()
+        {
+            return newV1;
+        }
+
+        public Vertex getNewV2()
+        {
+            return newV2;
         }
 
         public int getHandleNumber()
@@ -265,6 +284,16 @@ namespace BachelorArbeitUnity
         public void setF2(Face f)
         {
             this.f2 = f;
+        }
+
+        public void setNewV1(Vertex v)
+        {
+            this.newV1 = v;
+        }
+
+        public void setNewV2(Vertex v)
+        {
+            this.newV2 = v;
         }
 
         public void setHandleNumber(int handleNumber)

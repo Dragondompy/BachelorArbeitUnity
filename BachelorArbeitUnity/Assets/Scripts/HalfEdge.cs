@@ -5,105 +5,128 @@ using UnityEngine;
 namespace BachelorArbeitUnity
 {
     public class HalfEdge
-	{
-		private Vertex v1;
-		private Vertex v2;
-		private Face f;
-		private Edge e;
-		private int handleNumber;
-		private int[,] additionalVertices;
-		private Vertex[] verticesOnEdge;
-		private int outerFlow;
-		private int reduced;
+    {
+        private Vertex v1;
+        private Vertex v2;
+        private Face f;
+        private Edge e;
+        private int handleNumber;
 
-		public HalfEdge (Vertex v1,Vertex v2,Edge e, Face f, Mesh m)
-		{
-			setV1 (v1);
-			setV2 (v2);
-			outerFlow = 0;
-			reduced = -1;
-			setE (e);
-			setFace (f);
+        private int outerFlow;
+        private int reduced;
+        private Vertex newV1;
+        private Vertex newV2;
+        private int[,] additionalVertices;
+        private Vertex[] verticesOnEdge;
 
-			e.addHalfEdge (this);
-			this.handleNumber = m.getHalfEdgeHandleNumber ();
-			m.getHalfEdges ().Add (this);
-		}
+        public HalfEdge(Vertex v1, Vertex v2, Edge e, Face f, MeshStruct m)
+        {
+            setV1(v1);
+            setV2(v2);
+            outerFlow = 0;
+            reduced = -1;
+            setE(e);
+            setFace(f);
 
-		public Boolean contains (Vertex v)
-		{
-			return e.contains (v);
-		}
+            e.addHalfEdge(this);
+            this.handleNumber = m.getHalfEdgeHandleNumber();
+            m.getHalfEdges().Add(this);
+        }
 
-		//adds the vertex in an outer flow to the halfedge
-		public void addVertex (Vertex v, int flow, int index)
-		{
-			if (inrange (flow, index)) {
-				additionalVertices [flow, index] = v.getHandleNumber ();
-			}
-		}
+        public Boolean contains(Vertex v)
+        {
+            return e.contains(v);
+        }
 
-		//tests if the vertex in the flow at the position exists
-		public int exists (int flow, int index)
-		{
-			if (inrange (flow, index)) {
-				return additionalVertices [flow, index];
-			} else {
-				return -2;
-			}
-		}
+        //adds the vertex in an outer flow to the halfedge
+        public void addVertex(Vertex v, int flow, int index)
+        {
+            if (inrange(flow, index))
+            {
+                additionalVertices[flow, index] = v.getHandleNumber();
+            }
+        }
 
-		//tests if the vertex at the position can and should be added to the halfedge
-		public Boolean inrange (int flow, int index)
-		{
-			if (flow < outerFlow && index < getSepNumber () - 1)
-				return true;
-			return false;
+        //tests if the vertex in the flow at the position exists
+        public int exists(int flow, int index)
+        {
+            if (inrange(flow, index))
+            {
+                return additionalVertices[flow, index];
+            }
+            else
+            {
+                return -2;
+            }
+        }
 
-		}
+        //tests if the vertex at the position can and should be added to the halfedge
+        public Boolean inrange(int flow, int index)
+        {
+            if (flow < outerFlow && index < getSepNumber() - 1)
+                return true;
+            return false;
 
-		public void createVerticesArray ()
-		{
-			additionalVertices = new int[outerFlow, getSepNumber () - 1];
-			for (int i = 0; i < additionalVertices.GetLength (0); i++) {
-				for (int j = 0; j < additionalVertices.GetLength (1); j++) {
-					additionalVertices [i, j] = -1;
-				}
-			}
-		}
+        }
 
-		public void addOuterFlow ()
-		{
-			outerFlow++;
-		}
+        public void createVerticesArray()
+        {
+            additionalVertices = new int[outerFlow, getSepNumber() - 1];
+            for (int i = 0; i < additionalVertices.GetLength(0); i++)
+            {
+                for (int j = 0; j < additionalVertices.GetLength(1); j++)
+                {
+                    additionalVertices[i, j] = -1;
+                }
+            }
+        }
 
-		public void reduceSep ()
-		{
-			if (reduced < 0)
-				throw new Exception ("SepNumber has not been set correctly");
-			reduced--;
-		}
+        public void addOuterFlow()
+        {
+            outerFlow++;
+        }
 
-		public void setVerticesOnEdge (Vertex[] voe)
-		{
-			if (voe.Length > 0 && voe [0].distanceTo (v1) > voe [0].distanceTo (v2)) {
-				Vertex[] turnedAround = new Vertex[voe.Length];
-				for (int i = 0; i < turnedAround.Length; i++) {
-					turnedAround [turnedAround.Length - i - 1] = voe [i];
-				}
-				voe = turnedAround;
-			}
-			verticesOnEdge = voe;
-		}
+        public void reduceSep()
+        {
+            if (reduced < 0)
+                throw new Exception("SepNumber has not been set correctly");
+            reduced--;
+        }
 
-		public String printVertices(){
-			String output = "";
-			output += v1;
-			foreach (Vertex v in verticesOnEdge) {
-				output += v;
-			}
-			output += v2;
-			return output;
+        public void setVerticesOnEdge(Vertex[] voe)
+        {
+            if (voe.Length > 0 && voe[0].distanceTo(v1) > voe[0].distanceTo(v2))
+            {
+                Vertex[] turnedAround = new Vertex[voe.Length];
+                for (int i = 0; i < turnedAround.Length; i++)
+                {
+                    turnedAround[turnedAround.Length - i - 1] = voe[i];
+                }
+                voe = turnedAround;
+            }
+            verticesOnEdge = voe;
+        }
+
+        public String printVertices()
+        {
+            String output = "";
+            output += v1;
+            foreach (Vertex v in verticesOnEdge)
+            {
+                output += v;
+            }
+            output += v2;
+            return output;
+        }
+
+        public void resetValues()
+        {
+            reduced = -1;
+            outerFlow = 0;
+            newV1 = null;
+            newV2 = null;
+            additionalVertices = null;
+            verticesOnEdge = null;
         }
 
         //returns if the HalfEdge is valid or deleted
@@ -112,105 +135,125 @@ namespace BachelorArbeitUnity
             return handleNumber >= 0;
         }
 
-        public void delete ()
-		{
-			handleNumber = -1;
+        public void delete()
+        {
+            handleNumber = -1;
             if (e != null && e.isValid())
             {
                 e.remHalfEdge(this);
             }
-		}
+        }
 
-		public Face getF ()
-		{
-			return f;
-		}
+        public Face getF()
+        {
+            return f;
+        }
 
-		public Edge getE ()
-		{
-			return e;
-		}
+        public Edge getE()
+        {
+            return e;
+        }
 
-		public Vertex getV1 ()
-		{
-			return v1;
-		}
+        public Vertex getV1()
+        {
+            return v1;
+        }
 
-		public Vertex getV2 ()
-		{
-			return v2;
-		}
+        public Vertex getV2()
+        {
+            return v2;
+        }
 
-		public int getReduced ()
-		{
-			return reduced;
-		}
+        public Vertex getNewV1()
+        {
+            return newV1;
+        }
 
-		public int getOuterFlow ()
-		{
-			return outerFlow;
-		}
+        public Vertex getNewV2()
+        {
+            return newV2;
+        }
 
-		public int getHandleNumber ()
-		{
-			return handleNumber;
-		}
+        public int getReduced()
+        {
+            return reduced;
+        }
 
-		public int getSepNumber ()
-		{
-			return getE ().getSepNumber ();
-		}
+        public int getOuterFlow()
+        {
+            return outerFlow;
+        }
 
-		public Vertex[] getVerticesOnEdge ()
-		{
-			return verticesOnEdge;
-		}
+        public int getHandleNumber()
+        {
+            return handleNumber;
+        }
 
-		public int[,] getAdditionalVertices ()
-		{
-			return additionalVertices;
-		}
+        public int getSepNumber()
+        {
+            return getE().getSepNumber();
+        }
 
-		public void setFace (Face f)
-		{
-			this.f = f;
-		}
+        public Vertex[] getVerticesOnEdge()
+        {
+            return verticesOnEdge;
+        }
 
-		public void setE (Edge e)
-		{
-			this.e = e;
-		}
+        public int[,] getAdditionalVertices()
+        {
+            return additionalVertices;
+        }
 
-		public void setV1 (Vertex v)
-		{
-			this.v1 = v;
-		}
+        public void setFace(Face f)
+        {
+            this.f = f;
+        }
 
-		public void setV2 (Vertex v)
-		{
-			this.v2 = v;
-		}
+        public void setE(Edge e)
+        {
+            this.e = e;
+        }
 
-		public void setReduced (int reduced)
-		{
-			this.reduced = reduced;
-		}
+        public void setV1(Vertex v)
+        {
+            this.v1 = v;
+        }
 
-		public void setOuterFlow (int outerFlow)
-		{
-			this.outerFlow = outerFlow;
-		}
+        public void setV2(Vertex v)
+        {
+            this.v2 = v;
+        }
 
-		public override string ToString ()
-		{
-			return "HalfEdge:\n from  " + v1 + "\n to    " + v2 +
-			"\n Reduced SepNumber: " + reduced + "\n Amount of Flow: " + outerFlow + "\n";
-		}
+        public void setNewV1(Vertex v)
+        {
+            this.newV1 = v;
+        }
 
-		public bool Equals (HalfEdge he)
-		{
-			return this.getHandleNumber () == he.getHandleNumber ();
-		}
-	}
+        public void setNewV2(Vertex v)
+        {
+            this.newV2 = v;
+        }
+
+        public void setReduced(int reduced)
+        {
+            this.reduced = reduced;
+        }
+
+        public void setOuterFlow(int outerFlow)
+        {
+            this.outerFlow = outerFlow;
+        }
+
+        public override string ToString()
+        {
+            return "HalfEdge:\n from  " + v1 + "\n to    " + v2 +
+            "\n Reduced SepNumber: " + reduced + "\n Amount of Flow: " + outerFlow + "\n";
+        }
+
+        public bool Equals(HalfEdge he)
+        {
+            return this.getHandleNumber() == he.getHandleNumber();
+        }
+    }
 }
 

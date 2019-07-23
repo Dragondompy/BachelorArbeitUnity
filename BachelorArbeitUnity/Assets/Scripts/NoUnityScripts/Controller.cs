@@ -106,7 +106,6 @@ namespace BachelorArbeitCSharp
 		//Adds all vertices on All Edges
 		public void addVerticesOnEdge (Mesh oldMesh, Mesh newMesh)
 		{
-
 			List<Edge> edges = oldMesh.getEdges ();
 
 			foreach (Edge e in edges) {

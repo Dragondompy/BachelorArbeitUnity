@@ -14,7 +14,7 @@ namespace BachelorArbeitUnity
 			this.beta = beta;
 		}
 
-		public override void createFaces (Mesh newMesh, Face f,List<List<int>> innerListVertices)
+		public override void createFaces (MeshStruct newMesh, Face f,List<List<int>> innerListVertices)
 		{
 			List<SyntheticEdge> edges = createSyntheticEdges (innerListVertices);
 			List<int> faceList = new List<int> ();

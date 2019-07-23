@@ -12,9 +12,9 @@ namespace BachelorArbeitUnity
         private List<Vertex> innerVertices;
 
         private int handleNumber;
-        private Mesh mesh;
+        private MeshStruct mesh;
 
-        public Face(Mesh m)
+        public Face(MeshStruct m)
         {
             vertices = new List<Vertex>();
             edges = new List<Edge>();
@@ -104,6 +104,11 @@ namespace BachelorArbeitUnity
             throw new Exception("the given Halfedge \n" + he + "\n is not in this Face \n" + this);
         }
 
+        public void resetValues()
+        {
+            innerVertices.Clear();
+        }
+
         public void delete()
         {
             handleNumber = -1;
@@ -149,7 +154,7 @@ namespace BachelorArbeitUnity
             return handleNumber;
         }
 
-        public Mesh getMesh()
+        public MeshStruct getMesh()
         {
             return mesh;
         }
@@ -169,14 +174,14 @@ namespace BachelorArbeitUnity
             this.handleNumber = handleNumber;
         }
 
-        public void setMesh(Mesh m)
+        public void setMesh(MeshStruct m)
         {
             this.mesh = m;
         }
 
         public override string ToString()
         {
-            string output = "Face " +handleNumber+"\n";
+            string output = "Face " + handleNumber + "\n";
             foreach (Vertex v in vertices)
             {
                 output += v + "\n";

@@ -69,7 +69,7 @@
     <Compile Include="Assets\Scripts\Flow.cs" />
     <Compile Include="Assets\Scripts\HalfEdge.cs" />
     <Compile Include="Assets\Scripts\InformationHolder.cs" />
-    <Compile Include="Assets\Scripts\Mesh.cs" />
+    <Compile Include="Assets\Scripts\MeshStruct.cs" />
     <Compile Include="Assets\Scripts\Movement\CameraMovement.cs" />
     <Compile Include="Assets\Scripts\NoUnityScripts\Controller.cs" />
     <Compile Include="Assets\Scripts\NoUnityScripts\Edge.cs" />
