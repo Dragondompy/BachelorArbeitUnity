@@ -104,6 +104,32 @@ namespace BachelorArbeitUnity
             throw new Exception("the given Halfedge \n" + he + "\n is not in this Face \n" + this);
         }
 
+        public List<Edge> getInnerEdges()
+        {
+            List<Edge> innerEdges = new List<Edge>();
+
+            foreach (Edge e in edges)
+            {
+                Vertex prevVertex = e.getNewV1();
+                foreach (Vertex v in e.getVerticesOnEdge()) {
+                    innerEdges.Add(prevVertex.isConnected(v));
+                    prevVertex = v;
+                }
+
+                innerEdges.Add(prevVertex.isConnected(e.getNewV2()));
+            }
+
+            foreach (Vertex v in innerVertices) {
+                foreach (Edge e in v.getEdges()) {
+                    if (!innerEdges.Contains(e)) {
+                        innerEdges.Add(e);
+                    }
+                }
+            }
+
+            return innerEdges;
+        }
+
         public void resetValues()
         {
             innerVertices.Clear();

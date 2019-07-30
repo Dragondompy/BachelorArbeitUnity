@@ -169,6 +169,18 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void increaseSepNumber()
+        {
+            sepNumber += 1;
+        }
+
+        public void decreaseSepNumber()
+        {
+            if (sepNumber > 1) {
+                sepNumber -= 1;
+            }
+        }
+
         //Calculates the direction from v1 to v2
         public Vector3 direction()
         {
@@ -303,7 +315,7 @@ namespace BachelorArbeitUnity
 
         public override string ToString()
         {
-            return ("Edge:\n from  " + v1 + "\n to    " + v2 + "\n SeperationNumber: " + sepNumber + "\n");
+            return ("Edge "+handleNumber+"\n from  " + v1 + "\n to    " + v2 + "\n SeperationNumber: " + sepNumber + "\n");
         }
 
         public bool Equals(Edge e)

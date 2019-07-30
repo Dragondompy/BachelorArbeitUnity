@@ -153,30 +153,27 @@ namespace BachelorArbeitUnity
                     GameObject objhit = meshCollider.gameObject;
                     if (objhit.CompareTag("MeshObject"))
                     {
-                        UnityEngine.Mesh mesh = meshCollider.sharedMesh;
+                        Mesh mesh = meshCollider.sharedMesh;
                         Transform hitTransform = hit.collider.transform;
                         Vector3 impactPoint = hit.point;
 
-                        Vector3[] vertices = mesh.vertices;
-                        int[] triangles = mesh.triangles;
-                        Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
-                        Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
-                        Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
-
-                        p0 = hitTransform.TransformPoint(p0);
-                        p1 = hitTransform.TransformPoint(p1);
-                        p2 = hitTransform.TransformPoint(p2);
-
-                        float d0 = (impactPoint - p0).magnitude;
-                        float d1 = (impactPoint - p1).magnitude;
-                        float d2 = (impactPoint - p2).magnitude;
-
-                        int v0 = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 1]];
-                        int v1 = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 1]];
-                        int v2 = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 2]];
-
                         if (InformationHolder.selectVertices)
                         {
+                            Vector3[] vertices = mesh.vertices;
+                            int[] triangles = mesh.triangles;
+
+                            Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
+                            Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
+                            Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
+
+                            p0 = hitTransform.TransformPoint(p0);
+                            p1 = hitTransform.TransformPoint(p1);
+                            p2 = hitTransform.TransformPoint(p2);
+
+                            float d0 = (impactPoint - p0).magnitude;
+                            float d1 = (impactPoint - p1).magnitude;
+                            float d2 = (impactPoint - p2).magnitude;
+
                             int vertexIndex = -1;
                             if (d0 < d1 && d0 < d2)
                             {
@@ -195,29 +192,38 @@ namespace BachelorArbeitUnity
                         }
                         else if (InformationHolder.selectEdge)
                         {
-                            Edge e;
-                            if (d1 < d0 && d2 < d0)
+                            Face f = patchHolder.getFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
+                            Edge edge = null;
+                            if (f != null)
                             {
-                                e = myMesh.getVertexAt(v1).isConnected(myMesh.getVertexAt(v2));
-                            }
-                            else if (d0 < d1 && d2 < d1)
-                            {
-                                e = myMesh.getVertexAt(v0).isConnected(myMesh.getVertexAt(v2));
-                            }
-                            else if (d0 < d2 && d1 < d2)
-                            {
-                                e = myMesh.getVertexAt(v0).isConnected(myMesh.getVertexAt(v1));
-                            }
-                            else
-                            {
-                                e = null;
-                            }
+                                float min = float.MaxValue;
+                                foreach (Edge e in f.getEdges())
+                                {
+                                    Vector3 linePoint = e.getV1().getPosition();
+                                    Vector3 lineVec = e.getV2().getPosition() - e.getV1().getPosition();
 
-                            if (e != null)
-                            {
-                                patchHolder.selectEdgeAt(e.getHandleNumber());
-                            }
+                                    Vector3 linePointToPoint = impactPoint - linePoint;
+                                    float t = Vector3.Dot(linePointToPoint, lineVec);
 
+                                    float distance = ((linePoint + lineVec * t) - impactPoint).magnitude;
+                                    if (distance <= min)
+                                    {
+                                        min = distance;
+                                        edge = e;
+                                    }
+                                }
+                                edge = patchHolder.selectEdgeAt(edge.getHandleNumber());
+                                removeLines();
+                                if (edge != null)
+                                {
+                                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                                    lineRend.positionCount = 2;
+                                    lineRend.SetPosition(0, edge.getV1().getPosition());
+                                    lineRend.SetPosition(1, edge.getV2().getPosition());
+                                    lines.Add(Liner);
+                                }
+                            }
                         }
                         else if (InformationHolder.selectFace)
                         {
@@ -225,7 +231,7 @@ namespace BachelorArbeitUnity
                             removeLines();
                             if (f != null)
                             {
-                                foreach (Edge e in f.getEdges())
+                                foreach (Edge e in f.getInnerEdges())
                                 {
                                     GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
                                     LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
@@ -239,6 +245,12 @@ namespace BachelorArbeitUnity
                     }
                 }
             }
+        }
+
+        public void clearSelection()
+        {
+            removeLines();
+            patchHolder.clearSelection();
         }
 
         //Starts creating the Faces in the patch specified by the selected vertices
@@ -301,6 +313,18 @@ namespace BachelorArbeitUnity
             removeLines();
         }
 
+        public void increaseSepNumber()
+        {
+            patchHolder.getSelectedEdge().increaseSepNumber();
+            refreshRefinedMesh();
+        }
+
+        public void decreaseSepNumber()
+        {
+            patchHolder.getSelectedEdge().decreaseSepNumber();
+            refreshRefinedMesh();
+        }
+
         public void removeLines()
         {
             foreach (GameObject o in lines)
@@ -338,9 +362,31 @@ namespace BachelorArbeitUnity
                     executePatch(f, refinedMesh, patchHolder);
                 }
             }
+
+            Vector3 pos = myMesh.transform.position;
+            Quaternion rot = myMesh.transform.rotation;
+
+            //Streches the refinedMesh to fit the oldMesh
+            foreach (Edge e in patchHolder.getEdges())
+            {
+                foreach (Vertex v in e.getVerticesOnEdge())
+                {
+                    Vector3 newPos = Physics.ClosestPoint(v.getPosition(), myMesh.GetComponent<MeshCollider>(), pos, rot);
+                    v.setPosition(newPos);
+                }
+            }
+            foreach (Face f in patchHolder.getFaces())
+            {
+                foreach (Vertex v in f.getInnerVertices())
+                {
+                    Vector3 newPos = Physics.ClosestPoint(v.getPosition(), myMesh.GetComponent<MeshCollider>(), pos, rot);
+                    v.setPosition(newPos);
+                }
+            }
             refinedMesh.updateMesh();
         }
 
+        //creates the corner vertices of the face in patchHolderMesh in the refinedMesh
         public void addCornerVertices(MeshStruct newMesh, MeshStruct oldMesh)
         {
             foreach (Vertex v in oldMesh.getVertices())
@@ -446,7 +492,8 @@ namespace BachelorArbeitUnity
 
             if (sumOfSepNumbers % 2 != 0)
             {
-                throw new Exception("the Sum of Seperation in a face Must be even " + sumOfSepNumbers + " is not even");
+                print("the Sum of Seperation in a face Must be even " + sumOfSepNumbers + " is not even");
+                return;
             }
 
             reducePattern(face);
@@ -523,7 +570,6 @@ namespace BachelorArbeitUnity
             }
             Patterndecider pat = new Patterndecider(reducedPattern.Count, t);
             return pat;
-
         }
     }
 }

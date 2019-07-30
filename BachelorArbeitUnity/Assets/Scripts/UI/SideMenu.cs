@@ -42,6 +42,7 @@ namespace BachelorArbeitUnity
 
         public void setSelectVertex()
         {
+            InformationHolder.con.clearSelection();
             if (InformationHolder.selectVertices)
             {
                 InformationHolder.selectVertices = false;
@@ -62,6 +63,7 @@ namespace BachelorArbeitUnity
 
         public void setSelectEdge()
         {
+            InformationHolder.con.clearSelection();
             if (InformationHolder.selectEdge)
             {
                 InformationHolder.selectEdge = false;
@@ -82,6 +84,7 @@ namespace BachelorArbeitUnity
 
         public void setSelectFace()
         {
+            InformationHolder.con.clearSelection();
             if (InformationHolder.selectFace)
             {
                 InformationHolder.selectFace = false;
@@ -165,6 +168,16 @@ namespace BachelorArbeitUnity
 
         public void deleteFace() {
             InformationHolder.con.deleteSelectedFace();
+        }
+
+        public void increaseSepNumber()
+        {
+            InformationHolder.con.increaseSepNumber();
+        }
+
+        public void decreaseSepNumber()
+        {
+            InformationHolder.con.decreaseSepNumber();
         }
 
         public void saveNewMesh()

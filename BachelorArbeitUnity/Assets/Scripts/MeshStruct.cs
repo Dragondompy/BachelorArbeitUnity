@@ -233,9 +233,23 @@ namespace BachelorArbeitUnity
             selectedVertices.Clear();
         }
 
-        public void selectEdgeAt(int e)
+        public void clearSelection() {
+            selectedFace = null;
+            selectedEdge = null;
+            clearSelectedVertices();
+        }
+
+        public Edge selectEdgeAt(int e)
         {
-            selectedEdge = edges[e];
+            if (selectedEdge != null && selectedEdge.Equals(edges[e]))
+            {
+                selectedEdge = null;
+            }
+            else
+            {
+                selectedEdge = edges[e];
+            }
+            return selectedEdge;
         }
 
         public Face selectFaceAt(int f)
@@ -247,11 +261,6 @@ namespace BachelorArbeitUnity
             else
             {
                 selectedFace = faces[f];
-                print(selectedFace);
-                foreach (Edge e in selectedFace.getEdges())
-                {
-                    Debug.DrawLine(e.getV1().getPosition(), e.getV2().getPosition(), Color.red, 1f);
-                }
             }
             return selectedFace;
         }
@@ -272,7 +281,7 @@ namespace BachelorArbeitUnity
         {
             ObjMesh helper = new ObjMesh(this);
             ObjLoader loader = new ObjLoader();
-            UnityEngine.Mesh ownMesh = loader.newLoad(helper);
+            Mesh ownMesh = loader.newLoad(helper);
             gameObject.GetComponent<MeshFilter>().mesh = ownMesh;
             gameObject.GetComponent<MeshCollider>().sharedMesh = ownMesh;
             splitToNotSplitVertices = loader.getSplitToNotSplitVertices();
@@ -294,6 +303,7 @@ namespace BachelorArbeitUnity
             Debug.Log("There is no Vertex at " + v);
             return new Vertex("Empty");
         }
+
         public Edge getEdgeAt(int e)
         {
             if (edgeExists(e))
@@ -303,6 +313,7 @@ namespace BachelorArbeitUnity
             Debug.Log("There is no Edge at " + e);
             return new Edge("Empty");
         }
+
         public Face getFaceAt(int f)
         {
             if (faceExists(f))
@@ -351,6 +362,11 @@ namespace BachelorArbeitUnity
         public List<Vertex> getSelectedVertices()
         {
             return selectedVertices;
+        }
+
+        public Edge getSelectedEdge()
+        {
+            return selectedEdge;
         }
 
         public Face getSelectedFace()
