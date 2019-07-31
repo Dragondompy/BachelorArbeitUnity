@@ -31,14 +31,6 @@ namespace BachelorArbeitUnity
         // Start is called before the first frame update
         void Start()
         {
-            /*for (int i = 0; i < 1000; i++)
-            {
-                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                lineRend.positionCount = 2;
-                lineRend.SetPosition(0, new Vector3(0, i * 0.01f, 0));
-                lineRend.SetPosition(1, new Vector3(1, i * 0.01f, 0));
-            }*/
             InformationHolder.con = this;
             this.objName = InformationHolder.pathToMesh;
 
@@ -125,7 +117,6 @@ namespace BachelorArbeitUnity
         {
             if (Input.GetMouseButtonDown(0))
             {
-
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 LayerMask mask = new LayerMask();
@@ -371,16 +362,39 @@ namespace BachelorArbeitUnity
             {
                 foreach (Vertex v in e.getVerticesOnEdge())
                 {
-                    Vector3 newPos = Physics.ClosestPoint(v.getPosition(), myMesh.GetComponent<MeshCollider>(), pos, rot);
-                    v.setPosition(newPos);
+                    //Vector3 newPos = Physics.ClosestPoint(v.getPosition(), myMesh.GetComponent<MeshCollider>(), pos, rot);
+                    //v.setPosition(newPos);
                 }
             }
             foreach (Face f in patchHolder.getFaces())
             {
                 foreach (Vertex v in f.getInnerVertices())
                 {
-                    Vector3 newPos = Physics.ClosestPoint(v.getPosition(), myMesh.GetComponent<MeshCollider>(), pos, rot);
-                    v.setPosition(newPos);
+                    Vector3 prevDir = v.getEdges()[v.getEdges().Count - 1].getDirection();
+                    Vector3 dir = new Vector3(0, 0, 0);
+                    foreach (Edge e in v.getEdges())
+                    {
+                        Vector3 newDir = Vector3.Cross(prevDir, e.getDirection());
+                        if (newDir.magnitude > 0.01)
+                        {
+                            dir += newDir;
+                        }
+
+                        prevDir = e.getDirection();
+                    }
+                    dir = dir.normalized;
+
+                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                    lineRend.positionCount = 2;
+                    lineRend.SetPosition(0, v.getPosition());
+                    lineRend.SetPosition(1, v.getPosition() + dir);
+
+                    RaycastHit hit;
+                    Ray ray = new Ray(v.getPosition()+dir, -dir);
+                    Physics.Raycast(ray, out hit, float.MaxValue, maskOrg);
+                    //TODO better nearest point on Mesh
+                    v.setPosition(hit.point);
                 }
             }
             refinedMesh.updateMesh();
