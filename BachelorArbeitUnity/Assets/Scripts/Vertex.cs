@@ -8,6 +8,7 @@ namespace BachelorArbeitUnity
     {
         private int handleNumber;
         private Vector3 position;
+        private Vector3 newPosition;
         private GameObject VertexObject;
         private bool isSelected;
         private bool isCreated;
@@ -64,7 +65,8 @@ namespace BachelorArbeitUnity
         public void remEdge(Edge edge)
         {
             edges.Remove(edge);
-            if (edges.Count <= 0) {
+            if (edges.Count <= 0)
+            {
                 delete();
             }
         }
@@ -73,6 +75,11 @@ namespace BachelorArbeitUnity
         {
 
             return (getPosition() - v.getPosition()).magnitude;
+        }
+
+        public void updatePosition()
+        {
+            setPosition(newPosition);
         }
 
         //returns if the vertex is valid or deleted
@@ -84,6 +91,11 @@ namespace BachelorArbeitUnity
         public Vector3 getPosition()
         {
             return position;
+        }
+
+        public Vector3 getNewPosition()
+        {
+            return newPosition;
         }
 
         public GameObject getVertexObject()
@@ -114,9 +126,12 @@ namespace BachelorArbeitUnity
         public void setPosition(Vector3 pos)
         {
             position = pos;
-            //VertexObject.transform.position = pos;
+            newPosition = pos;
+        }
 
-            //m.updateEdges(edges);
+        public void setNewPosition(Vector3 pos)
+        {
+            newPosition = pos;
         }
 
         public void setVertexObject(GameObject vo)

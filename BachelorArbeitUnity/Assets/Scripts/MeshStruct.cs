@@ -7,8 +7,6 @@ namespace BachelorArbeitUnity
     public class MeshStruct : MonoBehaviour
     {
         private GameObject VertexObj;
-        private GameObject EdgeObj;
-        private GameObject FaceObj;
 
         private EmptyPattern utils;
         private List<Vertex> vertices;
@@ -65,7 +63,7 @@ namespace BachelorArbeitUnity
                 addVertex(v.getPosition());
             }
         }
-        
+
         //initializes Empty Mesh
         public void loadEmptyFromMesh(MeshStruct old)
         {
@@ -80,11 +78,9 @@ namespace BachelorArbeitUnity
             size = old.getSize(); ;
         }
 
-        public void addGameObjects(GameObject vOb, GameObject eOb, GameObject fObj)
+        public void addGameObjects(GameObject vOb)
         {
             VertexObj = vOb;
-            EdgeObj = eOb;
-            FaceObj = fObj;
         }
 
         public float calcSize(List<Vector3> verts)
@@ -227,13 +223,14 @@ namespace BachelorArbeitUnity
         {
             foreach (Vertex v in selectedVertices)
             {
-                v.setIsSelected(false);
                 Destroy(v.getVertexObject());
+                v.setIsSelected(false);
             }
             selectedVertices.Clear();
         }
 
-        public void clearSelection() {
+        public void clearSelection()
+        {
             selectedFace = null;
             selectedEdge = null;
             clearSelectedVertices();

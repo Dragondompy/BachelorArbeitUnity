@@ -30,8 +30,8 @@ namespace BachelorArbeitUnity
             InformationHolder.showOriginal = true;
             setBtnActive(btnShowOriginal, true);
 
-            InformationHolder.showPatches = true;
-            setBtnActive(btnShowPatches, true);
+            InformationHolder.showPatches = false;
+            setBtnActive(btnShowPatches, false);
 
             InformationHolder.showNewMesh = true;
             setBtnActive(btnShowNewMesh, true);
