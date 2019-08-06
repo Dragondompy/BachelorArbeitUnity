@@ -130,6 +130,13 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void scaleMesh(float size) {
+            for(int i=0;i<vertices.Count;i++)
+            {
+                vertices[i] = vertices[i] * size;
+            }
+        }
+
         public void writeToFile(String fileName,bool overwrite)
         {
             String path = "./Assets/Meshes/" + fileName + ".obj";

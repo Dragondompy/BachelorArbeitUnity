@@ -129,6 +129,11 @@ namespace BachelorArbeitUnity
             verticesOnEdge = null;
         }
 
+        public Vector3 getDirection()
+        {
+            return v2.getPosition() - v1.getPosition();
+        }
+
         //returns if the HalfEdge is valid or deleted
         public Boolean isValid()
         {

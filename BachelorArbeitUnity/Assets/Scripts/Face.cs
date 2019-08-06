@@ -111,7 +111,8 @@ namespace BachelorArbeitUnity
             foreach (Edge e in edges)
             {
                 Vertex prevVertex = e.getNewV1();
-                foreach (Vertex v in e.getVerticesOnEdge()) {
+                foreach (Vertex v in e.getVerticesOnEdge())
+                {
                     innerEdges.Add(prevVertex.isConnected(v));
                     prevVertex = v;
                 }
@@ -119,9 +120,12 @@ namespace BachelorArbeitUnity
                 innerEdges.Add(prevVertex.isConnected(e.getNewV2()));
             }
 
-            foreach (Vertex v in innerVertices) {
-                foreach (Edge e in v.getEdges()) {
-                    if (!innerEdges.Contains(e)) {
+            foreach (Vertex v in innerVertices)
+            {
+                foreach (Edge e in v.getEdges())
+                {
+                    if (!innerEdges.Contains(e))
+                    {
                         innerEdges.Add(e);
                     }
                 }
@@ -152,6 +156,18 @@ namespace BachelorArbeitUnity
                     he.delete();
                 }
             }
+        }
+
+        public Vector3 getNormal()
+        {
+            HalfEdge prevEdge = halfEdges[edges.Count - 1];
+            Vector3 normal = new Vector3(0, 0, 0);
+            foreach (HalfEdge e in halfEdges) {
+                normal += Vector3.Cross(prevEdge.getDirection(), e.getDirection());
+
+                prevEdge = e;
+            }
+            return normal.normalized;
         }
 
         //returns if the face is valid or deleted

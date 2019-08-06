@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace BachelorArbeitUnity
 {
@@ -20,14 +21,14 @@ namespace BachelorArbeitUnity
         public Material patchesMaterial;
         public Material newMeshMaterial;
 
-        private string objName;
-        private List<GameObject> lines;
-        private List<GameObject> meshLines;
-
         Camera cam;
         MeshStruct myMesh;
         MeshStruct patchHolder;
         MeshStruct refinedMesh;
+
+        private string objName;
+        private List<GameObject> lines;
+        private List<GameObject> meshLines;
 
         // Start is called before the first frame update
         void Start()
@@ -49,6 +50,7 @@ namespace BachelorArbeitUnity
             MeshOB.layer = 8;
 
             ObjMesh o = new ObjMesh("./Assets/Meshes/" + objName + ".obj");
+            o.scaleMesh(20);
 
             MeshOB.name = "Original";
             MeshOB.layer = 10;
@@ -116,11 +118,61 @@ namespace BachelorArbeitUnity
             saver.writeToFile(name, true);
         }
 
+        public void deleteSelectedFace()
+        {
+            patchHolder.deleteSelectedFace();
+            patchHolder.getFaces().Remove(patchHolder.getSelectedFace());
+            patchHolder.updateMesh();
+            refreshRefinedMesh();
+            removeLines();
+        }
+
+        public void increaseSepNumber()
+        {
+            if (patchHolder.getSelectedEdge() != null)
+            {
+                patchHolder.getSelectedEdge().increaseSepNumber();
+                refreshRefinedMesh();
+            }
+        }
+
+        public void decreaseSepNumber()
+        {
+            if (patchHolder.getSelectedEdge() != null)
+            {
+                patchHolder.getSelectedEdge().decreaseSepNumber();
+                refreshRefinedMesh();
+            }
+        }
+
+        public void removeLines()
+        {
+            foreach (GameObject o in lines)
+            {
+                Destroy(o);
+            }
+            lines.Clear();
+        }
+
+        public void removeMeshLines()
+        {
+            foreach (GameObject o in meshLines)
+            {
+                Destroy(o);
+            }
+            meshLines.Clear();
+        }
+
         // Update is called once per frame
         void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
+                if (EventSystem.current.IsPointerOverGameObject(0) || EventSystem.current.IsPointerOverGameObject(-1))
+                {
+                    return;
+                }
+
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 LayerMask mask = new LayerMask();
@@ -213,9 +265,16 @@ namespace BachelorArbeitUnity
                                 {
                                     GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
                                     LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                                    lineRend.positionCount = 2;
-                                    lineRend.SetPosition(0, edge.getV1().getPosition());
-                                    lineRend.SetPosition(1, edge.getV2().getPosition());
+                                    lineRend.positionCount = edge.getSepNumber() + 1;
+                                    int count = 0;
+                                    lineRend.SetPosition(count, edge.getV1().getPosition());
+                                    count++;
+                                    foreach (Vertex v in edge.getVerticesOnEdge())
+                                    {
+                                        lineRend.SetPosition(count, v.getPosition());
+                                        count++;
+                                    }
+                                    lineRend.SetPosition(count, edge.getV2().getPosition());
                                     lines.Add(Liner);
                                 }
                             }
@@ -299,54 +358,9 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void deleteSelectedFace()
-        {
-            patchHolder.deleteSelectedFace();
-            patchHolder.getFaces().Remove(patchHolder.getSelectedFace());
-            patchHolder.updateMesh();
-            refreshRefinedMesh();
-            removeLines();
-        }
-
-        public void increaseSepNumber()
-        {
-            if (patchHolder.getSelectedEdge() != null)
-            {
-                patchHolder.getSelectedEdge().increaseSepNumber();
-                refreshRefinedMesh();
-            }
-        }
-
-        public void decreaseSepNumber()
-        {
-            if (patchHolder.getSelectedEdge() != null)
-            {
-                patchHolder.getSelectedEdge().decreaseSepNumber();
-                refreshRefinedMesh();
-            }
-        }
-
-        public void removeLines()
-        {
-            foreach (GameObject o in lines)
-            {
-                Destroy(o);
-            }
-            lines.Clear();
-        }
-
-        public void removeMeshLines()
-        {
-            foreach (GameObject o in meshLines)
-            {
-                Destroy(o);
-            }
-            meshLines.Clear();
-        }
 
         public void refreshRefinedMesh()
         {
-            print("refreshing");
             foreach (HalfEdge he in patchHolder.getHalfEdges())
             {
                 he.resetValues();
@@ -380,28 +394,17 @@ namespace BachelorArbeitUnity
             //Streches the refinedMesh to fit the oldMesh
             foreach (Face f in patchHolder.getFaces())
             {
+                Vector3 normal = f.getNormal();
+
                 foreach (Vertex v in f.getInnerVertices())
                 {
-                    Vector3 prevDir = v.getEdges()[v.getEdges().Count - 1].getDirection();
-                    Vector3 dir = new Vector3(0, 0, 0);
-                    foreach (Edge e in v.getEdges())
+                    v.setNewPosition(fitToMesh(v, normal));
+                }
+                foreach (Edge e in f.getEdges())
+                {
+                    foreach (Vertex v in e.getVerticesOnEdge())
                     {
-                        Vector3 newDir = Vector3.Cross(prevDir, e.getDirection());
-                        if (newDir.magnitude > 0.01)
-                        {
-                            dir += newDir;
-                        }
-
-                        prevDir = e.getDirection();
-                    }
-                    dir = dir.normalized;
-
-                    RaycastHit hit;
-                    Ray ray = new Ray(v.getPosition() + dir, -3 * dir);
-                    Physics.Raycast(ray, out hit, float.MaxValue, maskOrg);
-                    if (hit.point != new Vector3(0, 0, 0))
-                    {
-                        v.setNewPosition(hit.point);
+                        v.setNewPosition(fitToMesh(v, normal));
                     }
                 }
             }
@@ -429,6 +432,14 @@ namespace BachelorArbeitUnity
                     meshLines.Add(Liner);
                 }
             }
+        }
+
+        public Vector3 fitToMesh(Vertex v, Vector3 normal)
+        {
+            RaycastHit hit;
+            Ray ray = new Ray(v.getPosition() + normal, -3 * normal);
+            Physics.Raycast(ray, out hit, float.MaxValue, maskOrg);
+            return hit.point;
         }
 
         //creates the corner vertices of the face in patchHolderMesh in the refinedMesh

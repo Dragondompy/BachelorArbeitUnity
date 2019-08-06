@@ -43,13 +43,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87d729c88fb15924f8d3edb8d60fc093, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objName: 
   MeshObject: {fileID: 3268674866036233772, guid: 76ee7410a011f3244ab3a8adfa2cb14d,
     type: 3}
   VertexObj: {fileID: 3990228018305560259, guid: f9216654ca87abd44a88f225021c4d7d,
     type: 3}
-  EdgeObj: {fileID: 0}
-  FaceObj: {fileID: 0}
   LineObj: {fileID: 7816491887593866208, guid: 7e48a77e257d4f14c912d08aba26ebbd, type: 3}
   MeshLineObj: {fileID: 7816491887593866208, guid: 3cb784dde5b4fe04b9f1e0045d99ca2c,
     type: 3}
