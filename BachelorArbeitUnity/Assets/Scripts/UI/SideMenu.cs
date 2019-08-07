@@ -18,6 +18,7 @@ namespace BachelorArbeitUnity
         public Button btnShowNewMesh;
         public Slider sliCamSpeed;
         public Slider sliCamRotSpeed;
+        public Slider sliThreshHold;
         public Button btnSaveNewMesh;
         public InputField itfSaveMeshName;
 
@@ -36,6 +37,7 @@ namespace BachelorArbeitUnity
             InformationHolder.showNewMesh = true;
             setBtnActive(btnShowNewMesh, true);
 
+            setThreshHold();
             setCamSpeed();
             setCamRotSpeed();
             showPatches();
@@ -152,14 +154,27 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void setThreshHold()
+        {
+            InformationHolder.threshHold = sliThreshHold.value;
+            sliThreshHold.GetComponentsInChildren<Text>()[0].text = ("Fitting ThreshHold " + InformationHolder.threshHold);
+        }
+
         public void setCamSpeed()
         {
             InformationHolder.camSpeed = sliCamSpeed.value;
+            sliCamSpeed.GetComponentsInChildren<Text>()[0].text = "Camera Speed " + InformationHolder.camSpeed;
         }
 
         public void setCamRotSpeed()
         {
             InformationHolder.camRotSpeed = sliCamRotSpeed.value;
+            sliCamRotSpeed.GetComponentsInChildren<Text>()[0].text = "Rotation Speed " + InformationHolder.camRotSpeed;
+        }
+
+        public void swapNormal()
+        {
+            InformationHolder.con.swapNormal();
         }
 
         public void createFace()
@@ -167,7 +182,8 @@ namespace BachelorArbeitUnity
             InformationHolder.con.createFace();
         }
 
-        public void deleteFace() {
+        public void deleteFace()
+        {
             InformationHolder.con.deleteSelectedFace();
         }
 

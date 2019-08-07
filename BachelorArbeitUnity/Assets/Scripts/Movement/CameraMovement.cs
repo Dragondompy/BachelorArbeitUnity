@@ -22,7 +22,7 @@ namespace BachelorArbeitUnity
                 yaw += Input.GetAxis("Mouse X");
 
                 pitch = Mathf.Clamp(pitch, -90f, 90f);
-                transform.rotation = Quaternion.Euler(pitch, yaw, 0);
+                transform.rotation = Quaternion.Euler(pitch * InformationHolder.camRotSpeed, yaw * InformationHolder.camRotSpeed, 0);
 
                 Vector3 direction = new Vector3(0, 0, 0);
                 if (Input.GetAxis("Vertical") != 0)

@@ -12,6 +12,7 @@ namespace BachelorArbeitUnity
         public GameObject VertexObj;
         public GameObject LineObj;
         public GameObject MeshLineObj;
+        public GameObject facePreviewObj;
 
         public LayerMask maskOrg;
         public LayerMask maskPH;
@@ -31,6 +32,7 @@ namespace BachelorArbeitUnity
         private string objName;
         private List<GameObject> lines;
         private List<GameObject> meshLines;
+        private facePreview facePre;
 
         // Start is called before the first frame update
         void Start()
@@ -44,6 +46,9 @@ namespace BachelorArbeitUnity
             initializeOldMesh();
             initializePatchHolder();
             initializeNewMesh();
+
+            GameObject FacePreObj = Instantiate(facePreviewObj, new Vector3(0, 0, 0), Quaternion.identity);
+            facePre = FacePreObj.GetComponent<facePreview>();
         }
 
         public void initializeOldMesh()
@@ -121,6 +126,12 @@ namespace BachelorArbeitUnity
         {
             ObjMesh saver = new ObjMesh(refinedMesh);
             saver.writeToFile(name, true);
+        }
+
+        public void swapNormal()
+        {
+            facePre.flipped = !facePre.flipped;
+            facePre.drawMesh(patchHolder.getSelectedVertices());
         }
 
         public void deleteSelectedFace()
@@ -208,6 +219,7 @@ namespace BachelorArbeitUnity
                         if (v != null && v.isValid())
                         {
                             patchHolder.selectVertex(v);
+                            facePre.drawMesh(patchHolder.getSelectedVertices());
                         }
                         break;
                     case "Vertex":
@@ -215,6 +227,7 @@ namespace BachelorArbeitUnity
                         if (ver != null && ver.isValid())
                         {
                             patchHolder.selectVertex(ver);
+                            facePre.drawMesh(patchHolder.getSelectedVertices());
                         }
                         break;
                     case "PatchHolder":
@@ -287,22 +300,28 @@ namespace BachelorArbeitUnity
         {
             removeLines();
             patchHolder.clearSelection();
-            myMesh.clearSelection();
+            facePre.drawMesh(patchHolder.getSelectedVertices());
         }
 
         //Starts creating the Faces in the patch specified by the selected vertices
         public void createFace()
         {
-            removeLines();
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
             List<int> verticesIndices = new List<int>();
 
             if (selectedVertices.Count > 2)
             {
+                Vector3 prevDir = selectedVertices[selectedVertices.Count - 1].getPosition();
                 foreach (Vertex v in selectedVertices)
                 {
                     verticesIndices.Add(v.getHandleNumber());
                 }
+                if (facePre.flipped)
+                {
+                    print("Flipped");
+                    verticesIndices.Reverse();
+                }
+
                 Face f = patchHolder.addFace(verticesIndices);
                 foreach (Vertex v in f.getVertices())
                 {
@@ -321,7 +340,7 @@ namespace BachelorArbeitUnity
                 }
                 edges[edges.Count - 1].setSepNumber(2 + count % 2);
 
-                patchHolder.clearSelectedVertices();
+                clearSelection();
                 patchHolder.updateMesh();
 
                 refreshRefinedMesh();
@@ -372,13 +391,13 @@ namespace BachelorArbeitUnity
 
                 foreach (Vertex v in f.getInnerVertices())
                 {
-                    v.setNewPosition(fitToMesh(v, normal));
+                    v.setNewPosition(fitToMesh(v.getPosition(), normal).point);
                 }
                 foreach (Edge e in f.getEdges())
                 {
                     foreach (Vertex v in e.getVerticesOnEdge())
                     {
-                        v.setNewPosition(fitToMesh(v, normal));
+                        v.setNewPosition(fitToMesh(v.getPosition(), normal).point);
                     }
                 }
             }
@@ -408,21 +427,21 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public Vector3 fitToMesh(Vertex v, Vector3 normal)
+        public RaycastHit fitToMesh(Vector3 pos, Vector3 normal)
         {
-            Ray ray = new Ray(v.getPosition() + 2 * normal, -normal);
-            RaycastHit[] hits = Physics.RaycastAll(ray, float.MaxValue, maskOrg);
+            Ray ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
+            RaycastHit[] hits = Physics.RaycastAll(ray, 2f, maskOrg);
             float minDis = float.MaxValue;
             RaycastHit hit = new RaycastHit();
             foreach (RaycastHit h in hits)
             {
-                if ((h.point - v.getPosition()).magnitude < minDis)
+                if ((h.point - pos).magnitude < minDis)
                 {
-                    minDis = (h.point - v.getPosition()).magnitude;
+                    minDis = (h.point - pos).magnitude;
                     hit = h;
                 }
             }
-            return hit.point;
+            return hit;
         }
 
         //creates the corner vertices of the face in patchHolderMesh in the refinedMesh

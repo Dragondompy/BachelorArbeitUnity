@@ -9,7 +9,7 @@ namespace BachelorArbeitUnity
     {
         private List<int> splitToNotSplitVertices;
         private List<int> splitToNotSplitFaces;
-        public UnityEngine.Mesh newLoad(ObjMesh o)
+        public Mesh newLoad(ObjMesh o)
         {
             List<List<int>> faces = o.getFaces();
             List<Vector3> oldVertices = o.getVertices();
@@ -45,7 +45,7 @@ namespace BachelorArbeitUnity
                 }
             }
 
-            UnityEngine.Mesh mesh = new UnityEngine.Mesh();
+            Mesh mesh = new Mesh();
             mesh.vertices = getArrayfromList(vertices);
 
             mesh.triangles = triangles;
@@ -67,7 +67,7 @@ namespace BachelorArbeitUnity
         }
 
         //Depricated
-        public UnityEngine.Mesh load(ObjMesh o)
+        public Mesh load(ObjMesh o)
         {
             List<List<int>> faces = o.getFaces();
 
@@ -96,7 +96,7 @@ namespace BachelorArbeitUnity
                 }
             }
 
-            UnityEngine.Mesh mesh = new UnityEngine.Mesh();
+            Mesh mesh = new Mesh();
             mesh.vertices = vertices;
             //mesh.uv = uv;
             mesh.triangles = triangles;

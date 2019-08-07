@@ -62,6 +62,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\facePreview.cs" />
     <Compile Include="Assets\Scripts\Controller.cs" />
     <Compile Include="Assets\Scripts\depricated\ControllerCSharp.cs" />
     <Compile Include="Assets\Scripts\Edge.cs" />

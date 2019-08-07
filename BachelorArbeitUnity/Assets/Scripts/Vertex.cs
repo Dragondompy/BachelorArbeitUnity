@@ -52,6 +52,7 @@ namespace BachelorArbeitUnity
         public void delete()
         {
             handleNumber = -1;
+            UnityEngine.Object.Destroy(VertexObject);
             foreach (Edge e in edges)
             {
                 if (e != null && e.isValid())

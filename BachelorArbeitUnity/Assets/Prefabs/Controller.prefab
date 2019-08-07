@@ -50,6 +50,8 @@ MonoBehaviour:
   LineObj: {fileID: 7816491887593866208, guid: 7e48a77e257d4f14c912d08aba26ebbd, type: 3}
   MeshLineObj: {fileID: 7816491887593866208, guid: 3cb784dde5b4fe04b9f1e0045d99ca2c,
     type: 3}
+  facePreviewObj: {fileID: 3395410345921760256, guid: e575bda3505d5b042901b4df31f2826d,
+    type: 3}
   maskOrg:
     serializedVersion: 2
     m_Bits: 1024

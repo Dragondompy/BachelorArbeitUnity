@@ -13,6 +13,7 @@ public static class InformationHolder {
     public static bool showNewMesh;
     public static float camSpeed;
     public static float camRotSpeed;
+    public static float threshHold;
     public static Controller con;
     public static int[] myMeshToPatchHolder;
     public static List<int> PatchHolderToNewMesh;
