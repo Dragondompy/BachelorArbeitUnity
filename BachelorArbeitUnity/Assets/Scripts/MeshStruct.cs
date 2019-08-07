@@ -186,17 +186,16 @@ namespace BachelorArbeitUnity
             return face;
         }
 
-        public void selectVertexAt(int v)
+        public void selectVertex(Vertex ver)
         {
-            Vertex ver = getVertexAt(v);
             if (!ver.getIsSelected())
             {
                 if (selectedVertices.Count < 6)
                 {
-                    if (ver.getVertexObject() == null)
+                    if (!ver.getIsCreated())
                     {
                         GameObject vOb = Instantiate(VertexObj, transform.position + ver.getPosition(), Quaternion.identity);
-                        vOb.GetComponent<VertexObj>().vertexIndex = v;
+                        vOb.GetComponent<VertexObj>().vertex = ver;
                         ver.setVertexObject(vOb);
                     }
                     ver.setIsSelected(true);
@@ -209,12 +208,13 @@ namespace BachelorArbeitUnity
             }
             else
             {
+                ver.setIsSelected(false);
+                selectedVertices.Remove(ver);
                 if (!ver.getIsCreated())
                 {
                     Destroy(ver.getVertexObject());
+                    ver.delete();
                 }
-                ver.setIsSelected(false);
-                selectedVertices.Remove(ver);
             }
 
         }
@@ -223,8 +223,11 @@ namespace BachelorArbeitUnity
         {
             foreach (Vertex v in selectedVertices)
             {
-                Destroy(v.getVertexObject());
                 v.setIsSelected(false);
+                if (!v.getIsCreated())
+                {
+                    Destroy(v.getVertexObject());
+                }
             }
             selectedVertices.Clear();
         }

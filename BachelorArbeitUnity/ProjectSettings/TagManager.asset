@@ -5,8 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Vertex
+  - Original
+  - RefinedMesh
+  - PatchHolder
   - MeshObject
-  - MeshParts
   layers:
   - Default
   - TransparentFX

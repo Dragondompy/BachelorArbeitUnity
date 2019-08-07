@@ -143,18 +143,15 @@ namespace BachelorArbeitUnity
         {
             if (VertexObject != null)
             {
-                GameObject cube = VertexObject.GetComponent<VertexObj>().cube;
+                GameObject sphere = VertexObject.GetComponent<VertexObj>().sphere;
                 isSelected = s;
                 if (isSelected)
                 {
-                    cube.GetComponent<MeshRenderer>().material = VertexObject.GetComponent<VertexObj>().select;
+                    sphere.GetComponent<MeshRenderer>().material = VertexObject.GetComponent<VertexObj>().select;
                 }
                 else
                 {
-                    if (isCreated)
-                    {
-                        cube.GetComponent<MeshRenderer>().material = VertexObject.GetComponent<VertexObj>().created;
-                    }
+                    sphere.GetComponent<MeshRenderer>().material = VertexObject.GetComponent<VertexObj>().created;
                 }
             }
         }

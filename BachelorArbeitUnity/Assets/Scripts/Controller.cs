@@ -21,6 +21,8 @@ namespace BachelorArbeitUnity
         public Material patchesMaterial;
         public Material newMeshMaterial;
 
+        public float size;
+
         Camera cam;
         MeshStruct myMesh;
         MeshStruct patchHolder;
@@ -50,8 +52,9 @@ namespace BachelorArbeitUnity
             MeshOB.layer = 8;
 
             ObjMesh o = new ObjMesh("./Assets/Meshes/" + objName + ".obj");
-            o.scaleMesh(20);
+            o.scaleMesh(size);
 
+            MeshOB.tag = "Original";
             MeshOB.name = "Original";
             MeshOB.layer = 10;
 
@@ -73,6 +76,7 @@ namespace BachelorArbeitUnity
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
 
+            MeshOB.tag = "PatchHolder";
             MeshOB.name = "PatchHolder";
             MeshOB.layer = 11;
 
@@ -87,7 +91,8 @@ namespace BachelorArbeitUnity
         {
             GameObject MeshOB = Instantiate(MeshObject, new Vector3(0, 0, 0), Quaternion.identity);
 
-            MeshOB.name = "NewMesh";
+            MeshOB.name = "RefinedMesh";
+            MeshOB.name = "RefinedMesh";
             MeshOB.layer = 12;
 
             MeshOB.GetComponent<MeshRenderer>().material = newMeshMaterial;
@@ -188,56 +193,32 @@ namespace BachelorArbeitUnity
                 {
                     mask = maskPH;
                 }
-                if (!Physics.Raycast(ray, out hit, 100.0f, mask))
+
+                if (!Physics.Raycast(ray, out hit, float.MaxValue, mask))
                 {
                     return;
                 }
+                GameObject objhit = hit.transform.gameObject;
+                Vector3 impactPoint = hit.point;
 
-                MeshCollider meshCollider = hit.collider as MeshCollider;
-                BoxCollider boxCollider = hit.collider as BoxCollider;
-                if (meshCollider != null && meshCollider.sharedMesh != null)
+                switch (objhit.tag)
                 {
-                    GameObject objhit = meshCollider.gameObject;
-                    if (objhit.CompareTag("MeshObject"))
-                    {
-                        Mesh mesh = meshCollider.sharedMesh;
-                        Transform hitTransform = hit.collider.transform;
-                        Vector3 impactPoint = hit.point;
-
-                        if (InformationHolder.selectVertices)
+                    case "Original":
+                        Vertex v = patchHolder.addVertex(impactPoint);
+                        if (v != null && v.isValid())
                         {
-                            Vector3[] vertices = mesh.vertices;
-                            int[] triangles = mesh.triangles;
-
-                            Vector3 p0 = vertices[triangles[hit.triangleIndex * 3 + 0]];
-                            Vector3 p1 = vertices[triangles[hit.triangleIndex * 3 + 1]];
-                            Vector3 p2 = vertices[triangles[hit.triangleIndex * 3 + 2]];
-
-                            p0 = hitTransform.TransformPoint(p0);
-                            p1 = hitTransform.TransformPoint(p1);
-                            p2 = hitTransform.TransformPoint(p2);
-
-                            float d0 = (impactPoint - p0).magnitude;
-                            float d1 = (impactPoint - p1).magnitude;
-                            float d2 = (impactPoint - p2).magnitude;
-
-                            int vertexIndex = -1;
-                            if (d0 < d1 && d0 < d2)
-                            {
-                                vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 0]];
-                            }
-                            else if (d1 < d0 && d1 < d2)
-                            {
-                                vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 1]];
-                            }
-                            else if (d2 < d0 && d2 < d1)
-                            {
-                                vertexIndex = myMesh.getSplitToNotSplitVertices()[triangles[hit.triangleIndex * 3 + 2]];
-                            }
-
-                            myMesh.selectVertexAt(vertexIndex);
+                            patchHolder.selectVertex(v);
                         }
-                        else if (InformationHolder.selectEdge)
+                        break;
+                    case "Vertex":
+                        Vertex ver = hit.transform.parent.gameObject.GetComponent<VertexObj>().vertex;
+                        if (ver != null && ver.isValid())
+                        {
+                            patchHolder.selectVertex(ver);
+                        }
+                        break;
+                    case "PatchHolder":
+                        if (InformationHolder.selectEdge)
                         {
                             Face f = patchHolder.getFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                             Edge edge = null;
@@ -269,15 +250,16 @@ namespace BachelorArbeitUnity
                                     int count = 0;
                                     lineRend.SetPosition(count, edge.getV1().getPosition());
                                     count++;
-                                    foreach (Vertex v in edge.getVerticesOnEdge())
+                                    foreach (Vertex vertex in edge.getVerticesOnEdge())
                                     {
-                                        lineRend.SetPosition(count, v.getPosition());
+                                        lineRend.SetPosition(count, vertex.getPosition());
                                         count++;
                                     }
                                     lineRend.SetPosition(count, edge.getV2().getPosition());
                                     lines.Add(Liner);
                                 }
                             }
+
                         }
                         else if (InformationHolder.selectFace)
                         {
@@ -296,7 +278,7 @@ namespace BachelorArbeitUnity
                                 }
                             }
                         }
-                    }
+                        break;
                 }
             }
         }
@@ -305,36 +287,27 @@ namespace BachelorArbeitUnity
         {
             removeLines();
             patchHolder.clearSelection();
+            myMesh.clearSelection();
         }
 
         //Starts creating the Faces in the patch specified by the selected vertices
         public void createFace()
         {
             removeLines();
-            List<Vertex> selectedVertices = myMesh.getSelectedVertices();
+            List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
             List<int> verticesIndices = new List<int>();
 
             if (selectedVertices.Count > 2)
             {
-                for (int i = 0; i < selectedVertices.Count; i++)
+                foreach (Vertex v in selectedVertices)
                 {
-                    int vHnMyMesh = selectedVertices[i].getHandleNumber();
-                    int vHnPatchHolder = InformationHolder.myMeshToPatchHolder[vHnMyMesh];
-                    Vertex v;
-
-                    //Test if Vertex already Exists
-                    if (patchHolder.vertexExists(vHnPatchHolder))
-                    {
-                        v = patchHolder.getVertexAt(vHnPatchHolder);
-                    }
-                    else
-                    {
-                        v = patchHolder.addVertex(selectedVertices[i].getPosition());
-                        InformationHolder.myMeshToPatchHolder[vHnMyMesh] = v.getHandleNumber();
-                    }
                     verticesIndices.Add(v.getHandleNumber());
                 }
                 Face f = patchHolder.addFace(verticesIndices);
+                foreach (Vertex v in f.getVertices())
+                {
+                    v.setIsCreated(true);
+                }
 
                 List<Edge> edges = f.getEdges();
                 int count = 0;
@@ -342,12 +315,13 @@ namespace BachelorArbeitUnity
                 {
                     if (edges[i].getSepNumber() <= 0)
                     {
-                        edges[i].setSepNumber(4);
+                        edges[i].setSepNumber(2);
                     }
                     count += edges[i].getSepNumber();
                 }
                 edges[edges.Count - 1].setSepNumber(2 + count % 2);
-                myMesh.clearSelectedVertices();
+
+                patchHolder.clearSelectedVertices();
                 patchHolder.updateMesh();
 
                 refreshRefinedMesh();
@@ -436,9 +410,18 @@ namespace BachelorArbeitUnity
 
         public Vector3 fitToMesh(Vertex v, Vector3 normal)
         {
-            RaycastHit hit;
-            Ray ray = new Ray(v.getPosition() + normal, -3 * normal);
-            Physics.Raycast(ray, out hit, float.MaxValue, maskOrg);
+            Ray ray = new Ray(v.getPosition() + 2 * normal, -normal);
+            RaycastHit[] hits = Physics.RaycastAll(ray, float.MaxValue, maskOrg);
+            float minDis = float.MaxValue;
+            RaycastHit hit = new RaycastHit();
+            foreach (RaycastHit h in hits)
+            {
+                if ((h.point - v.getPosition()).magnitude < minDis)
+                {
+                    minDis = (h.point - v.getPosition()).magnitude;
+                    hit = h;
+                }
+            }
             return hit.point;
         }
 
