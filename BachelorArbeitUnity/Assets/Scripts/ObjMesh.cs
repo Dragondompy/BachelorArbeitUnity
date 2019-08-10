@@ -20,11 +20,14 @@ namespace BachelorArbeitUnity
         }
 
         //creates the objmesh from an Mesh m
-        public ObjMesh(MeshStruct m) {
+        public ObjMesh(MeshStruct m)
+        {
             int newIndex = 0;
             int[] oldToNewIndices = new int[m.getVertices().Count];
-            foreach (Vertex vertex in m.getVertices()) {
-                if (vertex.isValid()) {
+            foreach (Vertex vertex in m.getVertices())
+            {
+                if (vertex.isValid())
+                {
                     vertices.Add(vertex.getPosition());
                     oldToNewIndices[vertex.getHandleNumber()] = newIndex;
                     newIndex++;
@@ -46,7 +49,7 @@ namespace BachelorArbeitUnity
         }
 
         //creates the objmesh from an Mesh m
-        public ObjMesh(MeshStruct m,int old)
+        public ObjMesh(MeshStruct m, int old)
         {
             List<int> delVertexHandler = new List<int>();
             int validCount = 0;
@@ -95,20 +98,12 @@ namespace BachelorArbeitUnity
 
                         if (curLine[0].Equals("v"))
                         {
-                            vertices.Add(new Vector3(
-                                Single.Parse(curLine[1].Replace('.', ',')),
-                                Single.Parse(curLine[2].Replace('.', ',')),
-                                Single.Parse(curLine[3].Replace('.', ','))
-                            ));
+                            vertices.Add(readVertex(curLine));
 
                         }
                         else if (curLine[0].Equals("f"))
                         {
-                            for (int f = 1; f < curLine.Length; f++)
-                            {
-                                faceVertices.Add((Int32.Parse(curLine[f])) - 1);
-                            }
-                            faces.Add(faceVertices);
+                            faces.Add(readFace(curLine));
                         }
                         else if (curLine[0].Equals("#"))
                         {
@@ -130,14 +125,39 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void scaleMesh(float size) {
-            for(int i=0;i<vertices.Count;i++)
+        public Vector3 readVertex(String[] line)
+        {
+            float x, y, z;
+            x = Single.Parse(line[1].Replace('.', ','));
+            y = Single.Parse(line[2].Replace('.', ','));
+            z = Single.Parse(line[3].Replace('.', ','));
+
+            Vector3 vertex = new Vector3(x, y, z);
+            return vertex;
+        }
+
+        public List<int> readFace(String[] line)
+        {
+            List<int> face = new List<int>();
+            for (int i = 1; i < line.Length; i++)
+            {
+                String[] value = line[i].Split('/');
+
+                face.Add((Int32.Parse(value[0])) - 1);
+            }
+
+            return face;
+        }
+
+        public void scaleMesh(float size)
+        {
+            for (int i = 0; i < vertices.Count; i++)
             {
                 vertices[i] = vertices[i] * size;
             }
         }
 
-        public void writeToFile(String fileName,bool overwrite)
+        public void writeToFile(String fileName, bool overwrite)
         {
             String path = "./Assets/Meshes/" + fileName + ".obj";
             if (File.Exists(path))
