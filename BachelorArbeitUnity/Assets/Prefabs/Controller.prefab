@@ -64,4 +64,7 @@ MonoBehaviour:
   myMeshMaterial: {fileID: 2100000, guid: b16aa175b4d061744a4e5c2e862cc374, type: 2}
   patchesMaterial: {fileID: 2100000, guid: cdddf0b0bf597db4ea22cefe35431112, type: 2}
   newMeshMaterial: {fileID: 2100000, guid: e37b6dff472a34345bbd12c19b075001, type: 2}
+  symPlaneObject: {fileID: 2686725284157197030, guid: 6d4d9a1484f5aa64e9cca47ddc3c51a6,
+    type: 3}
+  symPlane: {fileID: 0}
   size: 1

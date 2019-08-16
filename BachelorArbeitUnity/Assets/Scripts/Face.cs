@@ -10,6 +10,7 @@ namespace BachelorArbeitUnity
         private List<Edge> edges;
         private List<HalfEdge> halfEdges;
         private List<Vertex> innerVertices;
+        private Face symFace;
 
         private int handleNumber;
         private MeshStruct mesh;
@@ -162,7 +163,8 @@ namespace BachelorArbeitUnity
         {
             HalfEdge prevEdge = halfEdges[edges.Count - 1];
             Vector3 normal = new Vector3(0, 0, 0);
-            foreach (HalfEdge e in halfEdges) {
+            foreach (HalfEdge e in halfEdges)
+            {
                 normal += Vector3.Cross(prevEdge.getDirection(), e.getDirection());
 
                 prevEdge = e;
@@ -206,6 +208,11 @@ namespace BachelorArbeitUnity
             return innerVertices;
         }
 
+        public Face getSymFace()
+        {
+            return symFace;
+        }
+
         public void setVertices(List<Vertex> v)
         {
             this.vertices = v;
@@ -219,6 +226,15 @@ namespace BachelorArbeitUnity
         public void setMesh(MeshStruct m)
         {
             this.mesh = m;
+        }
+
+        public void setSymFace(Face f)
+        {
+            symFace = f;
+            if (f.getSymFace() == null)
+            {
+                f.setSymFace(this);
+            }
         }
 
         public override string ToString()

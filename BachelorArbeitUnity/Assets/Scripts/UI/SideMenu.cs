@@ -9,17 +9,15 @@ namespace BachelorArbeitUnity
     public class SideMenu : MonoBehaviour
     {
         public Button btnSelectVert;
-        public Button btnCreateFace;
         public Button btnSelectEdge;
         public Button btnSelectFace;
-        public Button btnDeleteFace;
         public Button btnShowOriginal;
         public Button btnShowPatches;
         public Button btnShowNewMesh;
+        public Button btnActiveSymmetry;
         public Slider sliCamSpeed;
         public Slider sliCamRotSpeed;
         public Slider sliThreshHold;
-        public Button btnSaveNewMesh;
         public InputField itfSaveMeshName;
 
         // Start is called before the first frame update
@@ -182,6 +180,17 @@ namespace BachelorArbeitUnity
             InformationHolder.con.createFace();
         }
 
+        public void createSymmetryPlane()
+        {
+            InformationHolder.con.createSymmetryPlane();
+        }
+
+        public void activeSymmetry()
+        {
+            InformationHolder.activeSymmetry = !InformationHolder.activeSymmetry;
+            setBtnActive(btnActiveSymmetry, InformationHolder.activeSymmetry);
+        }
+
         public void deleteFace()
         {
             InformationHolder.con.deleteSelectedFace();
@@ -204,7 +213,6 @@ namespace BachelorArbeitUnity
                 InformationHolder.con.saveMesh(itfSaveMeshName.text);
             }
         }
-
 
         public void setBtnActive(Button btn, bool active)
         {

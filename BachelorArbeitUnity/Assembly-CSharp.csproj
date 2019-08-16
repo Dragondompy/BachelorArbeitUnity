@@ -62,11 +62,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\facePreview.cs" />
     <Compile Include="Assets\Scripts\Controller.cs" />
     <Compile Include="Assets\Scripts\depricated\ControllerCSharp.cs" />
     <Compile Include="Assets\Scripts\Edge.cs" />
     <Compile Include="Assets\Scripts\Face.cs" />
+    <Compile Include="Assets\Scripts\facePreview.cs" />
     <Compile Include="Assets\Scripts\Flow.cs" />
     <Compile Include="Assets\Scripts\HalfEdge.cs" />
     <Compile Include="Assets\Scripts\InformationHolder.cs" />
@@ -120,6 +120,7 @@
     <Compile Include="Assets\Scripts\Pattern\Pattern62.cs" />
     <Compile Include="Assets\Scripts\Pattern\Pattern63.cs" />
     <Compile Include="Assets\Scripts\Pattern\Patterndecider.cs" />
+    <Compile Include="Assets\Scripts\SymmetryPlane.cs" />
     <Compile Include="Assets\Scripts\SyntheticEdge.cs" />
     <Compile Include="Assets\Scripts\Tests\gridcreate.cs" />
     <Compile Include="Assets\Scripts\Tests\MathTest.cs" />

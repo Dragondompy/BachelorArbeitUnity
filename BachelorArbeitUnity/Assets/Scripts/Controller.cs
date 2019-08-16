@@ -22,12 +22,15 @@ namespace BachelorArbeitUnity
         public Material patchesMaterial;
         public Material newMeshMaterial;
 
+        public GameObject symPlaneObject;
+
         public float size;
 
         Camera cam;
         MeshStruct myMesh;
         MeshStruct patchHolder;
         MeshStruct refinedMesh;
+        SymmetryPlane symPlane;
 
         private string objName;
         private List<GameObject> lines;
@@ -120,6 +123,10 @@ namespace BachelorArbeitUnity
         public void showNewMesh(bool v)
         {
             refinedMesh.GetComponent<MeshRenderer>().enabled = v;
+            foreach (GameObject o in meshLines)
+            {
+                o.GetComponent<LineRenderer>().enabled = v;
+            }
         }
 
         public void saveMesh(string name)
@@ -177,6 +184,24 @@ namespace BachelorArbeitUnity
                 Destroy(o);
             }
             meshLines.Clear();
+        }
+
+        public void createSymmetryPlane()
+        {
+            if (symPlane != null)
+            {
+                return;
+            }
+            List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
+            if (selectedVertices.Count < 3)
+            {
+                return;
+            }
+            GameObject go = Instantiate(symPlaneObject, new Vector3(0, 0, 0), Quaternion.identity);
+            symPlane = go.GetComponent<SymmetryPlane>();
+            symPlane.setPlane(selectedVertices[0].getPosition(), selectedVertices[1].getPosition(), selectedVertices[2].getPosition());
+
+            clearSelection();
         }
 
         // Update is called once per frame
@@ -307,48 +332,87 @@ namespace BachelorArbeitUnity
         public void createFace()
         {
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
-            List<int> verticesIndices = new List<int>();
-
             if (selectedVertices.Count > 2)
             {
-                Vector3 prevDir = selectedVertices[selectedVertices.Count - 1].getPosition();
-                foreach (Vertex v in selectedVertices)
+                if (symPlane == null || !InformationHolder.activeSymmetry)
                 {
-                    verticesIndices.Add(v.getHandleNumber());
+                    Face f = newFace(selectedVertices, facePre.flipped);
                 }
-                if (facePre.flipped)
+                else
                 {
-                    print("Flipped");
-                    verticesIndices.Reverse();
-                }
-
-                Face f = patchHolder.addFace(verticesIndices);
-                foreach (Vertex v in f.getVertices())
-                {
-                    v.setIsCreated(true);
-                }
-
-                List<Edge> edges = f.getEdges();
-                int count = 0;
-                for (int i = 0; i < edges.Count - 1; i++)
-                {
-                    if (edges[i].getSepNumber() <= 0)
+                    List<Vertex> selectedVerticesMir = new List<Vertex>();
+                    foreach (Vertex v in selectedVertices)
                     {
-                        edges[i].setSepNumber(2);
+                        if (v.getIsCreated())
+                        {
+                            selectedVerticesMir.Add(v.getSymVertex());
+                        }
+                        else
+                        {
+                            Vertex vMir = patchHolder.addVertex(symPlane.mirroredPos(v.getPosition()));
+                            selectedVerticesMir.Add(vMir);
+                            v.setSymVertex(vMir);
+                        }
                     }
-                    count += edges[i].getSepNumber();
+                    Face f = newFace(selectedVertices, facePre.flipped);
+                    clearSelection();
+
+                    foreach (Vertex v in selectedVerticesMir)
+                    {
+                        patchHolder.selectVertex(v);
+                    }
+                    Face fMir = newFace(selectedVerticesMir, !facePre.flipped);
+                    f.setSymFace(fMir);
+
+                    for (int i = 0; i < f.getEdges().Count; i++)
+                    {
+                        f.getEdges()[i].setSymEdge(fMir.getEdges()[fMir.getEdges().Count - 1 - i]);
+                    }
                 }
-                edges[edges.Count - 1].setSepNumber(2 + count % 2);
 
                 clearSelection();
                 patchHolder.updateMesh();
-
                 refreshRefinedMesh();
             }
             else
             {
                 print("Not enough Verices selected");
             }
+        }
+
+        public Face newFace(List<Vertex> selectedVertices, bool flipped)
+        {
+            List<int> verticesIndices = new List<int>();
+
+            Vector3 prevDir = selectedVertices[selectedVertices.Count - 1].getPosition();
+            foreach (Vertex v in selectedVertices)
+            {
+                verticesIndices.Add(v.getHandleNumber());
+            }
+            if (flipped)
+            {
+                print("Flipped");
+                verticesIndices.Reverse();
+            }
+
+            Face f = patchHolder.addFace(verticesIndices);
+            foreach (Vertex v in f.getVertices())
+            {
+                v.setIsCreated(true);
+            }
+
+            List<Edge> edges = f.getEdges();
+            int count = 0;
+            for (int i = 0; i < edges.Count - 1; i++)
+            {
+                if (edges[i].getSepNumber() <= 0)
+                {
+                    edges[i].setSepNumber(2);
+                }
+                count += edges[i].getSepNumber();
+            }
+            edges[edges.Count - 1].setSepNumber(2 + count % 2);
+            return f;
         }
 
 
@@ -406,7 +470,7 @@ namespace BachelorArbeitUnity
             {
                 if (v.isValid())
                 {
-                    v.updatePosition();
+                    //v.updatePosition();
                 }
             }
 

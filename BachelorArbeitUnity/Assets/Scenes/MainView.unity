@@ -588,6 +588,31 @@ PrefabInstance:
       propertyPath: m_ScreenMatchMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 72700603028419244, guid: 66db764c4d86c0743a7ecc9f2b70e9a9,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 72700603028419244, guid: 66db764c4d86c0743a7ecc9f2b70e9a9,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7135231039210599278, guid: 66db764c4d86c0743a7ecc9f2b70e9a9,
+        type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7135231039210599278, guid: 66db764c4d86c0743a7ecc9f2b70e9a9,
+        type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7135231039210599278, guid: 66db764c4d86c0743a7ecc9f2b70e9a9,
+        type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66db764c4d86c0743a7ecc9f2b70e9a9, type: 3}
 --- !u!1001 &1992098166

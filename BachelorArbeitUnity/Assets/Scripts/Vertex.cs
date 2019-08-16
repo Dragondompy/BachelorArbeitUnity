@@ -14,6 +14,7 @@ namespace BachelorArbeitUnity
         private bool isCreated;
 
         private List<Edge> edges;
+        private Vertex symVertex;
 
         public Vertex(Vector3 pos)
         {
@@ -124,6 +125,11 @@ namespace BachelorArbeitUnity
             return handleNumber;
         }
 
+        public Vertex getSymVertex()
+        {
+            return symVertex;
+        }
+
         public void setPosition(Vector3 pos)
         {
             position = pos;
@@ -138,6 +144,15 @@ namespace BachelorArbeitUnity
         public void setVertexObject(GameObject vo)
         {
             VertexObject = vo;
+        }
+
+        public void setSymVertex(Vertex v)
+        {
+            symVertex = v;
+            if (v.getSymVertex() == null)
+            {
+                v.setSymVertex(this);
+            }
         }
 
         public void setIsSelected(bool s)

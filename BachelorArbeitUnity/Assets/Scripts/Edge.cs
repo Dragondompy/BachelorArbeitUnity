@@ -20,6 +20,8 @@ namespace BachelorArbeitUnity
         private Vertex newV1;
         private Vertex newV2;
 
+        private Edge symEdge;
+
         private int handleNumber;
 
         public Edge(Vertex v1, Vertex v2, Face f, MeshStruct m)
@@ -273,6 +275,11 @@ namespace BachelorArbeitUnity
             return verticesOnEdge;
         }
 
+        public Edge getSymEdge()
+        {
+            return symEdge;
+        }
+
         public void setSepNumber(int sepNumber)
         {
             this.sepNumber = sepNumber;
@@ -311,6 +318,15 @@ namespace BachelorArbeitUnity
         public void setHandleNumber(int handleNumber)
         {
             this.handleNumber = handleNumber;
+        }
+
+        public void setSymEdge(Edge e)
+        {
+            symEdge = e;
+            if (e.getSymEdge() == null)
+            {
+                e.setSymEdge(this);
+            }
         }
 
         public override string ToString()
