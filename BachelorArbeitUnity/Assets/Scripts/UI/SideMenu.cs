@@ -19,6 +19,9 @@ namespace BachelorArbeitUnity
         public Slider sliCamRotSpeed;
         public Slider sliThreshHold;
         public InputField itfSaveMeshName;
+        public GameObject vertexContainer;
+        public GameObject edgeContainer;
+        public GameObject faceContainer;
 
         // Start is called before the first frame update
         void Start()
@@ -206,6 +209,16 @@ namespace BachelorArbeitUnity
             InformationHolder.con.decreaseSepNumber();
         }
 
+        public void increaseOuterFlowPreset()
+        {
+            InformationHolder.con.increaseOuterFlowPreset();
+        }
+
+        public void decreaseOuterFlowPreset()
+        {
+            InformationHolder.con.decreaseOuterFlowPreset();
+        }
+
         public void saveNewMesh()
         {
             if (!itfSaveMeshName.text.Equals(""))
@@ -223,6 +236,26 @@ namespace BachelorArbeitUnity
             else
             {
                 btn.GetComponent<Image>().color = Color.white;
+            }
+            setContainerActive();
+        }
+
+        public void setContainerActive()
+        {
+            vertexContainer.SetActive(false);
+            edgeContainer.SetActive(false);
+            faceContainer.SetActive(false);
+            if (InformationHolder.selectVertices)
+            {
+                vertexContainer.SetActive(true);
+            }
+            else if (InformationHolder.selectEdge)
+            {
+                edgeContainer.SetActive(true);
+            }
+            else if (InformationHolder.selectFace)
+            {
+                faceContainer.SetActive(true);
             }
         }
     }

@@ -168,6 +168,24 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void increaseOuterFlowPreset()
+        {
+            if (patchHolder.getSelectedEdge() != null)
+            {
+                patchHolder.getSelectedEdge().getHalfEdge(patchHolder.getSelectedFace()).increaseOuterFlowPreset();
+                refreshRefinedMesh();
+            }
+        }
+
+        public void decreaseOuterFlowPreset()
+        {
+            if (patchHolder.getSelectedEdge() != null)
+            {
+                patchHolder.getSelectedEdge().getHalfEdge(patchHolder.getSelectedFace()).decreaseOuterFlowPreset();
+                refreshRefinedMesh();
+            }
+        }
+
         public void removeLines()
         {
             foreach (GameObject o in lines)
@@ -258,7 +276,7 @@ namespace BachelorArbeitUnity
                     case "PatchHolder":
                         if (InformationHolder.selectEdge)
                         {
-                            Face f = patchHolder.getFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
+                            Face f = patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                             Edge edge = null;
                             if (f != null)
                             {
@@ -391,7 +409,6 @@ namespace BachelorArbeitUnity
             }
             if (flipped)
             {
-                print("Flipped");
                 verticesIndices.Reverse();
             }
 
@@ -642,6 +659,18 @@ namespace BachelorArbeitUnity
             int size = halfEdges.Count;
             int noFlowCount = 0;
             int counter = size;
+
+            for (int i = 0; i < size; i++)
+            {
+                int prevHe = i % size;
+                int curHe = (i + 1) % size;
+                int nextHe = (i + 2) % size;
+                int outerFlowPreset = halfEdges[curHe].getOuterFlowPreset();
+
+                halfEdges[curHe].setOuterFlow(outerFlowPreset);
+                halfEdges[prevHe].reduceSep(outerFlowPreset);
+                halfEdges[nextHe].reduceSep(outerFlowPreset);
+            }
 
             while (noFlowCount < size)
             {

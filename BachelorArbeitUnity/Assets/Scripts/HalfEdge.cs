@@ -12,6 +12,7 @@ namespace BachelorArbeitUnity
         private Edge e;
         private int handleNumber;
 
+        private int outerFlowPreset;
         private int outerFlow;
         private int reduced;
         private Vertex newV1;
@@ -88,9 +89,29 @@ namespace BachelorArbeitUnity
 
         public void reduceSep()
         {
-            if (reduced < 0)
-                throw new Exception("SepNumber has not been set correctly");
+            if (reduced - 1 < 1)
+                throw new Exception("To Much SepNumberReduction");
             reduced--;
+        }
+
+        public void reduceSep(int i)
+        {
+            if (reduced - i < 1)
+                throw new Exception("To Much SepNumberReduction");
+            reduced -= i;
+        }
+
+        public void increaseOuterFlowPreset()
+        {
+            outerFlowPreset += 1;
+        }
+
+        public void decreaseOuterFlowPreset()
+        {
+            if (outerFlowPreset > 0)
+            {
+                outerFlowPreset -= 1;
+            }
         }
 
         public void setVerticesOnEdge(Vertex[] voe)
@@ -187,6 +208,11 @@ namespace BachelorArbeitUnity
         public int getOuterFlow()
         {
             return outerFlow;
+        }
+
+        public int getOuterFlowPreset()
+        {
+            return outerFlowPreset;
         }
 
         public int getHandleNumber()
