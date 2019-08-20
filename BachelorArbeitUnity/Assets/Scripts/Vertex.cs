@@ -62,6 +62,11 @@ namespace BachelorArbeitUnity
                 }
             }
             edges.Clear();
+
+            if (symVertex != null)
+            {
+                symVertex.setSymVertex(null);
+            }
         }
 
         public void remEdge(Edge edge)

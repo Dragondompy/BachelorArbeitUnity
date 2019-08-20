@@ -352,41 +352,7 @@ namespace BachelorArbeitUnity
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
             if (selectedVertices.Count > 2)
             {
-                if (symPlane == null || !InformationHolder.activeSymmetry)
-                {
-                    Face f = newFace(selectedVertices, facePre.flipped);
-                }
-                else
-                {
-                    List<Vertex> selectedVerticesMir = new List<Vertex>();
-                    foreach (Vertex v in selectedVertices)
-                    {
-                        if (v.getIsCreated())
-                        {
-                            selectedVerticesMir.Add(v.getSymVertex());
-                        }
-                        else
-                        {
-                            Vertex vMir = patchHolder.addVertex(symPlane.mirroredPos(v.getPosition()));
-                            selectedVerticesMir.Add(vMir);
-                            v.setSymVertex(vMir);
-                        }
-                    }
-                    Face f = newFace(selectedVertices, facePre.flipped);
-                    clearSelection();
-
-                    foreach (Vertex v in selectedVerticesMir)
-                    {
-                        patchHolder.selectVertex(v);
-                    }
-                    Face fMir = newFace(selectedVerticesMir, !facePre.flipped);
-                    f.setSymFace(fMir);
-
-                    for (int i = 0; i < f.getEdges().Count; i++)
-                    {
-                        f.getEdges()[i].setSymEdge(fMir.getEdges()[fMir.getEdges().Count - 1 - i]);
-                    }
-                }
+                Face f = newFace(selectedVertices, facePre.flipped);
 
                 clearSelection();
                 patchHolder.updateMesh();
@@ -395,6 +361,35 @@ namespace BachelorArbeitUnity
             else
             {
                 print("Not enough Verices selected");
+            }
+        }
+
+        public void createSymmetryFace()
+        {
+            if (patchHolder.getSelectedFace() != null && symPlane != null && patchHolder.getSelectedFace().getSymFace() == null)
+            {
+                patchHolder.clearSelectedVertices();
+                Face orgFace = patchHolder.getSelectedFace();
+                foreach (Vertex v in orgFace.getVertices())
+                {
+                    Vertex vMir;
+                    if (v.getSymVertex() != null && v.getSymVertex().isValid())
+                    {
+                        vMir = v.getSymVertex();
+                    }
+                    else
+                    {
+                        vMir = patchHolder.addVertex(symPlane.mirroredPos(v.getPosition()));
+                        v.setSymVertex(vMir);
+                    }
+                    patchHolder.selectVertex(vMir);
+                }
+                Face f = newFace(patchHolder.getSelectedVertices(), true);
+                orgFace.setSymFace(f);
+
+                clearSelection();
+                patchHolder.updateMesh();
+                refreshRefinedMesh();
             }
         }
 
@@ -468,26 +463,27 @@ namespace BachelorArbeitUnity
             //Streches the refinedMesh to fit the oldMesh
             foreach (Face f in patchHolder.getFaces())
             {
+
                 Vector3 normal = f.getNormal();
 
                 foreach (Vertex v in f.getInnerVertices())
                 {
-                    v.setNewPosition(fitToMesh(v.getPosition(), normal).point);
+                    v.setNewPosition(fitToMesh(v.getPosition(), normal));
+
                 }
                 foreach (Edge e in f.getEdges())
                 {
                     foreach (Vertex v in e.getVerticesOnEdge())
                     {
-                        v.setNewPosition(fitToMesh(v.getPosition(), normal).point);
+                        v.setNewPosition(fitToMesh(v.getPosition(), normal));
                     }
                 }
             }
-
             foreach (Vertex v in refinedMesh.getVertices())
             {
                 if (v.isValid())
                 {
-                    //v.updatePosition();
+                    v.updatePosition();
                 }
             }
 
@@ -508,21 +504,42 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public RaycastHit fitToMesh(Vector3 pos, Vector3 normal)
+        public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
         {
             Ray ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
             RaycastHit[] hits = Physics.RaycastAll(ray, 2f, maskOrg);
             float minDis = float.MaxValue;
             RaycastHit hit = new RaycastHit();
-            foreach (RaycastHit h in hits)
+            if (hits.Length > 0)
             {
-                if ((h.point - pos).magnitude < minDis)
+                foreach (RaycastHit h in hits)
                 {
-                    minDis = (h.point - pos).magnitude;
-                    hit = h;
+                    if ((h.point - pos).magnitude < minDis)
+                    {
+                        minDis = (h.point - pos).magnitude;
+                        hit = h;
+                    }
                 }
+                return hit.point;
             }
-            return hit;
+            pos = symPlane.mirroredPos(pos);
+            normal = symPlane.mirroredPos(normal);
+            ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
+            hits = Physics.RaycastAll(ray, 2f, maskOrg);
+            minDis = float.MaxValue;
+            if (hits.Length > 0)
+            {
+                foreach (RaycastHit h in hits)
+                {
+                    if ((h.point - pos).magnitude < minDis)
+                    {
+                        minDis = (h.point - pos).magnitude;
+                        hit = h;
+                    }
+                }
+                return symPlane.mirroredPos(hit.point);
+            }
+            return symPlane.mirroredPos(pos);
         }
 
         //creates the corner vertices of the face in patchHolderMesh in the refinedMesh

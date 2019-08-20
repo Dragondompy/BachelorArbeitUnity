@@ -107,6 +107,11 @@ namespace BachelorArbeitUnity
             {
                 v2.remEdge(this);
             }
+
+            if (symEdge != null)
+            {
+                symEdge.setSymEdge(null);
+            }
         }
 
         public void remHalfEdge(HalfEdge he)
@@ -178,7 +183,8 @@ namespace BachelorArbeitUnity
 
         public void decreaseSepNumber()
         {
-            if (sepNumber > 1) {
+            if (sepNumber > 1)
+            {
                 sepNumber -= 1;
             }
         }
@@ -213,7 +219,7 @@ namespace BachelorArbeitUnity
             newV1 = null;
             newV2 = null;
         }
-        
+
         //returns if the edge is valid or deleted
         public Boolean isValid()
         {
@@ -331,7 +337,7 @@ namespace BachelorArbeitUnity
 
         public override string ToString()
         {
-            return ("Edge "+handleNumber+"\n from  " + v1 + "\n to    " + v2 + "\n SeperationNumber: " + sepNumber + "\n");
+            return ("Edge " + handleNumber + "\n from  " + v1 + "\n to    " + v2 + "\n SeperationNumber: " + sepNumber + "\n");
         }
 
         public bool Equals(Edge e)

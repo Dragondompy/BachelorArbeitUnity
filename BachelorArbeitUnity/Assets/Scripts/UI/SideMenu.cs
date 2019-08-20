@@ -190,8 +190,7 @@ namespace BachelorArbeitUnity
 
         public void activeSymmetry()
         {
-            InformationHolder.activeSymmetry = !InformationHolder.activeSymmetry;
-            setBtnActive(btnActiveSymmetry, InformationHolder.activeSymmetry);
+            InformationHolder.con.createSymmetryFace();
         }
 
         public void deleteFace()

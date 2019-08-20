@@ -157,6 +157,11 @@ namespace BachelorArbeitUnity
                     he.delete();
                 }
             }
+
+            if (symFace != null)
+            {
+                symFace.setSymFace(null);
+            }
         }
 
         public Vector3 getNormal()
