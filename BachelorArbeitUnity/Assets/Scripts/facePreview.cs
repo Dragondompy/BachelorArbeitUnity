@@ -6,7 +6,6 @@ namespace BachelorArbeitUnity
 {
     public class facePreview : MonoBehaviour
     {
-
         public GameObject arrow;
         public bool flipped;
         // Start is called before the first frame update
@@ -70,6 +69,11 @@ namespace BachelorArbeitUnity
             normal = normal / normals.Length;
 
             return normal;
+        }
+
+        public void scale(float s)
+        {
+            arrow.transform.localScale = arrow.transform.localScale*s;
         }
 
         private Vector3[] getPos(List<Vertex> vertices)

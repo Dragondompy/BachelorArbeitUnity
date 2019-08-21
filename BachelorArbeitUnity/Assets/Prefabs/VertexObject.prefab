@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6777689606755716305}
   - component: {fileID: 6761688316594421929}
   - component: {fileID: 6317405723037110184}
-  m_Layer: 10
+  m_Layer: 13
   m_Name: Sphere
   m_TagString: Vertex
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5249357836038955507}
   - component: {fileID: 778072176179752169}
-  m_Layer: 10
+  m_Layer: 13
   m_Name: VertexObject
   m_TagString: Vertex
   m_Icon: {fileID: 0}

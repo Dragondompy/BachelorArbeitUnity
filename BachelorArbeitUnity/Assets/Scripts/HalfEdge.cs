@@ -20,6 +20,8 @@ namespace BachelorArbeitUnity
         private int[,] additionalVertices;
         private Vertex[] verticesOnEdge;
 
+        private HalfEdge symHalfEdge;
+
         public HalfEdge(Vertex v1, Vertex v2, Edge e, Face f, MeshStruct m)
         {
             setV1(v1);
@@ -235,6 +237,11 @@ namespace BachelorArbeitUnity
             return additionalVertices;
         }
 
+        public HalfEdge getSymHalfEdge()
+        {
+            return symHalfEdge;
+        }
+
         public void setFace(Face f)
         {
             this.f = f;
@@ -273,6 +280,15 @@ namespace BachelorArbeitUnity
         public void setOuterFlow(int outerFlow)
         {
             this.outerFlow = outerFlow;
+        }
+
+        public void setSymHalfEdge(HalfEdge h)
+        {
+            symHalfEdge = h;
+            if (h.getSymHalfEdge() == null)
+            {
+                h.setSymHalfEdge(this);
+            }
         }
 
         public override string ToString()

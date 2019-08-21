@@ -12,6 +12,7 @@ public static class InformationHolder {
     public static bool showPatches;
     public static bool showNewMesh;
     public static bool activeSymmetry;
+    public static bool moveVertex;
     public static float camSpeed;
     public static float camRotSpeed;
     public static float threshHold;

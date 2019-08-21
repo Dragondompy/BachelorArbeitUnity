@@ -15,6 +15,7 @@ namespace BachelorArbeitUnity
         public Button btnShowPatches;
         public Button btnShowNewMesh;
         public Button btnActiveSymmetry;
+        public Button btnMoveVertex;
         public Slider sliCamSpeed;
         public Slider sliCamRotSpeed;
         public Slider sliThreshHold;
@@ -46,6 +47,7 @@ namespace BachelorArbeitUnity
 
         public void setSelectVertex()
         {
+            InformationHolder.moveVertex = false;
             InformationHolder.con.clearSelection();
             if (InformationHolder.selectVertices)
             {
@@ -67,6 +69,7 @@ namespace BachelorArbeitUnity
 
         public void setSelectEdge()
         {
+            InformationHolder.moveVertex = false;
             InformationHolder.con.clearSelection();
             if (InformationHolder.selectEdge)
             {
@@ -88,6 +91,7 @@ namespace BachelorArbeitUnity
 
         public void setSelectFace()
         {
+            InformationHolder.moveVertex = false;
             InformationHolder.con.clearSelection();
             if (InformationHolder.selectFace)
             {
@@ -181,6 +185,12 @@ namespace BachelorArbeitUnity
         public void createFace()
         {
             InformationHolder.con.createFace();
+        }
+
+        public void moveVertex()
+        {
+            InformationHolder.moveVertex = !InformationHolder.moveVertex;
+            setBtnActive(btnMoveVertex, InformationHolder.moveVertex);
         }
 
         public void createSymmetryPlane()

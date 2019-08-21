@@ -163,6 +163,10 @@ namespace BachelorArbeitUnity
             {
                 e.addFace(f, this);
             }
+            if (vertex1.getSymVertex() != null && vertex2.getSymVertex() != null)
+            {
+                e.setSymEdge(vertex1.getSymVertex().isConnected(vertex2.getSymVertex()));
+            }
             return e;
         }
 
@@ -195,6 +199,7 @@ namespace BachelorArbeitUnity
                     if (!ver.getIsCreated())
                     {
                         GameObject vOb = Instantiate(VertexObj, transform.position + ver.getPosition(), Quaternion.identity);
+                        vOb.transform.localScale = new Vector3(size * 3, size * 3, size * 3);
                         vOb.GetComponent<VertexObj>().vertex = ver;
                         ver.setVertexObject(vOb);
                     }
@@ -267,13 +272,16 @@ namespace BachelorArbeitUnity
 
         public void deleteSelectedFace()
         {
-            if (faceExists(selectedFace.getHandleNumber()))
+            if (selectedFace != null)
             {
-                selectedFace.delete();
-            }
-            else
-            {
-                print("No Face Selected");
+                if (faceExists(selectedFace.getHandleNumber()))
+                {
+                    selectedFace.delete();
+                }
+                else
+                {
+                    print("No Face Selected");
+                }
             }
         }
 

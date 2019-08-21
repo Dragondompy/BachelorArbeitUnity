@@ -17,6 +17,7 @@ namespace BachelorArbeitUnity
         public LayerMask maskOrg;
         public LayerMask maskPH;
         public LayerMask maskNM;
+        public LayerMask maskOrgOnly;
 
         public Material myMeshMaterial;
         public Material patchesMaterial;
@@ -37,21 +38,25 @@ namespace BachelorArbeitUnity
         private List<GameObject> meshLines;
         private facePreview facePre;
 
-        // Start is called before the first frame update
-        void Start()
+        private void Awake()
         {
             InformationHolder.con = this;
             this.objName = InformationHolder.pathToMesh;
 
-            lines = new List<GameObject>();
-            meshLines = new List<GameObject>();
-
             initializeOldMesh();
             initializePatchHolder();
             initializeNewMesh();
+        }
+
+        // Start is called before the first frame update
+        void Start()
+        {
+            lines = new List<GameObject>();
+            meshLines = new List<GameObject>();
 
             GameObject FacePreObj = Instantiate(facePreviewObj, new Vector3(0, 0, 0), Quaternion.identity);
             facePre = FacePreObj.GetComponent<facePreview>();
+            facePre.scale(myMesh.getSize() * 3);
         }
 
         public void initializeOldMesh()
@@ -145,7 +150,6 @@ namespace BachelorArbeitUnity
         {
             patchHolder.deleteSelectedFace();
             patchHolder.getFaces().Remove(patchHolder.getSelectedFace());
-            patchHolder.updateMesh();
             refreshRefinedMesh();
             removeLines();
         }
@@ -155,6 +159,10 @@ namespace BachelorArbeitUnity
             if (patchHolder.getSelectedEdge() != null)
             {
                 patchHolder.getSelectedEdge().increaseSepNumber();
+                if (patchHolder.getSelectedEdge().getSymEdge() != null)
+                {
+                    patchHolder.getSelectedEdge().getSymEdge().increaseSepNumber();
+                }
                 refreshRefinedMesh();
             }
         }
@@ -164,6 +172,10 @@ namespace BachelorArbeitUnity
             if (patchHolder.getSelectedEdge() != null)
             {
                 patchHolder.getSelectedEdge().decreaseSepNumber();
+                if (patchHolder.getSelectedEdge().getSymEdge() != null)
+                {
+                    patchHolder.getSelectedEdge().getSymEdge().decreaseSepNumber();
+                }
                 refreshRefinedMesh();
             }
         }
@@ -225,13 +237,31 @@ namespace BachelorArbeitUnity
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (EventSystem.current.IsPointerOverGameObject(0) || EventSystem.current.IsPointerOverGameObject(-1))
             {
-                if (EventSystem.current.IsPointerOverGameObject(0) || EventSystem.current.IsPointerOverGameObject(-1))
+                return;
+            }
+
+            if (InformationHolder.moveVertex)
+            {
+                if (Input.GetMouseButton(0))
                 {
+                    if (patchHolder.getSelectedVertices().Count == 1)
+                    {
+                        RaycastHit hit;
+                        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                        if (!Physics.Raycast(ray, out hit, float.MaxValue, maskOrgOnly))
+                        {
+                            return;
+                        }
+                        moveVertex(patchHolder.getSelectedVertices()[0], hit.point);
+                    }
                     return;
                 }
+            }
 
+            if (Input.GetMouseButtonDown(0))
+            {
                 RaycastHit hit;
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 LayerMask mask = new LayerMask();
@@ -303,6 +333,7 @@ namespace BachelorArbeitUnity
                                     GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
                                     LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
                                     lineRend.positionCount = edge.getSepNumber() + 1;
+                                    lineRend.widthMultiplier = myMesh.getSize();
                                     int count = 0;
                                     lineRend.SetPosition(count, edge.getV1().getPosition());
                                     count++;
@@ -327,6 +358,7 @@ namespace BachelorArbeitUnity
                                 {
                                     GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
                                     LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                                    lineRend.widthMultiplier = myMesh.getSize();
                                     lineRend.positionCount = 2;
                                     lineRend.SetPosition(0, e.getV1().getPosition());
                                     lineRend.SetPosition(1, e.getV2().getPosition());
@@ -337,6 +369,12 @@ namespace BachelorArbeitUnity
                         break;
                 }
             }
+        }
+
+        private void moveVertex(Vertex vertex, Vector3 point)
+        {
+            vertex.setPosition(point);
+            refreshRefinedMesh();
         }
 
         public void clearSelection()
@@ -355,7 +393,6 @@ namespace BachelorArbeitUnity
                 Face f = newFace(selectedVertices, facePre.flipped);
 
                 clearSelection();
-                patchHolder.updateMesh();
                 refreshRefinedMesh();
             }
             else
@@ -385,10 +422,14 @@ namespace BachelorArbeitUnity
                     patchHolder.selectVertex(vMir);
                 }
                 Face f = newFace(patchHolder.getSelectedVertices(), true);
+
+                for (int i = 0; i < f.getEdges().Count; i++)
+                {
+                    //orgFace.getEdges()[i].setSymEdge(f.getEdges()[f.getEdges().Count - i - 1]);
+                }
                 orgFace.setSymFace(f);
 
                 clearSelection();
-                patchHolder.updateMesh();
                 refreshRefinedMesh();
             }
         }
@@ -430,6 +471,8 @@ namespace BachelorArbeitUnity
 
         public void refreshRefinedMesh()
         {
+            patchHolder.updateMesh();
+
             foreach (HalfEdge he in patchHolder.getHalfEdges())
             {
                 he.resetValues();
@@ -496,6 +539,7 @@ namespace BachelorArbeitUnity
                 {
                     GameObject Liner = Instantiate(MeshLineObj, new Vector3(0, 0, 0), Quaternion.identity);
                     LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                    lineRend.widthMultiplier = myMesh.getSize();
                     lineRend.positionCount = 2;
                     lineRend.SetPosition(0, e.getV1().getPosition());
                     lineRend.SetPosition(1, e.getV2().getPosition());
@@ -507,7 +551,7 @@ namespace BachelorArbeitUnity
         public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
         {
             Ray ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
-            RaycastHit[] hits = Physics.RaycastAll(ray, 2f, maskOrg);
+            RaycastHit[] hits = Physics.RaycastAll(ray, 2f, maskOrgOnly);
             float minDis = float.MaxValue;
             RaycastHit hit = new RaycastHit();
             if (hits.Length > 0)
@@ -525,7 +569,7 @@ namespace BachelorArbeitUnity
             pos = symPlane.mirroredPos(pos);
             normal = symPlane.mirroredPos(normal);
             ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
-            hits = Physics.RaycastAll(ray, 2f, maskOrg);
+            hits = Physics.RaycastAll(ray, 2f, maskOrgOnly);
             minDis = float.MaxValue;
             if (hits.Length > 0)
             {

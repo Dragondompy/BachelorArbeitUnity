@@ -139,6 +139,9 @@ namespace BachelorArbeitUnity
         {
             position = pos;
             newPosition = pos;
+            if (VertexObject != null) {
+                VertexObject.transform.position = pos;
+            }
         }
 
         public void setNewPosition(Vector3 pos)
