@@ -166,6 +166,8 @@ namespace BachelorArbeitUnity
             if (vertex1.getSymVertex() != null && vertex2.getSymVertex() != null)
             {
                 e.setSymEdge(vertex1.getSymVertex().isConnected(vertex2.getSymVertex()));
+                e.setSepNumber(e.getSymEdge().getSepNumber());
+                print(e.getSymEdge().getSepNumber());
             }
             return e;
         }
@@ -249,11 +251,10 @@ namespace BachelorArbeitUnity
             if (selectedEdge != null && selectedEdge.Equals(edges[e]))
             {
                 selectedEdge = null;
+                return selectedEdge;
             }
-            else
-            {
-                selectedEdge = edges[e];
-            }
+            selectedEdge = edges[e];
+            
             return selectedEdge;
         }
 

@@ -124,10 +124,13 @@
     <Compile Include="Assets\Scripts\SyntheticEdge.cs" />
     <Compile Include="Assets\Scripts\Tests\gridcreate.cs" />
     <Compile Include="Assets\Scripts\Tests\MathTest.cs" />
+    <Compile Include="Assets\Scripts\testShader.cs" />
     <Compile Include="Assets\Scripts\UI\MainMenu.cs" />
     <Compile Include="Assets\Scripts\UI\SideMenu.cs" />
     <Compile Include="Assets\Scripts\Vertex.cs" />
     <Compile Include="Assets\Scripts\VertexObj.cs" />
+    <None Include="Assets\Shaders\MyMeshShader.shader" />
+    <None Include="Assets\Shaders\MyMeshShaderOld.shader" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>S:/BachelorArbeit/BachelorArbeitUnity/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

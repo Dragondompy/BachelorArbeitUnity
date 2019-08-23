@@ -17,6 +17,7 @@ namespace BachelorArbeitUnity
             splitToNotSplitVertices = new List<int>();
             splitToNotSplitFaces = new List<int>();
             int[] triangles = new int[calcTri(faces) * 3];
+            List<Color> colors = new List<Color>();
 
             int highest = 0;
             for (int i = 0; i < faces.Count; i++)
@@ -26,6 +27,19 @@ namespace BachelorArbeitUnity
                     List<int> faceVerticesNewIndex = new List<int>();
                     for (int k = 0; k < faces[i].Count; k++)
                     {
+                        if (k == 0)
+                        {
+                            colors.Add(new Color(1, 0, 0, 1));
+                        }
+                        else if (k == 1 || k == faces[i].Count - 1)
+                        {
+                            colors.Add(new Color(1, 1, 0, 1));
+                        }
+                        else
+                        {
+                            colors.Add(new Color(0, 1, 0, 1));
+
+                        }
                         vertices.Add(oldVertices[faces[i][k]]);
                         splitToNotSplitVertices.Add(faces[i][k]);
                         faceVerticesNewIndex.Add(vertices.Count - 1);
@@ -47,7 +61,7 @@ namespace BachelorArbeitUnity
 
             Mesh mesh = new Mesh();
             mesh.vertices = getArrayfromList(vertices);
-
+            mesh.colors = getArrayfromList(colors);
             mesh.triangles = triangles;
             mesh.RecalculateNormals();
 
@@ -64,6 +78,18 @@ namespace BachelorArbeitUnity
             }
 
             return ver;
+        }
+
+        private Color[] getArrayfromList(List<Color> colors)
+        {
+            Color[] col = new Color[colors.Count];
+
+            for (int i = 0; i < colors.Count; i++)
+            {
+                col[i] = colors[i];
+            }
+
+            return col;
         }
 
         //Depricated

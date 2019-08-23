@@ -165,6 +165,30 @@ namespace BachelorArbeitUnity
                 }
                 refreshRefinedMesh();
             }
+            else if (patchHolder.getSelectedFace() != null)
+            {
+                List<Edge> edges = patchHolder.getSelectedFace().getEdges();
+                foreach (Edge e in edges)
+                {
+                    e.increaseSepNumber();
+                    if (e.getSymEdge() != null)
+                    {
+                        e.getSymEdge().increaseSepNumber();
+                    }
+                }
+                refreshRefinedMesh();
+                removeLines();
+                foreach (Edge e in patchHolder.getSelectedFace().getInnerEdges())
+                {
+                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                    lineRend.widthMultiplier = myMesh.getSize();
+                    lineRend.positionCount = 2;
+                    lineRend.SetPosition(0, e.getV1().getPosition());
+                    lineRend.SetPosition(1, e.getV2().getPosition());
+                    lines.Add(Liner);
+                }
+            }
         }
 
         public void decreaseSepNumber()
@@ -177,6 +201,30 @@ namespace BachelorArbeitUnity
                     patchHolder.getSelectedEdge().getSymEdge().decreaseSepNumber();
                 }
                 refreshRefinedMesh();
+            }
+            else if (patchHolder.getSelectedFace() != null)
+            {
+                List<Edge> edges = patchHolder.getSelectedFace().getEdges();
+                foreach (Edge e in edges)
+                {
+                    e.decreaseSepNumber();
+                    if (e.getSymEdge() != null)
+                    {
+                        e.getSymEdge().decreaseSepNumber();
+                    }
+                }
+                refreshRefinedMesh();
+                removeLines();
+                foreach (Edge e in patchHolder.getSelectedFace().getInnerEdges())
+                {
+                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                    lineRend.widthMultiplier = myMesh.getSize();
+                    lineRend.positionCount = 2;
+                    lineRend.SetPosition(0, e.getV1().getPosition());
+                    lineRend.SetPosition(1, e.getV2().getPosition());
+                    lines.Add(Liner);
+                }
             }
         }
 
@@ -218,14 +266,14 @@ namespace BachelorArbeitUnity
 
         public void createSymmetryPlane()
         {
-            if (symPlane != null)
-            {
-                return;
-            }
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
             if (selectedVertices.Count < 3)
             {
                 return;
+            }
+            if (symPlane != null)
+            {
+                Destroy(symPlane.gameObject);
             }
             GameObject go = Instantiate(symPlaneObject, new Vector3(0, 0, 0), Quaternion.identity);
             symPlane = go.GetComponent<SymmetryPlane>();
@@ -306,7 +354,7 @@ namespace BachelorArbeitUnity
                     case "PatchHolder":
                         if (InformationHolder.selectEdge)
                         {
-                            Face f = patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
+                            Face f = patchHolder.getFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                             Edge edge = null;
                             if (f != null)
                             {
@@ -314,7 +362,7 @@ namespace BachelorArbeitUnity
                                 foreach (Edge e in f.getEdges())
                                 {
                                     Vector3 linePoint = e.getV1().getPosition();
-                                    Vector3 lineVec = e.getV2().getPosition() - e.getV1().getPosition();
+                                    Vector3 lineVec = e.getDirection().normalized;
 
                                     Vector3 linePointToPoint = impactPoint - linePoint;
                                     float t = Vector3.Dot(linePointToPoint, lineVec);
@@ -422,11 +470,6 @@ namespace BachelorArbeitUnity
                     patchHolder.selectVertex(vMir);
                 }
                 Face f = newFace(patchHolder.getSelectedVertices(), true);
-
-                for (int i = 0; i < f.getEdges().Count; i++)
-                {
-                    //orgFace.getEdges()[i].setSymEdge(f.getEdges()[f.getEdges().Count - i - 1]);
-                }
                 orgFace.setSymFace(f);
 
                 clearSelection();
@@ -464,7 +507,10 @@ namespace BachelorArbeitUnity
                 }
                 count += edges[i].getSepNumber();
             }
-            edges[edges.Count - 1].setSepNumber(2 + count % 2);
+            if (edges[edges.Count - 1].getSepNumber() <= 0)
+            {
+                edges[edges.Count - 1].setSepNumber(2 + count % 2);
+            }
             return f;
         }
 
@@ -550,8 +596,9 @@ namespace BachelorArbeitUnity
 
         public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
         {
-            Ray ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
-            RaycastHit[] hits = Physics.RaycastAll(ray, 2f, maskOrgOnly);
+            Ray ray = new Ray(pos + normal * 20 * InformationHolder.threshHold, -normal);
+            RaycastHit[] hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
+
             float minDis = float.MaxValue;
             RaycastHit hit = new RaycastHit();
             if (hits.Length > 0)
@@ -566,24 +613,28 @@ namespace BachelorArbeitUnity
                 }
                 return hit.point;
             }
-            pos = symPlane.mirroredPos(pos);
-            normal = symPlane.mirroredPos(normal);
-            ray = new Ray(pos + normal * InformationHolder.threshHold, -normal);
-            hits = Physics.RaycastAll(ray, 2f, maskOrgOnly);
-            minDis = float.MaxValue;
-            if (hits.Length > 0)
+            if (symPlane != null)
             {
-                foreach (RaycastHit h in hits)
+                pos = symPlane.mirroredPos(pos);
+                normal = symPlane.mirroredPos(normal);
+                ray = new Ray(pos + normal * 20 * InformationHolder.threshHold, -normal);
+                hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
+                minDis = float.MaxValue;
+                if (hits.Length > 0)
                 {
-                    if ((h.point - pos).magnitude < minDis)
+                    foreach (RaycastHit h in hits)
                     {
-                        minDis = (h.point - pos).magnitude;
-                        hit = h;
+                        if ((h.point - pos).magnitude < minDis)
+                        {
+                            minDis = (h.point - pos).magnitude;
+                            hit = h;
+                        }
                     }
+                    return symPlane.mirroredPos(hit.point);
                 }
-                return symPlane.mirroredPos(hit.point);
+                return symPlane.mirroredPos(pos);
             }
-            return symPlane.mirroredPos(pos);
+            return pos;
         }
 
         //creates the corner vertices of the face in patchHolderMesh in the refinedMesh
