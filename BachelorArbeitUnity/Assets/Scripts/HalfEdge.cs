@@ -152,6 +152,19 @@ namespace BachelorArbeitUnity
             verticesOnEdge = null;
         }
 
+        public void switchVertex(Vertex oldV, Vertex newV)
+        {
+            if (oldV.Equals(v1))
+            {
+                v1 = newV;
+            }
+            else if (oldV.Equals(v2))
+            {
+                v2 = newV;
+            }
+            f.switchVertex(oldV, newV);
+        }
+
         public Vector3 getDirection()
         {
             return v2.getPosition() - v1.getPosition();

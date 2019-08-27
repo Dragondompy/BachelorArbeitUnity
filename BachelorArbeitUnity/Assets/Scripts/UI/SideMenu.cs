@@ -187,6 +187,11 @@ namespace BachelorArbeitUnity
             InformationHolder.con.createFace();
         }
 
+        public void concatinateVertices()
+        {
+            InformationHolder.con.concatinateVertices();
+        }
+
         public void moveVertex()
         {
             InformationHolder.moveVertex = !InformationHolder.moveVertex;

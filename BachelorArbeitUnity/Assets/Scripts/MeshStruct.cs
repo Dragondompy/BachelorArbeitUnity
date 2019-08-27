@@ -254,7 +254,7 @@ namespace BachelorArbeitUnity
                 return selectedEdge;
             }
             selectedEdge = edges[e];
-            
+
             return selectedEdge;
         }
 
@@ -277,12 +277,26 @@ namespace BachelorArbeitUnity
             {
                 if (faceExists(selectedFace.getHandleNumber()))
                 {
+                    int hn = selectedFace.getHandleNumber();
                     selectedFace.delete();
+                    faces.Remove(selectedFace);
+                    foreach (Face f in faces)
+                    {
+                        if (f.getHandleNumber() > hn)
+                        {
+                            f.setHandleNumber(f.getHandleNumber() - 1);
+                        }
+                    }
+                    selectedFace = null;
                 }
                 else
                 {
-                    print("No Face Selected");
+                    print("Face is not Valid");
                 }
+            }
+            else
+            {
+                print("No Face selected");
             }
         }
 
@@ -295,6 +309,27 @@ namespace BachelorArbeitUnity
             gameObject.GetComponent<MeshCollider>().sharedMesh = ownMesh;
             splitToNotSplitVertices = loader.getSplitToNotSplitVertices();
             splitToNotSplitFaces = loader.getSplitToNotSplitFaces();
+        }
+
+        internal void concatinateVertices(Vertex vertex1, Vertex vertex2)
+        {
+            /*
+            Vector3 pos = (vertex1.getPosition() + vertex2.getPosition()) / 2f;
+            Edge edge = vertex1.isConnected(vertex2);
+            if (edge == null)
+            {
+                foreach (Edge e in vertex2.getEdges())
+                {
+                    e.switchVertex(vertex1, vertex2);
+                }
+                vertex2.removeAllEdges();
+                //print(new ObjMesh(this));
+            }
+            else
+            {
+
+            }
+            vertex2.setPosition(pos);*/
         }
 
         //deletes Vertex from Mesh TODO concatinate faces

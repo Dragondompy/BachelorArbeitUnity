@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2869186221447468467}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: rotator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 449556723046321015}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: NormalArrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,9 +75,9 @@ GameObject:
   - component: {fileID: 3032842749653687933}
   - component: {fileID: -2957842381520445565}
   - component: {fileID: -8358754384697330888}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: FacePreview
-  m_TagString: Untagged
+  m_TagString: PreFace
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -168,7 +168,7 @@ GameObject:
   - component: {fileID: 7263656890698624554}
   - component: {fileID: 176114780214815961}
   - component: {fileID: 3110060971437298952}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Cylinder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -259,6 +259,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Cone
+      objectReference: {fileID: 0}
+    - target: {fileID: 2189391220493988747, guid: 621370bdd7b48824983419b09983ee75,
+        type: 3}
+      propertyPath: m_Layer
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 6149150915234050758, guid: 621370bdd7b48824983419b09983ee75,
         type: 3}

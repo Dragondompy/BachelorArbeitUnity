@@ -9,6 +9,7 @@ TagManager:
   - RefinedMesh
   - PatchHolder
   - MeshObject
+  - PreFace
   layers:
   - Default
   - TransparentFX

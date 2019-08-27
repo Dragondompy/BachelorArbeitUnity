@@ -122,6 +122,26 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void switchVertex(Vertex oldV, Vertex newV)
+        {
+            if (oldV.Equals(v1))
+            {
+                v1 = newV;
+            }
+            else if (oldV.Equals(v2))
+            {
+                v2 = newV;
+            }
+            if (h1 != null && h1.isValid())
+            {
+                h1.switchVertex(oldV, newV);
+            }
+            if (h2 != null && h2.isValid())
+            {
+                h2.switchVertex(oldV, newV);
+            }
+        }
+
         //returns the Vector from Vertex v1 to Vertex v2
         public Vector3 getDirection()
         {

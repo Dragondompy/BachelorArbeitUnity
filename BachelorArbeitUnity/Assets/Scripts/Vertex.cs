@@ -69,6 +69,11 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void removeAllEdges() {
+            edges.Clear();
+            delete();
+        }
+
         public void remEdge(Edge edge)
         {
             edges.Remove(edge);
@@ -80,7 +85,6 @@ namespace BachelorArbeitUnity
 
         public double distanceTo(Vertex v)
         {
-
             return (getPosition() - v.getPosition()).magnitude;
         }
 

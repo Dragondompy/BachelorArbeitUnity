@@ -35,7 +35,6 @@ namespace BachelorArbeitUnity
 
         private string objName;
         private List<GameObject> lines;
-        private List<GameObject> meshLines;
         private facePreview facePre;
 
         private void Awake()
@@ -52,7 +51,6 @@ namespace BachelorArbeitUnity
         void Start()
         {
             lines = new List<GameObject>();
-            meshLines = new List<GameObject>();
 
             GameObject FacePreObj = Instantiate(facePreviewObj, new Vector3(0, 0, 0), Quaternion.identity);
             facePre = FacePreObj.GetComponent<facePreview>();
@@ -128,10 +126,6 @@ namespace BachelorArbeitUnity
         public void showNewMesh(bool v)
         {
             refinedMesh.GetComponent<MeshRenderer>().enabled = v;
-            foreach (GameObject o in meshLines)
-            {
-                o.GetComponent<LineRenderer>().enabled = v;
-            }
         }
 
         public void saveMesh(string name)
@@ -149,7 +143,6 @@ namespace BachelorArbeitUnity
         public void deleteSelectedFace()
         {
             patchHolder.deleteSelectedFace();
-            patchHolder.getFaces().Remove(patchHolder.getSelectedFace());
             refreshRefinedMesh();
             removeLines();
         }
@@ -255,15 +248,6 @@ namespace BachelorArbeitUnity
             lines.Clear();
         }
 
-        public void removeMeshLines()
-        {
-            foreach (GameObject o in meshLines)
-            {
-                Destroy(o);
-            }
-            meshLines.Clear();
-        }
-
         public void createSymmetryPlane()
         {
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
@@ -281,10 +265,22 @@ namespace BachelorArbeitUnity
 
             clearSelection();
         }
-
+        public void concatinateVertices()
+        {
+            List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
+            if (selectedVertices.Count == 2) {
+                patchHolder.concatinateVertices(selectedVertices[0], selectedVertices[1]);
+            }
+            //refreshRefinedMesh();
+        }
         // Update is called once per frame
         void Update()
         {
+            if (Input.GetButtonDown("Jump"))
+            {
+                createFace();
+                return;
+            }
             if (EventSystem.current.IsPointerOverGameObject(0) || EventSystem.current.IsPointerOverGameObject(-1))
             {
                 return;
@@ -356,7 +352,7 @@ namespace BachelorArbeitUnity
                         {
                             Face f = patchHolder.getFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                             Edge edge = null;
-                            if (f != null)
+                            if (f != null && f.isValid())
                             {
                                 float min = float.MaxValue;
                                 foreach (Edge e in f.getEdges())
@@ -376,7 +372,7 @@ namespace BachelorArbeitUnity
                                 }
                                 edge = patchHolder.selectEdgeAt(edge.getHandleNumber());
                                 removeLines();
-                                if (edge != null)
+                                if (edge != null && edge.isValid())
                                 {
                                     GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
                                     LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
@@ -400,7 +396,7 @@ namespace BachelorArbeitUnity
                         {
                             Face f = patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                             removeLines();
-                            if (f != null)
+                            if (f != null && f.isValid())
                             {
                                 foreach (Edge e in f.getInnerEdges())
                                 {
@@ -577,21 +573,6 @@ namespace BachelorArbeitUnity
             }
 
             refinedMesh.updateMesh();
-
-            removeMeshLines();
-            foreach (Edge e in refinedMesh.getEdges())
-            {
-                if (e.isValid())
-                {
-                    GameObject Liner = Instantiate(MeshLineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                    lineRend.widthMultiplier = myMesh.getSize();
-                    lineRend.positionCount = 2;
-                    lineRend.SetPosition(0, e.getV1().getPosition());
-                    lineRend.SetPosition(1, e.getV2().getPosition());
-                    meshLines.Add(Liner);
-                }
-            }
         }
 
         public Vector3 fitToMesh(Vector3 pos, Vector3 normal)

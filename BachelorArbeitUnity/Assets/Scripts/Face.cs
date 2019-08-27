@@ -140,6 +140,18 @@ namespace BachelorArbeitUnity
             innerVertices.Clear();
         }
 
+        public void switchVertex(Vertex oldV, Vertex newV)
+        {
+            for (int i = 0; i < vertices.Count; i++)
+            {
+                if (oldV.Equals(vertices[i]))
+                {
+                    vertices[i] = newV;
+                    Debug.Log("replaced "+oldV);
+                }
+            }
+        }
+
         public void delete()
         {
             handleNumber = -1;
