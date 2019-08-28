@@ -23,8 +23,6 @@ namespace BachelorArbeitUnity
             innerVertices = new List<Vertex>();
 
             setMesh(m);
-            setHandleNumber(m.getFaceHandleNumber());
-            m.getFaces().Add(this);
         }
 
         public Face(String isEmpty)
@@ -137,6 +135,10 @@ namespace BachelorArbeitUnity
 
         public void resetValues()
         {
+            foreach (Vertex v in innerVertices)
+            {
+                v.delete();
+            }
             innerVertices.Clear();
         }
 
@@ -147,7 +149,7 @@ namespace BachelorArbeitUnity
                 if (oldV.Equals(vertices[i]))
                 {
                     vertices[i] = newV;
-                    Debug.Log("replaced "+oldV);
+                    Debug.Log("replaced " + oldV);
                 }
             }
         }
@@ -174,6 +176,7 @@ namespace BachelorArbeitUnity
             {
                 symFace.setSymFace(null);
             }
+            mesh.removeFace(this);
         }
 
         public Vector3 getNormal()

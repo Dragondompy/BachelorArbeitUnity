@@ -11,6 +11,7 @@ namespace BachelorArbeitUnity
         private List<int> splitToNotSplitFaces;
         public Mesh newLoad(ObjMesh o)
         {
+            Debug.Log("DONT USE");
             List<List<int>> faces = o.getFaces();
             List<Vector3> oldVertices = o.getVertices();
             List<Vector3> vertices = new List<Vector3>();
@@ -48,6 +49,66 @@ namespace BachelorArbeitUnity
                     for (int j = 0; j < faces[i].Count - 2; j++)
                     {
                         splitToNotSplitFaces.Add(i);
+                        triangles[highest + 0] = faceVerticesNewIndex[0];
+
+                        triangles[highest + 1] = faceVerticesNewIndex[j + 1];
+
+                        triangles[highest + 2] = faceVerticesNewIndex[j + 2];
+
+                        highest += 3;
+                    }
+                }
+            }
+
+            Mesh mesh = new Mesh();
+            mesh.vertices = getArrayfromList(vertices);
+            mesh.colors = getArrayfromList(colors);
+            mesh.triangles = triangles;
+            mesh.RecalculateNormals();
+
+            return mesh;
+        }
+        public Mesh newLoad(MeshStruct m)
+        {
+            List<Face> faces = m.getFaces();
+            List<Vertex> oldVertices = m.getVertices();
+            List<Vector3> vertices = new List<Vector3>();
+            splitToNotSplitVertices = new List<int>();
+            splitToNotSplitFaces = new List<int>();
+            int[] triangles = new int[calcTri(faces) * 3];
+            List<Color> colors = new List<Color>();
+
+            int highest = 0;
+            for (int i = 0; i < faces.Count; i++)
+            {
+                Face f = faces[i];
+                List<Vertex> verts = f.getVertices();
+                if (verts.Count > 2)
+                {
+                    List<int> faceVerticesNewIndex = new List<int>();
+                    for (int k = 0; k < verts.Count; k++)
+                    {
+                        if (k == 0)
+                        {
+                            colors.Add(new Color(1, 0, 0, 1));
+                        }
+                        else if (k == 1 || k == verts.Count - 1)
+                        {
+                            colors.Add(new Color(1, 1, 0, 1));
+                        }
+                        else
+                        {
+                            colors.Add(new Color(0, 1, 0, 1));
+
+                        }
+                        vertices.Add(verts[k].getPosition());
+                        splitToNotSplitVertices.Add(verts[k].getHandleNumber());
+                        faceVerticesNewIndex.Add(vertices.Count - 1);
+                    }
+
+                    for (int j = 0; j < verts.Count - 2; j++)
+                    {
+                        splitToNotSplitFaces.Add(f.getHandleNumber());
                         triangles[highest + 0] = faceVerticesNewIndex[0];
 
                         triangles[highest + 1] = faceVerticesNewIndex[j + 1];
@@ -124,11 +185,23 @@ namespace BachelorArbeitUnity
 
             Mesh mesh = new Mesh();
             mesh.vertices = vertices;
-            //mesh.uv = uv;
             mesh.triangles = triangles;
             mesh.RecalculateNormals();
 
             return mesh;
+        }
+
+        private int calcTri(List<Face> faces)
+        {
+            int count = 0;
+            foreach (Face f in faces)
+            {
+                if (f.getVertices().Count > 2)
+                {
+                    count += f.getVertices().Count - 2;
+                }
+            }
+            return count;
         }
 
         private int calcTri(List<List<int>> faces)

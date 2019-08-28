@@ -33,20 +33,6 @@ namespace BachelorArbeitUnity
             pattern.createFaces(newMesh, face, innerListVertices);
 
             simpleRepositionVertices(face, 10);
-
-            /*foreach (List<int>l in innerListVertices) {
-				foreach (int i in l) {
-					Console.Write (i + " ");
-				}
-				Console.WriteLine ();
-			}
-			List<int> test = new List<int> ();
-			foreach (List<int> l in innerVertices) {
-				foreach (int i in l) {
-					test.Add (i);
-				}
-			}
-			newMesh.addSimpleFace (test);*/
         }
 
         //adds the vertices of outer flows to the Mesh and the halfedges

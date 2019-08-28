@@ -15,10 +15,9 @@ namespace BachelorArbeitUnity
         private int outerFlowPreset;
         private int outerFlow;
         private int reduced;
-        private Vertex newV1;
-        private Vertex newV2;
         private int[,] additionalVertices;
         private Vertex[] verticesOnEdge;
+        private MeshStruct m;
 
         private HalfEdge symHalfEdge;
 
@@ -32,8 +31,8 @@ namespace BachelorArbeitUnity
             setFace(f);
 
             e.addHalfEdge(this);
-            this.handleNumber = m.getHalfEdgeHandleNumber();
-            m.getHalfEdges().Add(this);
+            m.addHalfEdge(this);
+            this.m = m;
         }
 
         public Boolean contains(Vertex v)
@@ -146,10 +145,7 @@ namespace BachelorArbeitUnity
         {
             reduced = -1;
             outerFlow = 0;
-            newV1 = null;
-            newV2 = null;
             additionalVertices = null;
-            verticesOnEdge = null;
         }
 
         public void switchVertex(Vertex oldV, Vertex newV)
@@ -183,6 +179,7 @@ namespace BachelorArbeitUnity
             {
                 e.remHalfEdge(this);
             }
+            m.removeHalfEdge(this);
         }
 
         public Face getF()
@@ -207,12 +204,12 @@ namespace BachelorArbeitUnity
 
         public Vertex getNewV1()
         {
-            return newV1;
+            return v1.getRefinedVertex();
         }
 
         public Vertex getNewV2()
         {
-            return newV2;
+            return v2.getRefinedVertex();
         }
 
         public int getReduced()
@@ -275,7 +272,7 @@ namespace BachelorArbeitUnity
             this.v2 = v;
         }
 
-        public void setNewV1(Vertex v)
+        /*public void setNewV1(Vertex v)
         {
             this.newV1 = v;
         }
@@ -283,7 +280,7 @@ namespace BachelorArbeitUnity
         public void setNewV2(Vertex v)
         {
             this.newV2 = v;
-        }
+        }*/
 
         public void setReduced(int reduced)
         {
@@ -293,6 +290,11 @@ namespace BachelorArbeitUnity
         public void setOuterFlow(int outerFlow)
         {
             this.outerFlow = outerFlow;
+        }
+
+        public void setHandleNumber(int handleNumber)
+        {
+            this.handleNumber = handleNumber;
         }
 
         public void setSymHalfEdge(HalfEdge h)

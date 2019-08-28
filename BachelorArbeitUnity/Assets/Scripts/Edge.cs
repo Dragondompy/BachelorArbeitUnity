@@ -13,16 +13,14 @@ namespace BachelorArbeitUnity
         private Vertex v1;
         private Vertex v2;
         private int sepNumber;
-        private MeshStruct m;
         private GameObject EdgeObject;
 
         private Vertex[] verticesOnEdge;
-        private Vertex newV1;
-        private Vertex newV2;
 
         private Edge symEdge;
 
         private int handleNumber;
+        private MeshStruct m;
 
         public Edge(Vertex v1, Vertex v2, Face f, MeshStruct m)
         {
@@ -112,6 +110,8 @@ namespace BachelorArbeitUnity
             {
                 symEdge.setSymEdge(null);
             }
+
+            m.removeEdge(this);
         }
 
         public void remHalfEdge(HalfEdge he)
@@ -236,8 +236,6 @@ namespace BachelorArbeitUnity
         public void resetValues()
         {
             verticesOnEdge = null;
-            newV1 = null;
-            newV2 = null;
         }
 
         //returns if the edge is valid or deleted
@@ -278,12 +276,12 @@ namespace BachelorArbeitUnity
 
         public Vertex getNewV1()
         {
-            return newV1;
+            return v1.getRefinedVertex();
         }
 
         public Vertex getNewV2()
         {
-            return newV2;
+            return v2.getRefinedVertex();
         }
 
         public int getHandleNumber()
@@ -331,7 +329,7 @@ namespace BachelorArbeitUnity
             this.f2 = f;
         }
 
-        public void setNewV1(Vertex v)
+        /*public void setNewV1(Vertex v)
         {
             this.newV1 = v;
         }
@@ -339,7 +337,7 @@ namespace BachelorArbeitUnity
         public void setNewV2(Vertex v)
         {
             this.newV2 = v;
-        }
+        }*/
 
         public void setHandleNumber(int handleNumber)
         {

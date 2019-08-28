@@ -10,9 +10,13 @@ namespace BachelorArbeitUnity
 
         private EmptyPattern utils;
         private List<Vertex> vertices;
+        private int vertexHn;
         private List<Face> faces;
+        private int faceHn;
         private List<Edge> edges;
+        private int edgeHn;
         private List<HalfEdge> halfEdges;
+        private int halfedgeHn;
         private List<Vertex> selectedVertices;
         private Edge selectedEdge;
         private Face selectedFace;
@@ -107,20 +111,9 @@ namespace BachelorArbeitUnity
             return Mathf.Max(maxX - minX, maxY - minY, maxZ - minZ) / (param);
         }
 
-        //adds a Vertex to the Mesh and sets the handlenumber for that vertex
-        public Vertex addVertex(Vector3 pos)
-        {
-            Vertex v = new Vertex(pos);
-            v.setPosition(pos);
-            v.setHandleNumber(getVertexHandleNumber());
-            vertices.Add(v);
-
-            return v;
-        }
-
         public Boolean vertexExists(int hn)
         {
-            if (hn < getVertexHandleNumber() && hn >= 0 && vertices[hn].getHandleNumber() >= 0)
+            if (hn < getVertexHandleNumber() && hn >= 0 && getVertexAt(hn).getHandleNumber() >= 0)
             {
                 return true;
             }
@@ -129,7 +122,7 @@ namespace BachelorArbeitUnity
 
         public Boolean edgeExists(int hn)
         {
-            if (hn < getEdgeHandleNumber() && hn >= 0 && edges[hn].getHandleNumber() >= 0)
+            if (hn < getEdgeHandleNumber() && hn >= 0 && getEdgeAt(hn).getHandleNumber() >= 0)
             {
                 return true;
             }
@@ -138,19 +131,31 @@ namespace BachelorArbeitUnity
 
         public Boolean faceExists(int hn)
         {
-            if (hn < getFaceHandleNumber() && hn >= 0 && faces[hn].getHandleNumber() >= 0)
+            if (hn < getFaceHandleNumber() && hn >= 0 && getFaceAt(hn).getHandleNumber() >= 0)
             {
                 return true;
             }
             return false;
         }
 
+        //adds a Vertex to the Mesh and sets the handlenumber for that vertex
+        public Vertex addVertex(Vector3 pos)
+        {
+            Vertex v = new Vertex(pos, this);
+            v.setPosition(pos);
+            v.setHandleNumber(getVertexHandleNumber());
+            vertices.Add(v);
+            vertexHn++;
+
+            return v;
+        }
+
         //adds the edge between to vertices to the mesh if it doesnt exist already
         //also adds the face to the edge
         public Edge addEdge(Face f, int v1, int v2)
         {
-            Vertex vertex1 = (vertices[v1]);
-            Vertex vertex2 = (vertices[v2]);
+            Vertex vertex1 = (getVertexAt(v1));
+            Vertex vertex2 = (getVertexAt(v2));
             Edge e = vertex1.isConnected(vertex2);
 
             if (e == null)
@@ -158,6 +163,7 @@ namespace BachelorArbeitUnity
                 e = new Edge(vertex1, vertex2, f, this);
                 e.setHandleNumber(getEdgeHandleNumber());
                 edges.Add(e);
+                edgeHn++;
             }
             else
             {
@@ -179,17 +185,48 @@ namespace BachelorArbeitUnity
             return face;
         }
 
-        public Face addSimpleFace(List<int> vertices)
+        public HalfEdge addHalfEdge(HalfEdge h)
+        {
+            h.setHandleNumber(getHalfEdgeHandleNumber());
+            halfEdges.Add(h);
+            halfedgeHn++;
+            return h;
+        }
+
+        public Face addSimpleFace(List<int> faceVer)
         {
             Face face = new Face(this);
-            int prevVertex = vertices[vertices.Count - 1];
-            foreach (int i in vertices)
+            int prevVertex = faceVer[faceVer.Count - 1];
+            foreach (int i in faceVer)
             {
                 face.addVertex(i);
                 face.addEdge(addEdge(face, prevVertex, i));
                 prevVertex = i;
             }
+            face.setHandleNumber(getFaceHandleNumber());
+            faces.Add(face);
+            faceHn++;
             return face;
+        }
+
+        public void removeVertex(Vertex v)
+        {
+            vertices.Remove(v);
+        }
+
+        public void removeEdge(Edge e)
+        {
+            edges.Remove(e);
+        }
+
+        public void removeFace(Face f)
+        {
+            faces.Remove(f);
+        }
+
+        public void removeHalfEdge(HalfEdge h)
+        {
+            halfEdges.Remove(h);
         }
 
         public void selectVertex(Vertex ver)
@@ -248,25 +285,25 @@ namespace BachelorArbeitUnity
 
         public Edge selectEdgeAt(int e)
         {
-            if (selectedEdge != null && selectedEdge.Equals(edges[e]))
+            if (selectedEdge != null && selectedEdge.Equals(getEdgeAt(e)))
             {
                 selectedEdge = null;
                 return selectedEdge;
             }
-            selectedEdge = edges[e];
+            selectedEdge = getEdgeAt(e);
 
             return selectedEdge;
         }
 
         public Face selectFaceAt(int f)
         {
-            if (selectedFace != null && selectedFace.Equals(faces[f]))
+            if (selectedFace != null && selectedFace.Equals(getFaceAt(f)) && InformationHolder.selectFace)
             {
                 selectedFace = null;
             }
             else
             {
-                selectedFace = faces[f];
+                selectedFace = getFaceAt(f);
             }
             return selectedFace;
         }
@@ -279,14 +316,6 @@ namespace BachelorArbeitUnity
                 {
                     int hn = selectedFace.getHandleNumber();
                     selectedFace.delete();
-                    faces.Remove(selectedFace);
-                    foreach (Face f in faces)
-                    {
-                        if (f.getHandleNumber() > hn)
-                        {
-                            f.setHandleNumber(f.getHandleNumber() - 1);
-                        }
-                    }
                     selectedFace = null;
                 }
                 else
@@ -302,18 +331,17 @@ namespace BachelorArbeitUnity
 
         public void updateMesh()
         {
-            ObjMesh helper = new ObjMesh(this);
             ObjLoader loader = new ObjLoader();
-            Mesh ownMesh = loader.newLoad(helper);
+            Mesh ownMesh = loader.newLoad(this);
             gameObject.GetComponent<MeshFilter>().mesh = ownMesh;
             gameObject.GetComponent<MeshCollider>().sharedMesh = ownMesh;
             splitToNotSplitVertices = loader.getSplitToNotSplitVertices();
             splitToNotSplitFaces = loader.getSplitToNotSplitFaces();
         }
 
-        internal void concatinateVertices(Vertex vertex1, Vertex vertex2)
+        internal void concatinateVertices(Vertex vertex1, Vertex vertex2) //TODO 
         {
-            /*
+            Debug.Log("Not BugFree at all");
             Vector3 pos = (vertex1.getPosition() + vertex2.getPosition()) / 2f;
             Edge edge = vertex1.isConnected(vertex2);
             if (edge == null)
@@ -323,26 +351,17 @@ namespace BachelorArbeitUnity
                     e.switchVertex(vertex1, vertex2);
                 }
                 vertex2.removeAllEdges();
-                //print(new ObjMesh(this));
             }
-            else
-            {
-
-            }
-            vertex2.setPosition(pos);*/
-        }
-
-        //deletes Vertex from Mesh TODO concatinate faces
-        public void deleteVertex(int handleNumber)
-        {
-            vertices[handleNumber].delete();
         }
 
         public Vertex getVertexAt(int v)
         {
-            if (vertexExists(v))
+            foreach (Vertex ver in vertices)
             {
-                return vertices[v];
+                if (ver.getHandleNumber() == v)
+                {
+                    return ver;
+                }
             }
             Debug.Log("There is no Vertex at " + v);
             return new Vertex("Empty");
@@ -350,9 +369,12 @@ namespace BachelorArbeitUnity
 
         public Edge getEdgeAt(int e)
         {
-            if (edgeExists(e))
+            foreach (Edge ed in edges)
             {
-                return edges[e];
+                if (ed.getHandleNumber() == e)
+                {
+                    return ed;
+                }
             }
             Debug.Log("There is no Edge at " + e);
             return new Edge("Empty");
@@ -360,9 +382,12 @@ namespace BachelorArbeitUnity
 
         public Face getFaceAt(int f)
         {
-            if (faceExists(f))
+            foreach (Face fa in faces)
             {
-                return faces[f];
+                if (fa.getHandleNumber() == f)
+                {
+                    return fa;
+                }
             }
             Debug.Log("There is no Face at " + f);
             return new Face("Empty");
@@ -425,22 +450,22 @@ namespace BachelorArbeitUnity
 
         public int getVertexHandleNumber()
         {
-            return vertices.Count;
+            return vertexHn;
         }
 
         public int getFaceHandleNumber()
         {
-            return faces.Count;
+            return faceHn;
         }
 
         public int getEdgeHandleNumber()
         {
-            return edges.Count;
+            return edgeHn;
         }
 
         public int getHalfEdgeHandleNumber()
         {
-            return halfEdges.Count;
+            return halfedgeHn;
         }
 
         public void setSplitToNotSplitVertices(List<int> s)

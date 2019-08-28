@@ -7,6 +7,7 @@ namespace BachelorArbeitUnity
     public class Vertex
     {
         private int handleNumber;
+        private MeshStruct m;
         private Vector3 position;
         private Vector3 newPosition;
         private GameObject VertexObject;
@@ -15,11 +16,13 @@ namespace BachelorArbeitUnity
 
         private List<Edge> edges;
         private Vertex symVertex;
+        private Vertex refinedVertex;
 
-        public Vertex(Vector3 pos)
+        public Vertex(Vector3 pos, MeshStruct m)
         {
             edges = new List<Edge>();
             setPosition(pos);
+            this.m = m;
         }
 
         public Vertex(string isEmpty)
@@ -67,9 +70,12 @@ namespace BachelorArbeitUnity
             {
                 symVertex.setSymVertex(null);
             }
+
+            m.removeVertex(this);
         }
 
-        public void removeAllEdges() {
+        public void removeAllEdges()
+        {
             edges.Clear();
             delete();
         }
@@ -91,6 +97,23 @@ namespace BachelorArbeitUnity
         public void updatePosition()
         {
             setPosition(newPosition);
+        }
+
+        public List<Face> getFaces()
+        {
+            List<Face> faces = new List<Face>();
+            foreach (Edge e in edges)
+            {
+                if (e.getF1() != null && !faces.Contains(e.getF1()))
+                {
+                    faces.Add(e.getF1());
+                }
+                if (e.getF2() != null && !faces.Contains(e.getF2()))
+                {
+                    faces.Add(e.getF2());
+                }
+            }
+            return faces;
         }
 
         //returns if the vertex is valid or deleted
@@ -139,12 +162,22 @@ namespace BachelorArbeitUnity
             return symVertex;
         }
 
+        public Vertex getRefinedVertex()
+        {
+            return refinedVertex;
+        }
+
         public void setPosition(Vector3 pos)
         {
             position = pos;
             newPosition = pos;
-            if (VertexObject != null) {
+            if (VertexObject != null)
+            {
                 VertexObject.transform.position = pos;
+            }
+            if (refinedVertex != null)
+            {
+                refinedVertex.setPosition(pos);
             }
         }
 
@@ -165,6 +198,11 @@ namespace BachelorArbeitUnity
             {
                 v.setSymVertex(this);
             }
+        }
+
+        public void setRefinedVertex(Vertex v)
+        {
+            refinedVertex = v;
         }
 
         public void setIsSelected(bool s)

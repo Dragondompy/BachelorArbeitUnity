@@ -75,12 +75,6 @@ namespace BachelorArbeitUnity
             myMesh.addGameObjects(VertexObj);
             myMesh.loadMeshFromObj(o);
             myMesh.updateMesh();
-
-            InformationHolder.myMeshToPatchHolder = new int[myMesh.getVertices().Count];
-            for (int i = 0; i < InformationHolder.myMeshToPatchHolder.Length; i++)
-            {
-                InformationHolder.myMeshToPatchHolder[i] = -1;
-            }
         }
 
         private void initializePatchHolder()
@@ -143,43 +137,37 @@ namespace BachelorArbeitUnity
         public void deleteSelectedFace()
         {
             patchHolder.deleteSelectedFace();
-            refreshRefinedMesh();
+            patchHolder.updateMesh();
+            refinedMesh.updateMesh();
             removeLines();
+        }
+
+        private void moveVertex(Vertex vertex, Vector3 point)
+        {
+            vertex.setPosition(point);
+            foreach (Face f in vertex.getFaces())
+            {
+                reDrawFace(f);
+            }
         }
 
         public void increaseSepNumber()
         {
             if (patchHolder.getSelectedEdge() != null)
             {
-                patchHolder.getSelectedEdge().increaseSepNumber();
-                if (patchHolder.getSelectedEdge().getSymEdge() != null)
+                Edge e = patchHolder.getSelectedEdge();
+                changeSepNumber(e, e.getSepNumber() + 1);
+                if (e.getSymEdge() != null)
                 {
-                    patchHolder.getSelectedEdge().getSymEdge().increaseSepNumber();
+                    changeSepNumber(e.getSymEdge(), e.getSymEdge().getSepNumber() + 1);
                 }
-                refreshRefinedMesh();
             }
             else if (patchHolder.getSelectedFace() != null)
             {
-                List<Edge> edges = patchHolder.getSelectedFace().getEdges();
-                foreach (Edge e in edges)
+                changeSepNumber(patchHolder.getSelectedFace(), +1);
+                if (patchHolder.getSelectedFace().getSymFace() != null)
                 {
-                    e.increaseSepNumber();
-                    if (e.getSymEdge() != null)
-                    {
-                        e.getSymEdge().increaseSepNumber();
-                    }
-                }
-                refreshRefinedMesh();
-                removeLines();
-                foreach (Edge e in patchHolder.getSelectedFace().getInnerEdges())
-                {
-                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                    lineRend.widthMultiplier = myMesh.getSize();
-                    lineRend.positionCount = 2;
-                    lineRend.SetPosition(0, e.getV1().getPosition());
-                    lineRend.SetPosition(1, e.getV2().getPosition());
-                    lines.Add(Liner);
+                    changeSepNumber(patchHolder.getSelectedFace().getSymFace(), +1);
                 }
             }
         }
@@ -188,36 +176,53 @@ namespace BachelorArbeitUnity
         {
             if (patchHolder.getSelectedEdge() != null)
             {
-                patchHolder.getSelectedEdge().decreaseSepNumber();
-                if (patchHolder.getSelectedEdge().getSymEdge() != null)
+                Edge e = patchHolder.getSelectedEdge();
+                changeSepNumber(e, e.getSepNumber() - 1);
+                if (e.getSymEdge() != null)
                 {
-                    patchHolder.getSelectedEdge().getSymEdge().decreaseSepNumber();
+                    changeSepNumber(e.getSymEdge(), e.getSymEdge().getSepNumber() - 1);
                 }
-                refreshRefinedMesh();
             }
             else if (patchHolder.getSelectedFace() != null)
             {
-                List<Edge> edges = patchHolder.getSelectedFace().getEdges();
-                foreach (Edge e in edges)
+                changeSepNumber(patchHolder.getSelectedFace(), -1);
+                if (patchHolder.getSelectedFace().getSymFace() != null)
                 {
-                    e.decreaseSepNumber();
-                    if (e.getSymEdge() != null)
-                    {
-                        e.getSymEdge().decreaseSepNumber();
-                    }
+                    changeSepNumber(patchHolder.getSelectedFace().getSymFace(), -1);
                 }
-                refreshRefinedMesh();
-                removeLines();
-                foreach (Edge e in patchHolder.getSelectedFace().getInnerEdges())
-                {
-                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                    lineRend.widthMultiplier = myMesh.getSize();
-                    lineRend.positionCount = 2;
-                    lineRend.SetPosition(0, e.getV1().getPosition());
-                    lineRend.SetPosition(1, e.getV2().getPosition());
-                    lines.Add(Liner);
-                }
+            }
+        }
+
+        public void changeSepNumber(Edge e, int newSepN)
+        {
+            e.setSepNumber(newSepN);
+            e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
+            if (e.getF1() != null)
+            {
+                reDrawFace(e.getF1());
+            }
+            if (e.getF2() != null)
+            {
+                reDrawFace(e.getF2());
+            }
+        }
+
+        public void changeSepNumber(Face f, int deltaSep)
+        {
+            foreach (Edge e in f.getEdges())
+            {
+                changeSepNumber(e, e.getSepNumber() + deltaSep);
+            }
+            removeLines();
+            foreach (Edge e in patchHolder.getSelectedFace().getInnerEdges())
+            {
+                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                lineRend.widthMultiplier = myMesh.getSize();
+                lineRend.positionCount = 2;
+                lineRend.SetPosition(0, e.getV1().getPosition());
+                lineRend.SetPosition(1, e.getV2().getPosition());
+                lines.Add(Liner);
             }
         }
 
@@ -226,7 +231,7 @@ namespace BachelorArbeitUnity
             if (patchHolder.getSelectedEdge() != null)
             {
                 patchHolder.getSelectedEdge().getHalfEdge(patchHolder.getSelectedFace()).increaseOuterFlowPreset();
-                refreshRefinedMesh();
+                reDrawFace(patchHolder.getSelectedFace());
             }
         }
 
@@ -235,7 +240,7 @@ namespace BachelorArbeitUnity
             if (patchHolder.getSelectedEdge() != null)
             {
                 patchHolder.getSelectedEdge().getHalfEdge(patchHolder.getSelectedFace()).decreaseOuterFlowPreset();
-                refreshRefinedMesh();
+                reDrawFace(patchHolder.getSelectedFace());
             }
         }
 
@@ -265,14 +270,20 @@ namespace BachelorArbeitUnity
 
             clearSelection();
         }
-        public void concatinateVertices()
+
+        public void concatinateVertices() //TODO
         {
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
-            if (selectedVertices.Count == 2) {
+            if (selectedVertices.Count == 2)
+            {
                 patchHolder.concatinateVertices(selectedVertices[0], selectedVertices[1]);
             }
-            //refreshRefinedMesh();
+            foreach (Face f in selectedVertices[0].getFaces())
+            {
+                reDrawFace(f);
+            }
         }
+
         // Update is called once per frame
         void Update()
         {
@@ -350,7 +361,7 @@ namespace BachelorArbeitUnity
                     case "PatchHolder":
                         if (InformationHolder.selectEdge)
                         {
-                            Face f = patchHolder.getFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
+                            Face f = patchHolder.selectFaceAt(patchHolder.getSplitToNotSplitFaces()[hit.triangleIndex]);
                             Edge edge = null;
                             if (f != null && f.isValid())
                             {
@@ -415,12 +426,6 @@ namespace BachelorArbeitUnity
             }
         }
 
-        private void moveVertex(Vertex vertex, Vector3 point)
-        {
-            vertex.setPosition(point);
-            refreshRefinedMesh();
-        }
-
         public void clearSelection()
         {
             removeLines();
@@ -437,7 +442,6 @@ namespace BachelorArbeitUnity
                 Face f = newFace(selectedVertices, facePre.flipped);
 
                 clearSelection();
-                refreshRefinedMesh();
             }
             else
             {
@@ -469,7 +473,6 @@ namespace BachelorArbeitUnity
                 orgFace.setSymFace(f);
 
                 clearSelection();
-                refreshRefinedMesh();
             }
         }
 
@@ -488,10 +491,6 @@ namespace BachelorArbeitUnity
             }
 
             Face f = patchHolder.addFace(verticesIndices);
-            foreach (Vertex v in f.getVertices())
-            {
-                v.setIsCreated(true);
-            }
 
             List<Edge> edges = f.getEdges();
             int count = 0;
@@ -507,9 +506,45 @@ namespace BachelorArbeitUnity
             {
                 edges[edges.Count - 1].setSepNumber(2 + count % 2);
             }
+
+            foreach (Vertex v in f.getVertices())
+            {
+                if (!v.getIsCreated())
+                {
+                    Vertex newV = refinedMesh.addVertex(v.getPosition());
+                    v.setRefinedVertex(newV);
+                    v.setIsCreated(true);
+                }
+            }
+            foreach (Edge e in f.getEdges())
+            {
+                if (e.getNewV1().isConnected(e.getNewV2()) == null)
+                {
+                    e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
+                }
+            }
+            executePatch(f, refinedMesh, patchHolder);
+            updateMeshes();
             return f;
         }
 
+        public void reDrawFace(Face f)
+        {
+            f.resetValues();
+            foreach (HalfEdge h in f.getHalfEdges())
+            {
+                h.resetValues();
+            }
+            executePatch(f, refinedMesh, patchHolder);
+            updateMeshes();
+        }
+
+        public void updateMeshes()
+        {
+            patchHolder.updateMesh();
+
+            refinedMesh.updateMesh();
+        }
 
         public void refreshRefinedMesh()
         {
@@ -632,47 +667,12 @@ namespace BachelorArbeitUnity
                         {
                             if (e.getV1().Equals(v))
                             {
-                                e.setNewV1(newV);
+                                e.getV1().setRefinedVertex(newV);
                             }
                             else if (e.getV2().Equals(v))
                             {
-                                e.setNewV2(newV);
+                                e.getV2().setRefinedVertex(newV);
                             }
-                        }
-                    }
-                }
-            }
-            foreach (Edge e in oldMesh.getEdges())
-            {
-                if (e.isValid())
-                {
-                    HalfEdge h = e.getH1();
-                    if (h != null && h.isValid())
-                    {
-                        if (h.getV1().Equals(e.getV1()))
-                        {
-                            h.setNewV1(e.getNewV1());
-                            h.setNewV2(e.getNewV2());
-                        }
-                        else if (h.getV2().Equals(e.getV1()))
-                        {
-                            h.setNewV2(e.getNewV1());
-                            h.setNewV1(e.getNewV2());
-                        }
-                    }
-
-                    h = e.getH2();
-                    if (h != null && h.isValid())
-                    {
-                        if (h.getV1().Equals(e.getV1()))
-                        {
-                            h.setNewV1(e.getNewV1());
-                            h.setNewV2(e.getNewV2());
-                        }
-                        else if (h.getV2().Equals(e.getV1()))
-                        {
-                            h.setNewV2(e.getNewV1());
-                            h.setNewV1(e.getNewV2());
                         }
                     }
                 }

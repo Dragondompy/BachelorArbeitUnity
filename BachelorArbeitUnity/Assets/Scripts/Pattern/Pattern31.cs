@@ -36,8 +36,8 @@ namespace BachelorArbeitUnity
 				int nl = alphaEdge.getVerticesOnEdge () [alphaEdge.getLength () - 2 - i];
 				int nr = alphaEdge.getVerticesOnEdge () [i - 1];
 
-				createFace (l, nl, v, m, newMesh);
-				createFace (r, m, v, nr, newMesh);
+				createFace (l, m, v, nl, newMesh);
+				createFace (r, nr, v, m, newMesh);
 
 				l = nl;
 				m = v;
@@ -46,7 +46,7 @@ namespace BachelorArbeitUnity
 
 			int nv = alphaEdge.getVerticesOnEdge () [alphaEdge.getLength () / 2 - 1];
 
-			createFace (l, nv, r, m, newMesh);
+			createFace (l, m, r, nv, newMesh);
 		}
 	}
 }
