@@ -147,7 +147,7 @@ namespace BachelorArbeitUnity
             vertex.setPosition(point);
             foreach (Face f in vertex.getFaces())
             {
-                reDrawFace(f);
+                reDrawFaceWithEdges(f);
             }
         }
 
@@ -277,10 +277,15 @@ namespace BachelorArbeitUnity
             if (selectedVertices.Count == 2)
             {
                 patchHolder.concatinateVertices(selectedVertices[0], selectedVertices[1]);
-            }
-            foreach (Face f in selectedVertices[0].getFaces())
-            {
-                reDrawFace(f);
+
+                if (selectedVertices[0].getRefinedVertex() != null && selectedVertices[1].getRefinedVertex() != null)
+                {
+                    refinedMesh.concatinateVertices(selectedVertices[0].getRefinedVertex(), selectedVertices[1].getRefinedVertex());
+                }
+                foreach (Face f in selectedVertices[0].getFaces())
+                {
+                    reDrawFaceWithEdges(f);
+                }
             }
         }
 
@@ -537,6 +542,15 @@ namespace BachelorArbeitUnity
             }
             executePatch(f, refinedMesh, patchHolder);
             updateMeshes();
+        }
+
+        public void reDrawFaceWithEdges(Face f)
+        {
+            foreach (Edge e in f.getEdges()) {
+                e.resetValues();
+                e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
+            }
+            reDrawFace(f);
         }
 
         public void updateMeshes()

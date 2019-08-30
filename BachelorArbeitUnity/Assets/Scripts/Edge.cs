@@ -122,23 +122,25 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void switchVertex(Vertex oldV, Vertex newV)
+        public void switchVertex(Vertex newV, Vertex oldV)
         {
             if (oldV.Equals(v1))
             {
                 v1 = newV;
+                newV.addEdge(this);
             }
             else if (oldV.Equals(v2))
             {
                 v2 = newV;
+                newV.addEdge(this);
             }
             if (h1 != null && h1.isValid())
             {
-                h1.switchVertex(oldV, newV);
+                h1.switchVertex(newV, oldV);
             }
             if (h2 != null && h2.isValid())
             {
-                h2.switchVertex(oldV, newV);
+                h2.switchVertex(newV, oldV);
             }
         }
 

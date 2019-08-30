@@ -149,7 +149,6 @@ namespace BachelorArbeitUnity
                 if (oldV.Equals(vertices[i]))
                 {
                     vertices[i] = newV;
-                    Debug.Log("replaced " + oldV);
                 }
             }
         }

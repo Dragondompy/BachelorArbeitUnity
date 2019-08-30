@@ -148,7 +148,7 @@ namespace BachelorArbeitUnity
             additionalVertices = null;
         }
 
-        public void switchVertex(Vertex oldV, Vertex newV)
+        public void switchVertex(Vertex newV, Vertex oldV)
         {
             if (oldV.Equals(v1))
             {

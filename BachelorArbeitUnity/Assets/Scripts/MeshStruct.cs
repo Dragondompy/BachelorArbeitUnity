@@ -339,9 +339,8 @@ namespace BachelorArbeitUnity
             splitToNotSplitFaces = loader.getSplitToNotSplitFaces();
         }
 
-        internal void concatinateVertices(Vertex vertex1, Vertex vertex2) //TODO 
+        internal void concatinateVertices(Vertex vertex1, Vertex vertex2)
         {
-            Debug.Log("Not BugFree at all");
             Vector3 pos = (vertex1.getPosition() + vertex2.getPosition()) / 2f;
             Edge edge = vertex1.isConnected(vertex2);
             if (edge == null)
