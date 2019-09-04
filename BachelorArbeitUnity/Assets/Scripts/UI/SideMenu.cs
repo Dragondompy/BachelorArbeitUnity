@@ -203,6 +203,11 @@ namespace BachelorArbeitUnity
             InformationHolder.con.createSymmetryPlane();
         }
 
+        public void fitSymmetryPlane()
+        {
+            InformationHolder.con.fitSymmetryPlane();
+        }
+
         public void activeSymmetry()
         {
             InformationHolder.con.createSymmetryFace();

@@ -271,6 +271,19 @@ namespace BachelorArbeitUnity
             clearSelection();
         }
 
+        public void fitSymmetryPlane()
+        {
+            List<Vertex> verts = patchHolder.getSelectedVertices();
+            List<Vector3> points = new List<Vector3>();
+            foreach (Vertex v in verts)
+            {
+                points.Add(v.getPosition());
+            }
+            symPlane.fitPlane(points, maskOrgOnly,LineObj);
+
+            clearSelection();
+        }
+
         public void concatinateVertices() //TODO
         {
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
@@ -546,7 +559,8 @@ namespace BachelorArbeitUnity
 
         public void reDrawFaceWithEdges(Face f)
         {
-            foreach (Edge e in f.getEdges()) {
+            foreach (Edge e in f.getEdges())
+            {
                 e.resetValues();
                 e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
             }
