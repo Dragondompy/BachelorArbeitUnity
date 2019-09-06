@@ -74,17 +74,6 @@ namespace BachelorArbeitUnity
 
         public (Vector3, Vector3) fittedPlanes(List<Vector3> middlePoints)
         {
-
-            foreach (Vector3 v in middlePoints)
-            {
-                print(v);
-            }
-            /*
-            Matrix<double> testA = DenseMatrix.OfArray(new double[,] { { -1, 1 }, { 0, 1 }, { 1, 1 }, { 2, 1 } });
-            Vector<double> testz = DenseVector.OfArray(new double[] { 0, 1, 2, 1 });
-
-            print(MultipleRegression.NormalEquations(testA, testz));
-            */
             (double[,], double[]) aAndz = MatrixOfList(middlePoints);
 
             Matrix<double> A = DenseMatrix.OfArray(aAndz.Item1).Transpose();
@@ -94,11 +83,7 @@ namespace BachelorArbeitUnity
             Vector3 normal = new Vector3((float)p[0], (float)p[1], (float)p[2]);
             Vector3 a = normal.normalized/normal.magnitude ;
 
-            print(normal);
-            print(a);
             return (a, normal.normalized);
-            
-            //return (new Vector3(), new Vector3());
         }
 
         public float maxDistanceToPlane(List<Vector3> points)

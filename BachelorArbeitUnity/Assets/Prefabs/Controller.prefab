@@ -52,6 +52,8 @@ MonoBehaviour:
     type: 3}
   facePreviewObj: {fileID: 3395410345921760256, guid: e575bda3505d5b042901b4df31f2826d,
     type: 3}
+  FaceErrorMess: {fileID: 1546208412411709430, guid: e7b816ca751ce894cb450177b2dbab2a,
+    type: 3}
   maskOrg:
     serializedVersion: 2
     m_Bits: 9216

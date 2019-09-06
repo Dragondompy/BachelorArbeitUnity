@@ -220,12 +220,12 @@ namespace BachelorArbeitUnity
 
         public void increaseSepNumber()
         {
-            InformationHolder.con.increaseSepNumber();
+            InformationHolder.con.increaseSepNumber(1);
         }
 
         public void decreaseSepNumber()
         {
-            InformationHolder.con.decreaseSepNumber();
+            InformationHolder.con.increaseSepNumber(-1);
         }
 
         public void increaseOuterFlowPreset()

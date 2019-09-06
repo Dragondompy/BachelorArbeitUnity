@@ -88,19 +88,37 @@ namespace BachelorArbeitUnity
                     List<int> faceVerticesNewIndex = new List<int>();
                     for (int k = 0; k < verts.Count; k++)
                     {
-                        if (k == 0)
+                        if (verts.Count > 3)
                         {
-                            colors.Add(new Color(1, 0, 0, 1));
-                        }
-                        else if (k == 1 || k == verts.Count - 1)
-                        {
-                            colors.Add(new Color(1, 1, 0, 1));
+                            if (k == 0)
+                            {
+                                colors.Add(new Color(1, 0, 0, 1));
+                            }
+                            else if (k == 1 || k == verts.Count - 1)
+                            {
+                                colors.Add(new Color(1, 1, 0, 1));
+                            }
+                            else
+                            {
+                                colors.Add(new Color(0, 1, 0, 1));
+                            }
                         }
                         else
                         {
-                            colors.Add(new Color(0, 1, 0, 1));
-
+                            if (k == 0)
+                            {
+                                colors.Add(new Color(1, 1, 0, 1));
+                            }
+                            else if (k == 1)
+                            {
+                                colors.Add(new Color(1, 0, 1, 1));
+                            }
+                            else
+                            {
+                                colors.Add(new Color(0, 1, 1, 1));
+                            }
                         }
+
                         vertices.Add(verts[k].getPosition());
                         splitToNotSplitVertices.Add(verts[k].getHandleNumber());
                         faceVerticesNewIndex.Add(vertices.Count - 1);

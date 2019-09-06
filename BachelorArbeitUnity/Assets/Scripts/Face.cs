@@ -14,6 +14,7 @@ namespace BachelorArbeitUnity
 
         private int handleNumber;
         private MeshStruct mesh;
+        private GameObject errorMess;
 
         public Face(MeshStruct m)
         {
@@ -77,6 +78,35 @@ namespace BachelorArbeitUnity
                 i++;
             }
             return pos;
+        }
+
+        public Vector3 getMiddle()
+        {
+            Vector3 middle = new Vector3(0, 0, 0);
+            Vector3[] vertices = getVertexPositions();
+            foreach (Vector3 v in vertices)
+            {
+                middle += v;
+            }
+            return middle / vertices.Length;
+        }
+
+        public float getSize()
+        {
+            Vector3 maxholder = new Vector3(0, 0, 0);
+            Vector3 minholder = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+            foreach (Vector3 v in getVertexPositions())
+            {
+                maxholder.x = Mathf.Max(maxholder.x, v.x);
+                maxholder.y = Mathf.Max(maxholder.y, v.y);
+                maxholder.z = Mathf.Max(maxholder.z, v.z);
+
+                minholder.x = Mathf.Min(minholder.x, v.x);
+                minholder.y = Mathf.Min(minholder.y, v.y);
+                minholder.z = Mathf.Min(minholder.z, v.z);
+            }
+            float help = Math.Max(maxholder.x - minholder.x, maxholder.y - minholder.y);
+            return Math.Max(help, maxholder.z - minholder.z);
         }
 
         public void createHalfEdges()
@@ -191,6 +221,16 @@ namespace BachelorArbeitUnity
             return normal.normalized;
         }
 
+        public int getSepNumSum()
+        {
+            int sum = 0;
+            foreach (Edge e in edges)
+            {
+                sum += e.getSepNumber();
+            }
+            return sum;
+        }
+
         //returns if the face is valid or deleted
         public Boolean isValid()
         {
@@ -232,6 +272,11 @@ namespace BachelorArbeitUnity
             return symFace;
         }
 
+        public GameObject getErrorMess()
+        {
+            return errorMess;
+        }
+
         public void setVertices(List<Vertex> v)
         {
             this.vertices = v;
@@ -245,6 +290,11 @@ namespace BachelorArbeitUnity
         public void setMesh(MeshStruct m)
         {
             this.mesh = m;
+        }
+
+        public void setErrorMess(GameObject eM)
+        {
+            errorMess = eM;
         }
 
         public void setSymFace(Face f)

@@ -13,6 +13,7 @@ namespace BachelorArbeitUnity
         public GameObject LineObj;
         public GameObject MeshLineObj;
         public GameObject facePreviewObj;
+        public GameObject FaceErrorMess;
 
         public LayerMask maskOrg;
         public LayerMask maskPH;
@@ -151,79 +152,62 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void increaseSepNumber()
+        public void increaseSepNumber(int i)
         {
+            List<Face> facesToDraw = new List<Face>();
             if (patchHolder.getSelectedEdge() != null)
             {
+                (Face, Face) help;
                 Edge e = patchHolder.getSelectedEdge();
-                changeSepNumber(e, e.getSepNumber() + 1);
+                help = changeSepNumber(e, e.getSepNumber() + i);
+                facesToDraw.Add(help.Item1);
+                facesToDraw.Add(help.Item2);
                 if (e.getSymEdge() != null)
                 {
-                    changeSepNumber(e.getSymEdge(), e.getSymEdge().getSepNumber() + 1);
+                    help = changeSepNumber(e.getSymEdge(), e.getSymEdge().getSepNumber() + i);
+                    facesToDraw.Add(help.Item1);
+                    facesToDraw.Add(help.Item2);
                 }
+                reDrawFacesWithEdges(facesToDraw);
+                clearSelection();
+                patchHolder.selectEdgeAt(e.getHandleNumber());
             }
             else if (patchHolder.getSelectedFace() != null)
             {
-                changeSepNumber(patchHolder.getSelectedFace(), +1);
-                if (patchHolder.getSelectedFace().getSymFace() != null)
+                Face f = patchHolder.getSelectedFace();
+                facesToDraw = changeSepNumber(f, +i);
+                reDrawFacesWithEdges(facesToDraw);
+                if (f.getSymFace() != null)
                 {
-                    changeSepNumber(patchHolder.getSelectedFace().getSymFace(), +1);
+                    facesToDraw = changeSepNumber(f.getSymFace(), +i);
+                    reDrawFacesWithEdges(facesToDraw);
                 }
+                clearSelection();
+                removeLines();
+                patchHolder.selectFaceAt(f.getHandleNumber());
+                createLines(patchHolder.getSelectedFace());
             }
         }
 
-        public void decreaseSepNumber()
-        {
-            if (patchHolder.getSelectedEdge() != null)
-            {
-                Edge e = patchHolder.getSelectedEdge();
-                changeSepNumber(e, e.getSepNumber() - 1);
-                if (e.getSymEdge() != null)
-                {
-                    changeSepNumber(e.getSymEdge(), e.getSymEdge().getSepNumber() - 1);
-                }
-            }
-            else if (patchHolder.getSelectedFace() != null)
-            {
-                changeSepNumber(patchHolder.getSelectedFace(), -1);
-                if (patchHolder.getSelectedFace().getSymFace() != null)
-                {
-                    changeSepNumber(patchHolder.getSelectedFace().getSymFace(), -1);
-                }
-            }
-        }
-
-        public void changeSepNumber(Edge e, int newSepN)
+        public (Face, Face) changeSepNumber(Edge e, int newSepN)
         {
             e.setSepNumber(newSepN);
-            e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
-            if (e.getF1() != null)
-            {
-                reDrawFace(e.getF1());
-            }
-            if (e.getF2() != null)
-            {
-                reDrawFace(e.getF2());
-            }
+
+            return (e.getF1(), e.getF2());
         }
 
-        public void changeSepNumber(Face f, int deltaSep)
+        public List<Face> changeSepNumber(Face f, int deltaSep)
         {
+            List<Face> facesToDraw = new List<Face>();
+            (Face, Face) help;
             foreach (Edge e in f.getEdges())
             {
-                changeSepNumber(e, e.getSepNumber() + deltaSep);
+                help = changeSepNumber(e, e.getSepNumber() + deltaSep);
+                facesToDraw.Add(help.Item1);
+                facesToDraw.Add(help.Item2);
             }
-            removeLines();
-            foreach (Edge e in patchHolder.getSelectedFace().getInnerEdges())
-            {
-                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                lineRend.widthMultiplier = myMesh.getSize();
-                lineRend.positionCount = 2;
-                lineRend.SetPosition(0, e.getV1().getPosition());
-                lineRend.SetPosition(1, e.getV2().getPosition());
-                lines.Add(Liner);
-            }
+
+            return facesToDraw;
         }
 
         public void increaseOuterFlowPreset()
@@ -253,6 +237,20 @@ namespace BachelorArbeitUnity
             lines.Clear();
         }
 
+        public void createLines(Face f)
+        {
+            foreach (Edge e in f.getInnerEdges())
+            {
+                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                lineRend.widthMultiplier = myMesh.getSize();
+                lineRend.positionCount = 2;
+                lineRend.SetPosition(0, e.getV1().getPosition());
+                lineRend.SetPosition(1, e.getV2().getPosition());
+                lines.Add(Liner);
+            }
+        }
+
         public void createSymmetryPlane()
         {
             List<Vertex> selectedVertices = patchHolder.getSelectedVertices();
@@ -279,7 +277,7 @@ namespace BachelorArbeitUnity
             {
                 points.Add(v.getPosition());
             }
-            symPlane.fitPlane(points, maskOrgOnly,LineObj);
+            symPlane.fitPlane(points, maskOrgOnly, LineObj);
 
             clearSelection();
         }
@@ -427,16 +425,7 @@ namespace BachelorArbeitUnity
                             removeLines();
                             if (f != null && f.isValid())
                             {
-                                foreach (Edge e in f.getInnerEdges())
-                                {
-                                    GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                                    LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                                    lineRend.widthMultiplier = myMesh.getSize();
-                                    lineRend.positionCount = 2;
-                                    lineRend.SetPosition(0, e.getV1().getPosition());
-                                    lineRend.SetPosition(1, e.getV2().getPosition());
-                                    lines.Add(Liner);
-                                }
+                                createLines(f);
                             }
                         }
                         break;
@@ -534,31 +523,39 @@ namespace BachelorArbeitUnity
                     v.setIsCreated(true);
                 }
             }
-            foreach (Edge e in f.getEdges())
-            {
-                if (e.getNewV1().isConnected(e.getNewV2()) == null)
-                {
-                    e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
-                }
-            }
-            executePatch(f, refinedMesh, patchHolder);
+
+            reDrawFaceWithEdges(f);
             updateMeshes();
             return f;
         }
 
-        public void reDrawFace(Face f)
+        public void reDrawFacesWithEdges(List<Face> faces)
         {
-            f.resetValues();
-            foreach (HalfEdge h in f.getHalfEdges())
+            List<Face> helper = new List<Face>();
+            foreach (Face f in faces)
             {
-                h.resetValues();
+                if (f != null && !helper.Contains(f))
+                {
+                    helper.Add(f);
+                }
             }
-            executePatch(f, refinedMesh, patchHolder);
-            updateMeshes();
+            foreach (Face f in helper)
+            {
+                reDrawFaceWithEdges(f);
+            }
         }
 
         public void reDrawFaceWithEdges(Face f)
         {
+            if ((f.getSepNumSum() % 2) != 0)
+            {
+                print("test");
+                GameObject go = Instantiate(FaceErrorMess, f.getMiddle(), Quaternion.LookRotation(-f.getNormal()));
+                float size = f.getSize();
+                go.transform.localScale = new Vector3(size, size, size);
+                f.setErrorMess(go);
+                return;
+            }
             foreach (Edge e in f.getEdges())
             {
                 e.resetValues();
@@ -567,75 +564,53 @@ namespace BachelorArbeitUnity
             reDrawFace(f);
         }
 
-        public void updateMeshes()
+        public void reDrawFace(Face f)
         {
-            patchHolder.updateMesh();
-
-            refinedMesh.updateMesh();
-        }
-
-        public void refreshRefinedMesh()
-        {
-            patchHolder.updateMesh();
-
-            foreach (HalfEdge he in patchHolder.getHalfEdges())
+            if ((f.getSepNumSum() % 2) != 0)
             {
-                he.resetValues();
+                print("test");
+                GameObject go = Instantiate(FaceErrorMess, f.getMiddle(), Quaternion.Euler(f.getNormal()));
+                f.setErrorMess(go);
+                return;
             }
-            foreach (Edge e in patchHolder.getEdges())
+            if (f.getErrorMess() != null)
             {
-                e.resetValues();
+                Destroy(f.getErrorMess());
+                f.setErrorMess(null);
             }
-            foreach (Face f in patchHolder.getFaces())
+            f.resetValues();
+            foreach (HalfEdge h in f.getHalfEdges())
             {
-                f.resetValues();
+                h.resetValues();
             }
+            executePatch(f, refinedMesh, patchHolder); Vector3 normal = f.getNormal();
 
-            refinedMesh.loadEmptyFromMesh(patchHolder);
-
-            addCornerVertices(refinedMesh, patchHolder);
-
-            addVerticesOnEdge(refinedMesh, patchHolder);
-
-            foreach (Face f in patchHolder.getFaces())
+            //Calculate new Vertex Positions fitting to the Mesh
+            foreach (Vertex v in f.getInnerVertices())
             {
-                if (f.isValid())
-                {
-                    executePatch(f, refinedMesh, patchHolder);
-                }
+                v.setNewPosition(fitToMesh(v.getPosition(), normal));
             }
-
-            Vector3 pos = myMesh.transform.position;
-            Quaternion rot = myMesh.transform.rotation;
-
-            //Streches the refinedMesh to fit the oldMesh
-            foreach (Face f in patchHolder.getFaces())
+            foreach (Edge e in f.getEdges())
             {
-
-                Vector3 normal = f.getNormal();
-
-                foreach (Vertex v in f.getInnerVertices())
+                foreach (Vertex v in e.getVerticesOnEdge())
                 {
                     v.setNewPosition(fitToMesh(v.getPosition(), normal));
-
-                }
-                foreach (Edge e in f.getEdges())
-                {
-                    foreach (Vertex v in e.getVerticesOnEdge())
-                    {
-                        v.setNewPosition(fitToMesh(v.getPosition(), normal));
-                    }
                 }
             }
-            foreach (Vertex v in refinedMesh.getVertices())
+            //Set the new Vertex Positions
+            foreach (Vertex v in f.getInnerVertices())
             {
-                if (v.isValid())
+                v.updatePosition();
+            }
+            foreach (Edge e in f.getEdges())
+            {
+                foreach (Vertex v in e.getVerticesOnEdge())
                 {
                     v.updatePosition();
                 }
             }
 
-            refinedMesh.updateMesh();
+            updateMeshes();
         }
 
         public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
@@ -678,11 +653,84 @@ namespace BachelorArbeitUnity
                 }
                 return symPlane.mirroredPos(pos);
             }
+            print("shit");
             return pos;
         }
 
+        public void updateMeshes()
+        {
+            patchHolder.updateMesh();
+
+            refinedMesh.updateMesh();
+        }
+
+        /*public void refreshRefinedMesh()
+        {
+            patchHolder.updateMesh();
+
+            foreach (HalfEdge he in patchHolder.getHalfEdges())
+            {
+                he.resetValues();
+            }
+            foreach (Edge e in patchHolder.getEdges())
+            {
+                e.resetValues();
+            }
+            foreach (Face f in patchHolder.getFaces())
+            {
+                f.resetValues();
+            }
+
+            refinedMesh.loadEmptyFromMesh(patchHolder);
+
+            addCornerVertices(refinedMesh, patchHolder);
+
+            addVerticesOnEdge(refinedMesh, patchHolder);
+
+            foreach (Face f in patchHolder.getFaces())
+            {
+                if (f.isValid())
+                {
+                    executePatch(f, refinedMesh, patchHolder);
+                }
+            }
+
+            Vector3 pos = myMesh.transform.position;
+            Quaternion rot = myMesh.transform.rotation;
+
+            //Streches the refinedMesh to fit the oldMesh
+            foreach (Face f in patchHolder.getFaces())
+            {
+
+                Vector3 normal = f.getNormal();
+
+                foreach (Vertex v in f.getInnerVertices())
+                {
+                    v.setNewPosition(fitToMesh(v.getPosition(), normal));
+                }
+                foreach (Edge e in f.getEdges())
+                {
+                    foreach (Vertex v in e.getVerticesOnEdge())
+                    {
+                        v.setNewPosition(fitToMesh(v.getPosition(), normal));
+                    }
+                }
+            }
+            foreach (Vertex v in refinedMesh.getVertices())
+            {
+                if (v.isValid())
+                {
+                    v.updatePosition();
+                }
+            }
+
+            refinedMesh.updateMesh();
+        }*/
+
+
+
         //creates the corner vertices of the face in patchHolderMesh in the refinedMesh
-        public void addCornerVertices(MeshStruct newMesh, MeshStruct oldMesh)
+        /*public void addCornerVertices(MeshStruct newMesh, MeshStruct oldMesh)
         {
             foreach (Vertex v in oldMesh.getVertices())
             {
@@ -705,16 +753,16 @@ namespace BachelorArbeitUnity
                     }
                 }
             }
-        }
+        }*/
 
         //Adds all vertices on All Edges
-        public void addVerticesOnEdge(MeshStruct newMesh, MeshStruct oldMesh)
+        /*public void addVerticesOnEdge(MeshStruct newMesh, MeshStruct oldMesh)
         {
             foreach (Edge e in oldMesh.getEdges())
             {
                 e.setVerticesOnEdge(addVerticesBetween(e.getV1(), e.getDirection(), e, newMesh));
             }
-        }
+        }*/
 
         //Adds the Vertices on the Edge
         public Vertex[] addVerticesBetween(Vertex v1, Vector3 direction, Edge edge, MeshStruct newMesh)

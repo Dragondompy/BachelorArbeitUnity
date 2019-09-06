@@ -99,7 +99,6 @@ namespace BachelorArbeitUnity
                         if (curLine[0].Equals("v"))
                         {
                             vertices.Add(readVertex(curLine));
-
                         }
                         else if (curLine[0].Equals("f"))
                         {

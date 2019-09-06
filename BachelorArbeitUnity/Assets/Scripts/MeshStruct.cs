@@ -50,24 +50,6 @@ namespace BachelorArbeitUnity
             comments = obj.getComments();
         }
 
-        //initializes with vertices from old Mesh
-        public void loadVerticesFromMesh(MeshStruct old)
-        {
-            utils = new EmptyPattern();
-            vertices = new List<Vertex>();
-            faces = new List<Face>();
-            edges = new List<Edge>();
-            halfEdges = new List<HalfEdge>();
-            selectedVertices = new List<Vertex>();
-            comments = "";
-
-            size = old.getSize(); ;
-            foreach (Vertex v in old.getVertices())
-            {
-                addVertex(v.getPosition());
-            }
-        }
-
         //initializes Empty Mesh
         public void loadEmptyFromMesh(MeshStruct old)
         {
@@ -173,7 +155,6 @@ namespace BachelorArbeitUnity
             {
                 e.setSymEdge(vertex1.getSymVertex().isConnected(vertex2.getSymVertex()));
                 e.setSepNumber(e.getSymEdge().getSepNumber());
-                print(e.getSymEdge().getSepNumber());
             }
             return e;
         }
@@ -355,11 +336,11 @@ namespace BachelorArbeitUnity
 
         public Vertex getVertexAt(int v)
         {
-            foreach (Vertex ver in vertices)
+            for (int i = Mathf.Min(v,vertices.Count-1); i >= 0; i--)
             {
-                if (ver.getHandleNumber() == v)
+                if (vertices[i].getHandleNumber() == v)
                 {
-                    return ver;
+                    return vertices[i];
                 }
             }
             Debug.Log("There is no Vertex at " + v);
@@ -368,11 +349,11 @@ namespace BachelorArbeitUnity
 
         public Edge getEdgeAt(int e)
         {
-            foreach (Edge ed in edges)
+            for (int i = Mathf.Min(e, edges.Count - 1); i >= 0; i--)
             {
-                if (ed.getHandleNumber() == e)
+                if (edges[i].getHandleNumber() == e)
                 {
-                    return ed;
+                    return edges[i];
                 }
             }
             Debug.Log("There is no Edge at " + e);
@@ -381,11 +362,11 @@ namespace BachelorArbeitUnity
 
         public Face getFaceAt(int f)
         {
-            foreach (Face fa in faces)
+            for (int i = Mathf.Min(f, faces.Count - 1); i >= 0; i--)
             {
-                if (fa.getHandleNumber() == f)
+                if (faces[i].getHandleNumber() == f)
                 {
-                    return fa;
+                    return faces[i];
                 }
             }
             Debug.Log("There is no Face at " + f);
