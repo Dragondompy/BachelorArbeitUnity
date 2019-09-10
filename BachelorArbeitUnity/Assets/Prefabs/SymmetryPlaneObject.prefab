@@ -103,7 +103,7 @@ GameObject:
   - component: {fileID: 6230093589223399547}
   - component: {fileID: 8042306448394440970}
   m_Layer: 0
-  m_Name: SymmetryPlane
+  m_Name: SymmetryPlaneObject
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 809698f9b60f0de43968057d71e3b9e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  symPlane: {fileID: 5472149922405546200}
+  LineObj: {fileID: 7816491887593866208, guid: 7e48a77e257d4f14c912d08aba26ebbd, type: 3}
 --- !u!1 &5472149922405546200
 GameObject:
   m_ObjectHideFlags: 0

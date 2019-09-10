@@ -334,9 +334,27 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public (float, Vector3, Face) minDistanceToPoint(Vector3 p)
+        {
+            float minDist = float.MaxValue;
+            Vector3 minDistancePoint = new Vector3(0, 0, 0);
+            Face face = new Face("Emtpy");
+            foreach (Face f in faces)
+            {
+                (float, Vector3) tup = f.squaredDistanceTo(p);
+                if (tup.Item1 <= minDist)
+                {
+                    minDist = tup.Item1;
+                    minDistancePoint = tup.Item2;
+                    face = f;
+                }
+            }
+            return (minDist, minDistancePoint, face);
+        }
+
         public Vertex getVertexAt(int v)
         {
-            for (int i = Mathf.Min(v,vertices.Count-1); i >= 0; i--)
+            for (int i = Mathf.Min(v, vertices.Count - 1); i >= 0; i--)
             {
                 if (vertices[i].getHandleNumber() == v)
                 {

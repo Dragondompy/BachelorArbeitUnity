@@ -271,15 +271,42 @@ namespace BachelorArbeitUnity
 
         public void fitSymmetryPlane()
         {
+            removeLines();
+            for (int i = 0; i < 1; i++)
+            {
+                Vector3 p = new Vector3(UnityEngine.Random.Range(-myMesh.getSize() * 10, myMesh.getSize() * 10), UnityEngine.Random.Range(-myMesh.getSize() * 10, myMesh.getSize() * 10), UnityEngine.Random.Range(-myMesh.getSize() * 10, myMesh.getSize() * 10));
+                (float, Vector3, Face) tup = myMesh.minDistanceToPoint(p);
+
+                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
+                lineRend.positionCount = 2;
+                lineRend.SetPosition(0, p);
+                lineRend.SetPosition(1, tup.Item2);
+                lines.Add(Liner);
+                print(p);
+                /*
+                foreach (Edge e in tup.Item3.getEdges())
+                {
+                    GameObject Liner2 = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
+                    LineRenderer lineRend2 = Liner.GetComponent<LineRenderer>();
+                    lineRend2.positionCount = 2;
+                    lineRend2.SetPosition(0, e.getV1().getPosition());
+                    lineRend2.SetPosition(1, e.getV2().getPosition());
+                    lines.Add(Liner2);
+                }*/
+            }
+
+            /*
+
             List<Vertex> verts = patchHolder.getSelectedVertices();
             List<Vector3> points = new List<Vector3>();
             foreach (Vertex v in verts)
             {
                 points.Add(v.getPosition());
             }
-            symPlane.fitPlane(points, maskOrgOnly, LineObj);
+            symPlane.fitPlane(30, myMesh);
 
-            clearSelection();
+            clearSelection();*/
         }
 
         public void concatinateVertices() //TODO

@@ -109,6 +109,65 @@ namespace BachelorArbeitUnity
             return Math.Max(help, maxholder.z - minholder.z);
         }
 
+        public (float, Vector3) squaredDistanceTo(Vector3 p)
+        {
+            Vector3[] pos = getVertexPositions();
+            float minVal = float.MaxValue;
+            Vector3 minDistPoint = new Vector3(0, 0, 0);
+            for (int i = 0; i < pos.Length - 2; i++)
+            {
+                (float, Vector3) tup = sqrtDistanceTriangleToPoint(pos[0], pos[i + 1], pos[i + 2], p);
+                if (tup.Item1 <= minVal)
+                {
+                    minVal = tup.Item1;
+                    minDistPoint = tup.Item2;
+                }
+            }
+            return (minVal, minDistPoint);
+        }
+
+        public (float, Vector3) sqrtDistanceTriangleToPoint(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 p)
+        {
+            //Precalculation
+            Vector3 edge0 = v1 - v0;
+            Vector3 edge1 = v2 - v0;
+            Vector3 normal = Vector3.Cross(edge0, edge1);
+
+            float a = edge0.sqrMagnitude;
+            float b = Vector3.Dot(edge0, edge1);
+            float c = edge1.sqrMagnitude;
+            float d = Vector3.Dot(edge0, (v0 - p));
+            float e = Vector3.Dot(edge1, (v0 - p));
+
+            float s = b * e - c * d;
+            float t = b * d - a * e;
+            float det = a * c - b * b;
+
+            (float, float) nearestST = (0, 0);
+
+            //RegionTesting
+            if (s < 0)
+            {
+                nearestST = (0, Mathf.Clamp(t, 0, 1));
+            }
+            else if (t < 0)
+            {
+                nearestST = (Mathf.Clamp(s, 0, 1), 0);
+            }
+            else if (s + t <= 1)
+            {
+                nearestST = (s, t);
+            }
+            else
+            {
+                //region 1
+            }
+
+            Vector3 nearestPoint = v0 + edge0 * nearestST.Item1 + edge1 * nearestST.Item2;
+
+            return ((p - nearestPoint).sqrMagnitude, nearestPoint);
+        }
+
         public void createHalfEdges()
         {
             Vertex prevVertex = vertices[vertices.Count - 1];

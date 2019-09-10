@@ -9,9 +9,9 @@ namespace BachelorArbeitUnity
 {
     public class SymmetryPlane : MonoBehaviour
     {
-
-        public GameObject LineObj;
         public Plane symPlane;
+        public GameObject LineObj;
+        List<GameObject> sympoints = new List<GameObject>();
 
         public Vector3 mirroredPos(Vector3 pos)
         {
@@ -46,8 +46,6 @@ namespace BachelorArbeitUnity
 
         public void fitPlane(List<Vector3> points, LayerMask mask, GameObject LineObj)
         {
-            this.LineObj = LineObj;
-            List<Vector3> symPoints = new List<Vector3>();
             List<Vector3> middlePoints = new List<Vector3>();
             float size = maxDistanceToPlane(points);
             for (int i = 0; i < points.Count; i++)
@@ -59,7 +57,6 @@ namespace BachelorArbeitUnity
 
                 if (Physics.Raycast(ray, out hit, float.MaxValue, mask))
                 {
-                    symPoints.Add(hit.point);
                     middlePoints.Add((points[i] + hit.point) / 2);
                 }
                 else
@@ -72,6 +69,31 @@ namespace BachelorArbeitUnity
             setPlane(plane.Item1, plane.Item2);
         }
 
+        public void fitPlane(int numberOfPoints, MeshStruct m)
+        {
+            /*
+            List<Vertex> verts = m.getVertices();
+            List<Vector3> middlePoints = new List<Vector3>();
+            
+            for (int i = 0; i < numberOfPoints; i++)
+            {
+                int r = Random.Range(0, verts.Count);
+                Vector3 v = verts[r].getPosition();
+                Vector3 vMir = mirroredPos(v);
+
+                (float, Vector3) tup = m.minDistanceToPoint(vMir);
+
+                if ((tup.Item2 - vMir).magnitude < 30f)
+                {
+                    Vector3 middlePoint = (v + tup.Item2) / 2;
+                    middlePoints.Add((v + tup.Item2) / 2);
+                }
+            }
+
+            (Vector3, Vector3) plane = fittedPlanes(middlePoints);
+            setPlane(plane.Item1, plane.Item2);*/
+        }
+
         public (Vector3, Vector3) fittedPlanes(List<Vector3> middlePoints)
         {
             (double[,], double[]) aAndz = MatrixOfList(middlePoints);
@@ -81,7 +103,7 @@ namespace BachelorArbeitUnity
             Vector<double> p = MultipleRegression.QR(A, z);
 
             Vector3 normal = new Vector3((float)p[0], (float)p[1], (float)p[2]);
-            Vector3 a = normal.normalized/normal.magnitude ;
+            Vector3 a = normal.normalized / normal.magnitude;
 
             return (a, normal.normalized);
         }
