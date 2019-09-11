@@ -23,7 +23,7 @@ namespace BachelorArbeitUnity
         public ObjMesh(MeshStruct m)
         {
             int newIndex = 0;
-            int[] oldToNewIndices = new int[m.getVertices().Count];
+            int[] oldToNewIndices = new int[m.getVertexHandleNumber()];
             foreach (Vertex vertex in m.getVertices())
             {
                 if (vertex.isValid())

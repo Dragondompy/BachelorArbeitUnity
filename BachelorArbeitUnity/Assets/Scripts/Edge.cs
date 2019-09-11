@@ -190,11 +190,15 @@ namespace BachelorArbeitUnity
                 voe = turnedAround;
             }
             verticesOnEdge = voe;
-            h1.setVerticesOnEdge(voe);
+        }
 
-            if (h2 != null)
+        public void moveVerticesOnEdge()
+        {
+            int count = 1;
+            foreach (Vertex v in verticesOnEdge)
             {
-                h2.setVerticesOnEdge(voe);
+                v.setPosition(v1.getPosition() + getDirection() * count / sepNumber);
+                count++;
             }
         }
 
@@ -330,16 +334,6 @@ namespace BachelorArbeitUnity
         {
             this.f2 = f;
         }
-
-        /*public void setNewV1(Vertex v)
-        {
-            this.newV1 = v;
-        }
-
-        public void setNewV2(Vertex v)
-        {
-            this.newV2 = v;
-        }*/
 
         public void setHandleNumber(int handleNumber)
         {

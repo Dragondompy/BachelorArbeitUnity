@@ -334,11 +334,10 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public (float, Vector3, Face) minDistanceToPoint(Vector3 p)
+        public (float, Vector3) minDistanceToPoint(Vector3 p)
         {
             float minDist = float.MaxValue;
             Vector3 minDistancePoint = new Vector3(0, 0, 0);
-            Face face = new Face("Emtpy");
             foreach (Face f in faces)
             {
                 (float, Vector3) tup = f.squaredDistanceTo(p);
@@ -346,10 +345,9 @@ namespace BachelorArbeitUnity
                 {
                     minDist = tup.Item1;
                     minDistancePoint = tup.Item2;
-                    face = f;
                 }
             }
-            return (minDist, minDistancePoint, face);
+            return (minDist, minDistancePoint);
         }
 
         public Vertex getVertexAt(int v)

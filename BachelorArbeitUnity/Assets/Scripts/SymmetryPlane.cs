@@ -71,10 +71,9 @@ namespace BachelorArbeitUnity
 
         public void fitPlane(int numberOfPoints, MeshStruct m)
         {
-            /*
             List<Vertex> verts = m.getVertices();
             List<Vector3> middlePoints = new List<Vector3>();
-            
+
             for (int i = 0; i < numberOfPoints; i++)
             {
                 int r = Random.Range(0, verts.Count);
@@ -91,7 +90,7 @@ namespace BachelorArbeitUnity
             }
 
             (Vector3, Vector3) plane = fittedPlanes(middlePoints);
-            setPlane(plane.Item1, plane.Item2);*/
+            setPlane(plane.Item1, plane.Item2);
         }
 
         public (Vector3, Vector3) fittedPlanes(List<Vector3> middlePoints)

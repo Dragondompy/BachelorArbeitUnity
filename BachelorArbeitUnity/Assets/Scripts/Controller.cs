@@ -271,32 +271,6 @@ namespace BachelorArbeitUnity
 
         public void fitSymmetryPlane()
         {
-            removeLines();
-            for (int i = 0; i < 1; i++)
-            {
-                Vector3 p = new Vector3(UnityEngine.Random.Range(-myMesh.getSize() * 10, myMesh.getSize() * 10), UnityEngine.Random.Range(-myMesh.getSize() * 10, myMesh.getSize() * 10), UnityEngine.Random.Range(-myMesh.getSize() * 10, myMesh.getSize() * 10));
-                (float, Vector3, Face) tup = myMesh.minDistanceToPoint(p);
-
-                GameObject Liner = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                LineRenderer lineRend = Liner.GetComponent<LineRenderer>();
-                lineRend.positionCount = 2;
-                lineRend.SetPosition(0, p);
-                lineRend.SetPosition(1, tup.Item2);
-                lines.Add(Liner);
-                print(p);
-                /*
-                foreach (Edge e in tup.Item3.getEdges())
-                {
-                    GameObject Liner2 = Instantiate(LineObj, new Vector3(0, 0, 0), Quaternion.identity);
-                    LineRenderer lineRend2 = Liner.GetComponent<LineRenderer>();
-                    lineRend2.positionCount = 2;
-                    lineRend2.SetPosition(0, e.getV1().getPosition());
-                    lineRend2.SetPosition(1, e.getV2().getPosition());
-                    lines.Add(Liner2);
-                }*/
-            }
-
-            /*
 
             List<Vertex> verts = patchHolder.getSelectedVertices();
             List<Vector3> points = new List<Vector3>();
@@ -304,9 +278,12 @@ namespace BachelorArbeitUnity
             {
                 points.Add(v.getPosition());
             }
-            symPlane.fitPlane(30, myMesh);
+            for (int i = 0; i < 10; i++)
+            {
+                symPlane.fitPlane(10, myMesh);
+            }
 
-            clearSelection();*/
+            clearSelection();
         }
 
         public void concatinateVertices() //TODO
@@ -585,8 +562,15 @@ namespace BachelorArbeitUnity
             }
             foreach (Edge e in f.getEdges())
             {
-                e.resetValues();
-                e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
+                if (e.getVerticesOnEdge() == null || e.getVerticesOnEdge().Length + 1 != e.getSepNumber())
+                {
+                    e.resetValues();
+                    e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
+                }
+                else
+                {
+                    e.moveVerticesOnEdge();
+                }
             }
             reDrawFace(f);
         }
@@ -690,107 +674,7 @@ namespace BachelorArbeitUnity
 
             refinedMesh.updateMesh();
         }
-
-        /*public void refreshRefinedMesh()
-        {
-            patchHolder.updateMesh();
-
-            foreach (HalfEdge he in patchHolder.getHalfEdges())
-            {
-                he.resetValues();
-            }
-            foreach (Edge e in patchHolder.getEdges())
-            {
-                e.resetValues();
-            }
-            foreach (Face f in patchHolder.getFaces())
-            {
-                f.resetValues();
-            }
-
-            refinedMesh.loadEmptyFromMesh(patchHolder);
-
-            addCornerVertices(refinedMesh, patchHolder);
-
-            addVerticesOnEdge(refinedMesh, patchHolder);
-
-            foreach (Face f in patchHolder.getFaces())
-            {
-                if (f.isValid())
-                {
-                    executePatch(f, refinedMesh, patchHolder);
-                }
-            }
-
-            Vector3 pos = myMesh.transform.position;
-            Quaternion rot = myMesh.transform.rotation;
-
-            //Streches the refinedMesh to fit the oldMesh
-            foreach (Face f in patchHolder.getFaces())
-            {
-
-                Vector3 normal = f.getNormal();
-
-                foreach (Vertex v in f.getInnerVertices())
-                {
-                    v.setNewPosition(fitToMesh(v.getPosition(), normal));
-                }
-                foreach (Edge e in f.getEdges())
-                {
-                    foreach (Vertex v in e.getVerticesOnEdge())
-                    {
-                        v.setNewPosition(fitToMesh(v.getPosition(), normal));
-                    }
-                }
-            }
-            foreach (Vertex v in refinedMesh.getVertices())
-            {
-                if (v.isValid())
-                {
-                    v.updatePosition();
-                }
-            }
-
-            refinedMesh.updateMesh();
-        }*/
-
-
-
-        //creates the corner vertices of the face in patchHolderMesh in the refinedMesh
-        /*public void addCornerVertices(MeshStruct newMesh, MeshStruct oldMesh)
-        {
-            foreach (Vertex v in oldMesh.getVertices())
-            {
-                if (v.isValid())
-                {
-                    Vertex newV = newMesh.addVertex(v.getPosition());
-                    foreach (Edge e in v.getEdges())
-                    {
-                        if (e.isValid())
-                        {
-                            if (e.getV1().Equals(v))
-                            {
-                                e.getV1().setRefinedVertex(newV);
-                            }
-                            else if (e.getV2().Equals(v))
-                            {
-                                e.getV2().setRefinedVertex(newV);
-                            }
-                        }
-                    }
-                }
-            }
-        }*/
-
-        //Adds all vertices on All Edges
-        /*public void addVerticesOnEdge(MeshStruct newMesh, MeshStruct oldMesh)
-        {
-            foreach (Edge e in oldMesh.getEdges())
-            {
-                e.setVerticesOnEdge(addVerticesBetween(e.getV1(), e.getDirection(), e, newMesh));
-            }
-        }*/
-
+        
         //Adds the Vertices on the Edge
         public Vertex[] addVerticesBetween(Vertex v1, Vector3 direction, Edge edge, MeshStruct newMesh)
         {

@@ -131,7 +131,6 @@ namespace BachelorArbeitUnity
             //Precalculation
             Vector3 edge0 = v1 - v0;
             Vector3 edge1 = v2 - v0;
-            Vector3 normal = Vector3.Cross(edge0, edge1);
 
             float a = edge0.sqrMagnitude;
             float b = Vector3.Dot(edge0, edge1);
@@ -139,31 +138,188 @@ namespace BachelorArbeitUnity
             float d = Vector3.Dot(edge0, (v0 - p));
             float e = Vector3.Dot(edge1, (v0 - p));
 
+            float det = a * c - b * b;
             float s = b * e - c * d;
             float t = b * d - a * e;
-            float det = a * c - b * b;
 
-            (float, float) nearestST = (0, 0);
-
-            //RegionTesting
-            if (s < 0)
+            if (s + t < det)
             {
-                nearestST = (0, Mathf.Clamp(t, 0, 1));
-            }
-            else if (t < 0)
-            {
-                nearestST = (Mathf.Clamp(s, 0, 1), 0);
-            }
-            else if (s + t <= 1)
-            {
-                nearestST = (s, t);
+                if (s < 0f)
+                {
+                    if (t < 0f)
+                    {
+                        //Region 4
+                        if (d < 0)
+                        {
+                            t = 0;
+                            if (-d >= a)
+                            {
+                                s = 1;
+                            }
+                            else
+                            {
+                                s = -d / a;
+                            }
+                        }
+                        else
+                        {
+                            s = 0;
+                            if (e >= 0)
+                            {
+                                t = 0;
+                            }
+                            else if (-e >= c)
+                            {
+                                t = 1;
+                            }
+                            else
+                            {
+                                t = -e / c;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Region 3
+                        s = 0;
+                        if (e >= 0)
+                        {
+                            t = 0;
+                        }
+                        else if (-e >= c)
+                        {
+                            t = 1;
+                        }
+                        else
+                        {
+                            t = -e / c;
+                        }
+                    }
+                }
+                else if (t < 0f)
+                {
+                    //Region 5
+                    t = 0;
+                    if (d >= 0)
+                    {
+                        s = 0;
+                    }
+                    else if (-d >= a)
+                    {
+                        s = 1;
+                    }
+                    else
+                    {
+                        s = -d / a;
+                    }
+                }
+                else
+                {
+                    //Region 0
+                    float invDet = 1f / det;
+                    s *= invDet;
+                    t *= invDet;
+                }
             }
             else
             {
-                //region 1
+                if (s < 0f)
+                {
+                    //Region 2
+                    float tmp0 = b + d;
+                    float tmp1 = c + e;
+                    if (tmp1 > tmp0)
+                    {
+                        float numer = tmp1 - tmp0;
+                        float denom = a - 2 * b + c;
+                        if (numer >= denom)
+                        {
+                            s = 1;
+                        }
+                        else
+                        {
+                            s = numer / denom;
+                        }
+                        t = 1 - s;
+                    }
+                    else
+                    {
+                        s = 0;
+                        if (tmp1 <= 0)
+                        {
+                            t = 1;
+                        }
+                        else if (e >= 0)
+                        {
+                            t = 0;
+                        }
+                        else
+                        {
+                            t = -e / c;
+                        }
+                    }
+                }
+                else if (t < 0f)
+                {
+                    //Region 6
+                    float tmp0 = b + e;
+                    float tmp1 = a + d;
+                    if (tmp1 > tmp0)
+                    {
+                        float numer = tmp1 - tmp0;
+                        float denom = a - 2 * b + c;
+                        if (numer >= denom)
+                        {
+                            t = 1;
+                        }
+                        else
+                        {
+                            t = numer / denom;
+                        }
+                        s = 1 - t;
+                    }
+                    else
+                    {
+                        t = 0;
+                        if (tmp1 <= 0)
+                        {
+                            s = 1;
+                        }
+                        else if (d >= 0)
+                        {
+                            s = 0;
+                        }
+                        else
+                        {
+                            s = -d / a;
+                        }
+                    }
+                }
+                else
+                {
+                    //Region 1
+                    float numer = c + e - (b + d);
+                    if (numer <= 0)
+                    {
+                        s = 0;
+                    }
+                    else
+                    {
+                        float denom = a - 2 * b + c;
+                        if (numer >= denom)
+                        {
+                            s = 1;
+                        }
+                        else
+                        {
+                            s = numer / denom;
+                        }
+                    }
+                    t = 1f - s;
+                }
             }
 
-            Vector3 nearestPoint = v0 + edge0 * nearestST.Item1 + edge1 * nearestST.Item2;
+            Vector3 nearestPoint = v0 + s * edge0 + t * edge1;
 
             return ((p - nearestPoint).sqrMagnitude, nearestPoint);
         }

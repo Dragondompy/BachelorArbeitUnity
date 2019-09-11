@@ -115,7 +115,7 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void setVerticesOnEdge(Vertex[] voe)
+        /*public void setVerticesOnEdge(Vertex[] voe)
         {
             if (voe.Length > 0 && voe[0].distanceTo(v1) > voe[0].distanceTo(v2))
             {
@@ -127,13 +127,13 @@ namespace BachelorArbeitUnity
                 voe = turnedAround;
             }
             verticesOnEdge = voe;
-        }
+        }*/
 
         public String printVertices()
         {
             String output = "";
             output += v1;
-            foreach (Vertex v in verticesOnEdge)
+            foreach (Vertex v in getVerticesOnEdge())
             {
                 output += v;
             }
@@ -239,7 +239,17 @@ namespace BachelorArbeitUnity
 
         public Vertex[] getVerticesOnEdge()
         {
-            return verticesOnEdge;
+            Vertex[] voe = e.getVerticesOnEdge();
+            if (voe.Length > 0 && voe[0].distanceTo(v1) > voe[0].distanceTo(v2))
+            {
+                Vertex[] turnedAround = new Vertex[voe.Length];
+                for (int i = 0; i < turnedAround.Length; i++)
+                {
+                    turnedAround[turnedAround.Length - i - 1] = voe[i];
+                }
+                voe = turnedAround;
+            }
+            return voe;
         }
 
         public int[,] getAdditionalVertices()
