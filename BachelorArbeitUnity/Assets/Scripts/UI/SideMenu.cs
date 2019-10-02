@@ -161,7 +161,7 @@ namespace BachelorArbeitUnity
 
         public void setThreshHold()
         {
-            InformationHolder.threshHold = sliThreshHold.value;
+            InformationHolder.threshHold = (int)sliThreshHold.value;
             sliThreshHold.GetComponentsInChildren<Text>()[0].text = ("Fitting ThreshHold " + InformationHolder.threshHold);
         }
 
@@ -208,7 +208,7 @@ namespace BachelorArbeitUnity
             InformationHolder.con.fitSymmetryPlane();
         }
 
-        public void activeSymmetry()
+        public void createSymmetryFace()
         {
             InformationHolder.con.createSymmetryFace();
         }
@@ -216,6 +216,11 @@ namespace BachelorArbeitUnity
         public void deleteFace()
         {
             InformationHolder.con.deleteSelectedFace();
+        }
+
+        public void createAllSymmetryFaces()
+        {
+            InformationHolder.con.createAllSymmetryFaces();
         }
 
         public void increaseSepNumber()

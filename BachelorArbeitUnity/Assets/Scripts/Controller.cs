@@ -278,9 +278,9 @@ namespace BachelorArbeitUnity
             {
                 points.Add(v.getPosition());
             }
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
-                symPlane.fitPlane(10, myMesh);
+                symPlane.fitPlane(InformationHolder.threshHold, myMesh);
             }
 
             clearSelection();
@@ -487,6 +487,16 @@ namespace BachelorArbeitUnity
             }
         }
 
+        public void createAllSymmetryFaces()
+        {
+            Face[] faces = patchHolder.getFaces().ToArray();
+            foreach (Face f in faces)
+            {
+                patchHolder.selectFaceAt(f.getHandleNumber());
+                createSymmetryFace();
+            }
+        }
+
         public Face newFace(List<Vertex> selectedVertices, bool flipped)
         {
             List<int> verticesIndices = new List<int>();
@@ -626,7 +636,7 @@ namespace BachelorArbeitUnity
 
         public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
         {
-            Ray ray = new Ray(pos + normal * 20 * InformationHolder.threshHold, -normal);
+            Ray ray = new Ray(pos + normal * 20 * 1.5f, -normal);
             RaycastHit[] hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
 
             float minDis = float.MaxValue;
@@ -647,7 +657,7 @@ namespace BachelorArbeitUnity
             {
                 pos = symPlane.mirroredPos(pos);
                 normal = symPlane.mirroredPos(normal);
-                ray = new Ray(pos + normal * 20 * InformationHolder.threshHold, -normal);
+                ray = new Ray(pos + normal * 20 * 1.5f, -normal);
                 hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
                 minDis = float.MaxValue;
                 if (hits.Length > 0)
@@ -674,7 +684,7 @@ namespace BachelorArbeitUnity
 
             refinedMesh.updateMesh();
         }
-        
+
         //Adds the Vertices on the Edge
         public Vertex[] addVerticesBetween(Vertex v1, Vector3 direction, Edge edge, MeshStruct newMesh)
         {

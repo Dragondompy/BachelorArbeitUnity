@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.LinearAlgebra.Factorization;
 using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.LinearRegression;
 
@@ -44,35 +45,11 @@ namespace BachelorArbeitUnity
             return symPlane;
         }
 
-        public void fitPlane(List<Vector3> points, LayerMask mask, GameObject LineObj)
-        {
-            List<Vector3> middlePoints = new List<Vector3>();
-            float size = maxDistanceToPlane(points);
-            for (int i = 0; i < points.Count; i++)
-            {
-                Vector3 direction = (points[i] - mirroredPos(points[i])).normalized;
-                Vector3 origin = points[i] - 3 * size * direction;
-                RaycastHit hit;
-                Ray ray = new Ray(origin, direction);
-
-                if (Physics.Raycast(ray, out hit, float.MaxValue, mask))
-                {
-                    middlePoints.Add((points[i] + hit.point) / 2);
-                }
-                else
-                {
-                    throw new System.Exception("No SymmetryPointFound");
-                }
-            }
-
-            (Vector3, Vector3) plane = fittedPlanes(middlePoints);
-            setPlane(plane.Item1, plane.Item2);
-        }
-
         public void fitPlane(int numberOfPoints, MeshStruct m)
         {
             List<Vertex> verts = m.getVertices();
             List<Vector3> middlePoints = new List<Vector3>();
+            List<float> weightList = new List<float>();
 
             for (int i = 0; i < numberOfPoints; i++)
             {
@@ -85,26 +62,40 @@ namespace BachelorArbeitUnity
                 if ((tup.Item2 - vMir).magnitude < 30f)
                 {
                     Vector3 middlePoint = (v + tup.Item2) / 2;
-                    middlePoints.Add((v + tup.Item2) / 2);
+                    middlePoints.Add(middlePoint);
+                    weightList.Add(tup.Item1);
                 }
             }
+            //Draw middlePoints
+            Vector3 middleOfMiddlePoints = new Vector3(0,0,0);
+            Vector3 prev = middlePoints[0];
+            Color color = new Color(Random.Range(0F, 1F), Random.Range(0, 1F), Random.Range(0, 1F));
+            foreach (Vector3 v in middlePoints)
+            {
+                Debug.DrawLine(prev, v, color,float.MaxValue);
+                middleOfMiddlePoints += v;
+                prev = v;
+            }
 
-            (Vector3, Vector3) plane = fittedPlanes(middlePoints);
+            middleOfMiddlePoints = middleOfMiddlePoints / middlePoints.Count;
+            (Vector3, Vector3) plane = fittedPlanes(middlePoints, weightList,middleOfMiddlePoints);
             setPlane(plane.Item1, plane.Item2);
         }
 
-        public (Vector3, Vector3) fittedPlanes(List<Vector3> middlePoints)
+        public (Vector3, Vector3) fittedPlanes(List<Vector3> middlePoints, List<float> weightList, Vector3 middleOfMiddlePoints)
         {
-            (double[,], double[]) aAndz = MatrixOfList(middlePoints);
+            double[,] matA = MatrixOfList(middlePoints,middleOfMiddlePoints);
 
-            Matrix<double> A = DenseMatrix.OfArray(aAndz.Item1).Transpose();
-            Vector<double> z = DenseVector.OfArray(aAndz.Item2);
-            Vector<double> p = MultipleRegression.QR(A, z);
-
-            Vector3 normal = new Vector3((float)p[0], (float)p[1], (float)p[2]);
-            Vector3 a = normal.normalized / normal.magnitude;
-
-            return (a, normal.normalized);
+            Matrix<double> A = DenseMatrix.OfArray(matA);
+            Debug.Log(A);
+            Matrix<double> eV = A.Transpose().Multiply(A).Evd().EigenVectors;
+            //Debug.Log(A.Transpose().Multiply(A));
+            Debug.Log(eV);
+            var feV = eV.Column(0);
+            //Debug.Log(feV);
+            var normal = new Vector3((float)feV[0], (float)feV[1], (float)feV[2]);
+            
+            return (middleOfMiddlePoints, normal.normalized);
         }
 
         public float maxDistanceToPlane(List<Vector3> points)
@@ -117,19 +108,27 @@ namespace BachelorArbeitUnity
             return maxDist;
         }
 
-        public (double[,], double[]) MatrixOfList(List<Vector3> points)
+        public double[,] MatrixOfList(List<Vector3> points, Vector3 middleOfMiddlePoints)
         {
-            double[,] matrix = new double[3, points.Count];
-            double[] vector = new double[points.Count];
+            double[,] matrix = new double[points.Count,3];
             for (int i = 0; i < points.Count; i++)
             {
-                matrix[0, i] = points[i].x;
-                matrix[1, i] = points[i].y;
-                matrix[2, i] = points[i].z;
-                vector[i] = 1f;
+                matrix[i,0] = points[i].x - middleOfMiddlePoints.x;
+                matrix[i,1] = points[i].y - middleOfMiddlePoints.y;
+                matrix[i,2] = points[i].z - middleOfMiddlePoints.z;
             }
 
-            return (matrix, vector);
+            return matrix;
+        }
+
+        public double[,] diagMatrixOfList(List<float> list)
+        {
+            double[,] matrix = new double[list.Count,list.Count];
+            for (int i = 0; i < list.Count; i++)
+            {
+                matrix[i,i] = 1f;
+            }
+            return matrix;
         }
     }
 }

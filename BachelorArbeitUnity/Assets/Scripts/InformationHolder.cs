@@ -15,7 +15,7 @@ public static class InformationHolder {
     public static bool moveVertex;
     public static float camSpeed;
     public static float camRotSpeed;
-    public static float threshHold;
+    public static int threshHold;
     public static Controller con;
     public static List<int> PatchHolderToNewMesh;
 }
