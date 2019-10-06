@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: myMeshMat
-  m_Shader: {fileID: -6465566751694194690, guid: b66d5450be67f9643af3f2bd205f274d,
+  m_Name: greyscale
+  m_Shader: {fileID: -6465566751694194690, guid: 33ca77719b43cee47ba391bc06235b01,
     type: 3}
   m_ShaderKeywords: _COLORCOLOR_ON _GLOSSYREFLECTIONS_OFF _SPECULARHIGHLIGHTS_OFF
   m_LightmapFlags: 0
@@ -97,8 +97,8 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - Color_52FB546C: {r: 0, g: 0, b: 0, a: 0}
-    - Color_98E66D85: {r: 1, g: 1, b: 1, a: 0}
+    - Color_52FB546C: {r: 1, g: 1, b: 1, a: 0}
+    - Color_98E66D85: {r: 0.5, g: 0.5, b: 0.5, a: 0}
     - _CameraFadeParams: {r: 0, g: Infinity, b: 0, a: 0}
     - _Color: {r: 1, g: 0, b: 0, a: 1}
     - _ColorAddSubDiff: {r: 0, g: 0, b: 0, a: 0}
