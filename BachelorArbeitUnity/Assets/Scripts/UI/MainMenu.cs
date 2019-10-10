@@ -12,7 +12,6 @@ namespace BachelorArbeitUnity
 
         public void loadMesh()
         {
-            Debug.Log("works");
             InformationHolder.pathToMesh = pathField.text;
 
             SceneManager.LoadScene("MainView");

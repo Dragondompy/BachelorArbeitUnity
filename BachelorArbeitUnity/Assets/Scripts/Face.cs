@@ -10,6 +10,7 @@ namespace BachelorArbeitUnity
         private List<Edge> edges;
         private List<HalfEdge> halfEdges;
         private List<Vertex> innerVertices;
+        private List<Face> innerFaces;
         private Face symFace;
 
         private int handleNumber;
@@ -22,6 +23,7 @@ namespace BachelorArbeitUnity
             edges = new List<Edge>();
             halfEdges = new List<HalfEdge>();
             innerVertices = new List<Vertex>();
+            innerFaces = new List<Face>();
 
             setMesh(m);
         }
@@ -48,6 +50,13 @@ namespace BachelorArbeitUnity
         public void addInnerVertex(Vertex v)
         {
             innerVertices.Add(v);
+        }
+
+        public void func() { }
+
+        public void addInnerFace(Face f)
+        {
+            innerFaces.Add(f);
         }
 
         public int containsVertex(int p)
@@ -324,6 +333,14 @@ namespace BachelorArbeitUnity
             return ((p - nearestPoint).sqrMagnitude, nearestPoint);
         }
 
+        public void setOuterFlowPreset(int v)
+        {
+            foreach (HalfEdge h in halfEdges)
+            {
+                h.setOuterFlowPreset(v);
+            }
+        }
+
         public void createHalfEdges()
         {
             Vertex prevVertex = vertices[vertices.Count - 1];
@@ -380,10 +397,11 @@ namespace BachelorArbeitUnity
 
         public void resetValues()
         {
-            foreach (Vertex v in innerVertices)
+            foreach (Face f in innerFaces)
             {
-                v.delete();
+                f.delete();
             }
+            innerFaces.Clear();
             innerVertices.Clear();
         }
 
@@ -400,14 +418,9 @@ namespace BachelorArbeitUnity
 
         public void delete()
         {
+            resetValues();
+            mesh.removeFace(this);
             handleNumber = -1;
-            foreach (Vertex v in innerVertices)
-            {
-                if (v != null && v.isValid())
-                {
-                    v.delete();
-                }
-            }
             foreach (HalfEdge he in halfEdges)
             {
                 if (he != null && he.isValid())
@@ -415,12 +428,18 @@ namespace BachelorArbeitUnity
                     he.delete();
                 }
             }
-
             if (symFace != null)
             {
                 symFace.setSymFace(null);
             }
-            mesh.removeFace(this);
+            if (errorMess != null)
+            {
+                errorMess.GetComponent<errorMessageHandler>().selfDestroy();
+            }
+            edges.Clear();
+            vertices.Clear();
+            halfEdges.Clear();
+            innerVertices.Clear();
         }
 
         public Vector3 getNormal()

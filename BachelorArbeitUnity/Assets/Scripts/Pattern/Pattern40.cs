@@ -15,16 +15,17 @@ namespace BachelorArbeitUnity
 		}
 
 		public override void createFaces (MeshStruct newMesh, Face f,List<List<int>> innerListVertices)
-		{
-			List<SyntheticEdge> edges = createSyntheticEdges (innerListVertices);
+        {
+            patch = f;
+            List<SyntheticEdge> edges = createSyntheticEdges (innerListVertices);
 			List<int> faceList = new List<int> ();
-			foreach (SyntheticEdge e in edges) {
-				faceList.Add (e.getV1());
-				foreach (int i in e.getVerticesOnEdge()) {
-					faceList.Add (i);
-				}
-			}
-			newMesh.addSimpleFace (faceList);
+            int v1, v2, v3, v4;
+            v1 = edges[0].getV1();
+            v2 = edges[1].getV1();
+            v3 = edges[2].getV1();
+            v4 = edges[3].getV1();
+
+            createFace(v1, v2, v3, v4, newMesh);
 		}
 	}
 }

@@ -115,20 +115,6 @@ namespace BachelorArbeitUnity
             }
         }
 
-        /*public void setVerticesOnEdge(Vertex[] voe)
-        {
-            if (voe.Length > 0 && voe[0].distanceTo(v1) > voe[0].distanceTo(v2))
-            {
-                Vertex[] turnedAround = new Vertex[voe.Length];
-                for (int i = 0; i < turnedAround.Length; i++)
-                {
-                    turnedAround[turnedAround.Length - i - 1] = voe[i];
-                }
-                voe = turnedAround;
-            }
-            verticesOnEdge = voe;
-        }*/
-
         public String printVertices()
         {
             String output = "";
@@ -175,7 +161,7 @@ namespace BachelorArbeitUnity
         public void delete()
         {
             handleNumber = -1;
-            if (e != null && e.isValid())
+            if (e != null)
             {
                 e.remHalfEdge(this);
             }
@@ -281,17 +267,7 @@ namespace BachelorArbeitUnity
         {
             this.v2 = v;
         }
-
-        /*public void setNewV1(Vertex v)
-        {
-            this.newV1 = v;
-        }
-
-        public void setNewV2(Vertex v)
-        {
-            this.newV2 = v;
-        }*/
-
+        
         public void setReduced(int reduced)
         {
             this.reduced = reduced;
@@ -300,6 +276,11 @@ namespace BachelorArbeitUnity
         public void setOuterFlow(int outerFlow)
         {
             this.outerFlow = outerFlow;
+        }
+
+        public void setOuterFlowPreset(int outerFlowPreset)
+        {
+            this.outerFlowPreset = outerFlowPreset;
         }
 
         public void setHandleNumber(int handleNumber)

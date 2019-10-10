@@ -116,7 +116,14 @@ namespace BachelorArbeitUnity
 
         public void remHalfEdge(HalfEdge he)
         {
-            if ((h1 == null || !h1.isValid()) && (h2 == null || !h2.isValid()))
+            if (he == h1) {
+                h1 = null;
+            }
+            else if (he == h2)
+            {
+                h2 = null;
+            }
+            if ((h1 == null) && (h2 == null))
             {
                 delete();
             }
@@ -205,6 +212,14 @@ namespace BachelorArbeitUnity
         public void increaseSepNumber()
         {
             sepNumber += 1;
+            if (f1 != null)
+            {
+                f1.setOuterFlowPreset(0);
+            }
+            if (f2 != null)
+            {
+                f2.setOuterFlowPreset(0);
+            }
         }
 
         public void decreaseSepNumber()
@@ -239,9 +254,13 @@ namespace BachelorArbeitUnity
             return output;
         }
 
-        public void resetValues()
+        public Vertex[] resetValues()
         {
-            verticesOnEdge = null;
+            if (verticesOnEdge != null)
+            {
+                return verticesOnEdge;
+            }
+            return new Vertex[0];
         }
 
         //returns if the edge is valid or deleted

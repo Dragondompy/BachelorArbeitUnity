@@ -83,9 +83,9 @@ namespace BachelorArbeitUnity
             }
         }
 
-        public void addOuterFlowFaces(MeshStruct oldMesh, MeshStruct newMesh, Face oldFace)
+        public void addOuterFlowFaces(MeshStruct oldMesh, MeshStruct newMesh, Face patch)
         {
-            List<HalfEdge> halfEdges = oldFace.getHalfEdges();
+            List<HalfEdge> halfEdges = patch.getHalfEdges();
 
             int size = halfEdges.Count;
 
@@ -105,7 +105,9 @@ namespace BachelorArbeitUnity
                         faceList.Add(getVertexAt(prevHe, curHe, nextHe, flow, index + 1));
                         faceList.Add(getVertexAt(prevHe, curHe, nextHe, flow + 1, index + 1));
                         faceList.Add(getVertexAt(prevHe, curHe, nextHe, flow + 1, index));
-                        newMesh.addSimpleFace(faceList);
+                        Face newF = newMesh.addSimpleFace(faceList);
+
+                        patch.addInnerFace(newF);
                     }
                 }
             }

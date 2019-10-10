@@ -16,6 +16,7 @@ namespace BachelorArbeitUnity
 
         public override void createFaces(MeshStruct newMesh, Face f, List<List<int>> innerListVertices)
         {
+            patch = f;
             List<SyntheticEdge> edges = createSyntheticEdges(innerListVertices);
 
             int alphaPos = getAlphaPos(edges);

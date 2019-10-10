@@ -66,6 +66,7 @@ namespace BachelorArbeitUnity
             }
             edges.Clear();
 
+
             if (symVertex != null)
             {
                 symVertex.setSymVertex(null);

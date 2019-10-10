@@ -87,12 +87,8 @@ namespace BachelorArbeitUnity
             double[,] matA = MatrixOfList(middlePoints,middleOfMiddlePoints);
 
             Matrix<double> A = DenseMatrix.OfArray(matA);
-            Debug.Log(A);
             Matrix<double> eV = A.Transpose().Multiply(A).Evd().EigenVectors;
-            //Debug.Log(A.Transpose().Multiply(A));
-            Debug.Log(eV);
             var feV = eV.Column(0);
-            //Debug.Log(feV);
             var normal = new Vector3((float)feV[0], (float)feV[1], (float)feV[2]);
             
             return (middleOfMiddlePoints, normal.normalized);

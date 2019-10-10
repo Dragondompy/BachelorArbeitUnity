@@ -10,6 +10,7 @@ namespace BachelorArbeitUnity
         protected int patternNumber;
         protected int alpha;
         protected int beta;
+        protected Face patch;
 
         protected bool mirrored;
 
@@ -63,7 +64,9 @@ namespace BachelorArbeitUnity
                 f.Add(v4);
             }
 
-            return newMesh.addSimpleFace(f);
+            Face newF = newMesh.addSimpleFace(f);
+            patch.addInnerFace(newF);
+            return newF;
         }
 
         //Creates new Vertex at with position at pos + (number/max)*dir

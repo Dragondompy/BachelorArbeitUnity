@@ -215,7 +215,7 @@ namespace BachelorArbeitUnity
             if (patchHolder.getSelectedEdge() != null)
             {
                 patchHolder.getSelectedEdge().getHalfEdge(patchHolder.getSelectedFace()).increaseOuterFlowPreset();
-                reDrawFace(patchHolder.getSelectedFace());
+                reDrawFaceWithEdges(patchHolder.getSelectedFace());
             }
         }
 
@@ -224,7 +224,7 @@ namespace BachelorArbeitUnity
             if (patchHolder.getSelectedEdge() != null)
             {
                 patchHolder.getSelectedEdge().getHalfEdge(patchHolder.getSelectedFace()).decreaseOuterFlowPreset();
-                reDrawFace(patchHolder.getSelectedFace());
+                reDrawFaceWithEdges(patchHolder.getSelectedFace());
             }
         }
 
@@ -561,20 +561,27 @@ namespace BachelorArbeitUnity
 
         public void reDrawFaceWithEdges(Face f)
         {
+            var verticesOnEdges = new List<Vertex[]>();
+            GameObject g = f.getErrorMess();
+            if (g != null)
+            {
+                Destroy(g);
+            }
             if ((f.getSepNumSum() % 2) != 0)
             {
-                print("test");
                 GameObject go = Instantiate(FaceErrorMess, f.getMiddle(), Quaternion.LookRotation(-f.getNormal()));
                 float size = f.getSize();
                 go.transform.localScale = new Vector3(size, size, size);
+                go.GetComponent<errorMessageHandler>().setError(f.getEdges());
                 f.setErrorMess(go);
                 return;
             }
+            f.resetValues();
             foreach (Edge e in f.getEdges())
             {
                 if (e.getVerticesOnEdge() == null || e.getVerticesOnEdge().Length + 1 != e.getSepNumber())
                 {
-                    e.resetValues();
+                    verticesOnEdges.Add(e.resetValues());
                     e.setVerticesOnEdge(addVerticesBetween(e.getNewV1(), e.getDirection(), e, refinedMesh));
                 }
                 else
@@ -583,13 +590,19 @@ namespace BachelorArbeitUnity
                 }
             }
             reDrawFace(f);
+            foreach (Vertex[] vl in verticesOnEdges)
+            {
+                foreach (Vertex v in vl)
+                {
+                    v.delete();
+                }
+            }
         }
 
         public void reDrawFace(Face f)
         {
             if ((f.getSepNumSum() % 2) != 0)
             {
-                print("test");
                 GameObject go = Instantiate(FaceErrorMess, f.getMiddle(), Quaternion.Euler(f.getNormal()));
                 f.setErrorMess(go);
                 return;
@@ -636,6 +649,8 @@ namespace BachelorArbeitUnity
 
         public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
         {
+            (float, Vector3) tup = myMesh.minDistanceToPoint(pos);
+            return tup.Item2;
             Ray ray = new Ray(pos + normal * 20 * 1.5f, -normal);
             RaycastHit[] hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
 
@@ -674,7 +689,6 @@ namespace BachelorArbeitUnity
                 }
                 return symPlane.mirroredPos(pos);
             }
-            print("shit");
             return pos;
         }
 
@@ -731,7 +745,6 @@ namespace BachelorArbeitUnity
             foreach (HalfEdge he in face.getHalfEdges())
             {
                 reducedValues.Add(he.getReduced());
-                Console.WriteLine(he.getReduced());
             }
             Patterndecider patDec = createPatterndecider(reducedValues);
             Pattern p = new Pattern(patDec.choosePattern());
