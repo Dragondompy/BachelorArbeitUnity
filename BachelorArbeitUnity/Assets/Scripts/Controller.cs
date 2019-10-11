@@ -617,7 +617,8 @@ namespace BachelorArbeitUnity
             {
                 h.resetValues();
             }
-            executePatch(f, refinedMesh, patchHolder); Vector3 normal = f.getNormal();
+            executePatch(f, refinedMesh, patchHolder);
+            Vector3 normal = f.getNormal();
 
             //Calculate new Vertex Positions fitting to the Mesh
             foreach (Vertex v in f.getInnerVertices())
