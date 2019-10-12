@@ -160,13 +160,19 @@ namespace BachelorArbeitUnity
                 (Face, Face) help;
                 Edge e = patchHolder.getSelectedEdge();
                 help = changeSepNumber(e, e.getSepNumber() + i);
-                facesToDraw.Add(help.Item1);
-                facesToDraw.Add(help.Item2);
+                if (help.Item1.getHandleNumber() != -1 || help.Item2.getHandleNumber() != -1)
+                {
+                    facesToDraw.Add(help.Item1);
+                    facesToDraw.Add(help.Item2);
+                }
                 if (e.getSymEdge() != null)
                 {
                     help = changeSepNumber(e.getSymEdge(), e.getSymEdge().getSepNumber() + i);
-                    facesToDraw.Add(help.Item1);
-                    facesToDraw.Add(help.Item2);
+                    if (help.Item1.getHandleNumber() != -1 || help.Item2.getHandleNumber() != -1)
+                    {
+                        facesToDraw.Add(help.Item1);
+                        facesToDraw.Add(help.Item2);
+                    }
                 }
                 reDrawFacesWithEdges(facesToDraw);
                 clearSelection();
@@ -191,9 +197,12 @@ namespace BachelorArbeitUnity
 
         public (Face, Face) changeSepNumber(Edge e, int newSepN)
         {
-            e.setSepNumber(newSepN);
-
-            return (e.getF1(), e.getF2());
+            if (newSepN > 0)
+            {
+                e.setSepNumber(newSepN);
+                return (e.getF1(), e.getF2());
+            }
+            return (new Face("empty"), new Face("empty"));
         }
 
         public List<Face> changeSepNumber(Face f, int deltaSep)
@@ -203,8 +212,11 @@ namespace BachelorArbeitUnity
             foreach (Edge e in f.getEdges())
             {
                 help = changeSepNumber(e, e.getSepNumber() + deltaSep);
-                facesToDraw.Add(help.Item1);
-                facesToDraw.Add(help.Item2);
+                if (help.Item1.getHandleNumber() != -1 || help.Item2.getHandleNumber() != -1)
+                {
+                    facesToDraw.Add(help.Item1);
+                    facesToDraw.Add(help.Item2);
+                }
             }
 
             return facesToDraw;
@@ -514,19 +526,28 @@ namespace BachelorArbeitUnity
             Face f = patchHolder.addFace(verticesIndices);
 
             List<Edge> edges = f.getEdges();
+            int sepCount = 0;
             int count = 0;
-            for (int i = 0; i < edges.Count - 1; i++)
+            var edgesNoSep = new List<Edge>();
+            for (int i = 0; i < edges.Count; i++)
             {
                 if (edges[i].getSepNumber() <= 0)
                 {
-                    edges[i].setSepNumber(2);
+                    edgesNoSep.Add(edges[i]);
                 }
-                count += edges[i].getSepNumber();
+                else
+                {
+                    count++;
+                    sepCount += edges[i].getSepNumber();
+                }
             }
-            if (edges[edges.Count - 1].getSepNumber() <= 0)
+            count = Mathf.Max(count, 1);
+            sepCount = Mathf.Max(sepCount, 2);
+            for (int i = 0; i < edgesNoSep.Count - 1; i++)
             {
-                edges[edges.Count - 1].setSepNumber(2 + count % 2);
+                edgesNoSep[i].setSepNumber(2);
             }
+            edgesNoSep[edgesNoSep.Count - 1].setSepNumber(2 - sepCount % 2);
 
             foreach (Vertex v in f.getVertices())
             {
@@ -569,9 +590,9 @@ namespace BachelorArbeitUnity
             }
             if ((f.getSepNumSum() % 2) != 0)
             {
-                GameObject go = Instantiate(FaceErrorMess, f.getMiddle(), Quaternion.LookRotation(-f.getNormal()));
+                GameObject go = Instantiate(FaceErrorMess, f.getMiddle() + f.getNormal()/100, Quaternion.LookRotation(-f.getNormal()));
                 float size = f.getSize();
-                go.transform.localScale = new Vector3(size, size, size);
+                go.transform.localScale = new Vector3(size / 1, size / 1, size / 1);
                 go.GetComponent<errorMessageHandler>().setError(f.getEdges());
                 f.setErrorMess(go);
                 return;

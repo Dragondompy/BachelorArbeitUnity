@@ -227,6 +227,14 @@ namespace BachelorArbeitUnity
             if (sepNumber > 1)
             {
                 sepNumber -= 1;
+                if (f1 != null)
+                {
+                    f1.setOuterFlowPreset(0);
+                }
+                if (f2 != null)
+                {
+                    f2.setOuterFlowPreset(0);
+                }
             }
         }
 
@@ -332,6 +340,15 @@ namespace BachelorArbeitUnity
         public void setSepNumber(int sepNumber)
         {
             this.sepNumber = sepNumber;
+            sepNumber -= 1;
+            if (f1 != null)
+            {
+                f1.setOuterFlowPreset(0);
+            }
+            if (f2 != null)
+            {
+                f2.setOuterFlowPreset(0);
+            }
         }
 
         public void setV1(Vertex v)
