@@ -219,7 +219,7 @@ namespace BachelorArbeitUnity
                     if (!ver.getIsCreated())
                     {
                         GameObject vOb = Instantiate(VertexObj, transform.position + ver.getPosition(), Quaternion.identity);
-                        vOb.transform.localScale = new Vector3(size * 3, size * 3, size * 3);
+                        vOb.transform.localScale = new Vector3(Mathf.Sqrt(size) * 1, Mathf.Sqrt(size) * 1, Mathf.Sqrt(size) * 1);
                         vOb.GetComponent<VertexObj>().vertex = ver;
                         ver.setVertexObject(vOb);
                     }

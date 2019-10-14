@@ -12,6 +12,7 @@ namespace BachelorArbeitUnity
         private List<Vertex> innerVertices;
         private List<Face> innerFaces;
         private Face symFace;
+        public bool normalFitting;
 
         private int handleNumber;
         private MeshStruct mesh;
@@ -24,6 +25,7 @@ namespace BachelorArbeitUnity
             halfEdges = new List<HalfEdge>();
             innerVertices = new List<Vertex>();
             innerFaces = new List<Face>();
+            normalFitting = true;
 
             setMesh(m);
         }

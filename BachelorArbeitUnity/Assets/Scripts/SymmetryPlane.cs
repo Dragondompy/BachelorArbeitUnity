@@ -51,6 +51,8 @@ namespace BachelorArbeitUnity
             List<Vector3> middlePoints = new List<Vector3>();
             List<float> weightList = new List<float>();
 
+            float sqError = 0f;
+
             for (int i = 0; i < numberOfPoints; i++)
             {
                 int r = Random.Range(0, verts.Count);
@@ -58,6 +60,7 @@ namespace BachelorArbeitUnity
                 Vector3 vMir = mirroredPos(v);
 
                 (float, Vector3) tup = m.minDistanceToPoint(vMir);
+                sqError += tup.Item1;
 
                 if ((tup.Item2 - vMir).magnitude < 30f)
                 {
@@ -76,6 +79,8 @@ namespace BachelorArbeitUnity
                 middleOfMiddlePoints += v;
                 prev = v;
             }
+
+            Debug.Log(sqError);
 
             middleOfMiddlePoints = middleOfMiddlePoints / middlePoints.Count;
             (Vector3, Vector3) plane = fittedPlanes(middlePoints, weightList,middleOfMiddlePoints);

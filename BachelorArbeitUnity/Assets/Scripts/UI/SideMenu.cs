@@ -45,9 +45,42 @@ namespace BachelorArbeitUnity
             showPatches();
         }
 
+        void Update()
+        {
+            if (Input.GetButtonDown("Jump"))
+            {
+                createFace();
+            }
+            else if (Input.GetButtonDown("increment"))
+            {
+                increaseSepNumber();
+            }
+            else if (Input.GetButtonDown("decrement"))
+            {
+                decreaseSepNumber();
+            }
+            else if (Input.GetButtonDown("vertex"))
+            {
+                setSelectVertex();
+            }
+            else if (Input.GetButtonDown("edge"))
+            {
+                setSelectEdge();
+            }
+            else if (Input.GetButtonDown("face"))
+            {
+                setSelectFace();
+            }
+            else if (Input.GetButtonDown("move"))
+            {
+                moveVertex();
+            }
+        }
+
         public void setSelectVertex()
         {
             InformationHolder.moveVertex = false;
+            btnMoveVertex.GetComponent<Image>().color = Color.white;
             InformationHolder.con.clearSelection();
             if (InformationHolder.selectVertices)
             {
@@ -70,6 +103,7 @@ namespace BachelorArbeitUnity
         public void setSelectEdge()
         {
             InformationHolder.moveVertex = false;
+            btnMoveVertex.GetComponent<Image>().color = Color.white;
             InformationHolder.con.clearSelection();
             if (InformationHolder.selectEdge)
             {
@@ -92,6 +126,7 @@ namespace BachelorArbeitUnity
         public void setSelectFace()
         {
             InformationHolder.moveVertex = false;
+            btnMoveVertex.GetComponent<Image>().color = Color.white;
             InformationHolder.con.clearSelection();
             if (InformationHolder.selectFace)
             {
@@ -216,6 +251,11 @@ namespace BachelorArbeitUnity
         public void deleteFace()
         {
             InformationHolder.con.deleteSelectedFace();
+        }
+
+        public void swapFitting()
+        {
+            InformationHolder.con.swapFitting();
         }
 
         public void createAllSymmetryFaces()

@@ -28,7 +28,7 @@ namespace BachelorArbeitUnity
             {
                 add += " " + e.getSepNumber();
             }
-            errorText.GetComponent<TextMeshProUGUI>().SetText(textStart + errorText);
+            errorText.GetComponent<TextMeshProUGUI>().SetText(add);
         }
 
         public void selfDestroy() {

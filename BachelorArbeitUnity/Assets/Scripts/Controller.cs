@@ -143,6 +143,14 @@ namespace BachelorArbeitUnity
             removeLines();
         }
 
+        public void swapFitting()
+        {
+            if (patchHolder.getSelectedFace() != null) {
+                patchHolder.getSelectedFace().normalFitting = !patchHolder.getSelectedFace().normalFitting;
+                reDrawFace(patchHolder.getSelectedFace());
+            }
+        }
+
         private void moveVertex(Vertex vertex, Vector3 point)
         {
             vertex.setPosition(point);
@@ -319,11 +327,6 @@ namespace BachelorArbeitUnity
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetButtonDown("Jump"))
-            {
-                createFace();
-                return;
-            }
             if (EventSystem.current.IsPointerOverGameObject(0) || EventSystem.current.IsPointerOverGameObject(-1))
             {
                 return;
@@ -527,7 +530,6 @@ namespace BachelorArbeitUnity
 
             List<Edge> edges = f.getEdges();
             int sepCount = 0;
-            int count = 0;
             var edgesNoSep = new List<Edge>();
             for (int i = 0; i < edges.Count; i++)
             {
@@ -537,17 +539,17 @@ namespace BachelorArbeitUnity
                 }
                 else
                 {
-                    count++;
                     sepCount += edges[i].getSepNumber();
                 }
             }
-            count = Mathf.Max(count, 1);
-            sepCount = Mathf.Max(sepCount, 2);
-            for (int i = 0; i < edgesNoSep.Count - 1; i++)
+            if (edgesNoSep.Count > 0)
             {
-                edgesNoSep[i].setSepNumber(2);
+                for (int i = 0; i < edgesNoSep.Count - 1; i++)
+                {
+                    edgesNoSep[i].setSepNumber(2);
+                }
+                edgesNoSep[edgesNoSep.Count - 1].setSepNumber(2 + sepCount % 2);
             }
-            edgesNoSep[edgesNoSep.Count - 1].setSepNumber(2 - sepCount % 2);
 
             foreach (Vertex v in f.getVertices())
             {
@@ -590,7 +592,7 @@ namespace BachelorArbeitUnity
             }
             if ((f.getSepNumSum() % 2) != 0)
             {
-                GameObject go = Instantiate(FaceErrorMess, f.getMiddle() + f.getNormal()/100, Quaternion.LookRotation(-f.getNormal()));
+                GameObject go = Instantiate(FaceErrorMess, f.getMiddle() + f.getNormal() / 100, Quaternion.LookRotation(-f.getNormal()));
                 float size = f.getSize();
                 go.transform.localScale = new Vector3(size / 1, size / 1, size / 1);
                 go.GetComponent<errorMessageHandler>().setError(f.getEdges());
@@ -644,13 +646,13 @@ namespace BachelorArbeitUnity
             //Calculate new Vertex Positions fitting to the Mesh
             foreach (Vertex v in f.getInnerVertices())
             {
-                v.setNewPosition(fitToMesh(v.getPosition(), normal));
+                v.setNewPosition(fitToMesh(v.getPosition(), normal, f.normalFitting));
             }
             foreach (Edge e in f.getEdges())
             {
                 foreach (Vertex v in e.getVerticesOnEdge())
                 {
-                    v.setNewPosition(fitToMesh(v.getPosition(), normal));
+                    v.setNewPosition(fitToMesh(v.getPosition(), normal, f.normalFitting));
                 }
             }
             //Set the new Vertex Positions
@@ -669,34 +671,15 @@ namespace BachelorArbeitUnity
             updateMeshes();
         }
 
-        public Vector3 fitToMesh(Vector3 pos, Vector3 normal)
+        public Vector3 fitToMesh(Vector3 pos, Vector3 normal, bool normalfitting)
         {
-            (float, Vector3) tup = myMesh.minDistanceToPoint(pos);
-            return tup.Item2;
-            Ray ray = new Ray(pos + normal * 20 * 1.5f, -normal);
-            RaycastHit[] hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
+            if (normalfitting)
+            {
+                Ray ray = new Ray(pos + normal * 1.5f, -normal);
+                RaycastHit[] hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
 
-            float minDis = float.MaxValue;
-            RaycastHit hit = new RaycastHit();
-            if (hits.Length > 0)
-            {
-                foreach (RaycastHit h in hits)
-                {
-                    if ((h.point - pos).magnitude < minDis)
-                    {
-                        minDis = (h.point - pos).magnitude;
-                        hit = h;
-                    }
-                }
-                return hit.point;
-            }
-            if (symPlane != null)
-            {
-                pos = symPlane.mirroredPos(pos);
-                normal = symPlane.mirroredPos(normal);
-                ray = new Ray(pos + normal * 20 * 1.5f, -normal);
-                hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
-                minDis = float.MaxValue;
+                float minDis = float.MaxValue;
+                RaycastHit hit = new RaycastHit();
                 if (hits.Length > 0)
                 {
                     foreach (RaycastHit h in hits)
@@ -707,11 +690,36 @@ namespace BachelorArbeitUnity
                             hit = h;
                         }
                     }
-                    return symPlane.mirroredPos(hit.point);
+                    return hit.point;
                 }
-                return symPlane.mirroredPos(pos);
+                if (symPlane != null)
+                {
+                    pos = symPlane.mirroredPos(pos);
+                    normal = symPlane.mirroredPos(normal);
+                    ray = new Ray(pos + normal * 20 * 1.5f, -normal);
+                    hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
+                    minDis = float.MaxValue;
+                    if (hits.Length > 0)
+                    {
+                        foreach (RaycastHit h in hits)
+                        {
+                            if ((h.point - pos).magnitude < minDis)
+                            {
+                                minDis = (h.point - pos).magnitude;
+                                hit = h;
+                            }
+                        }
+                        return symPlane.mirroredPos(hit.point);
+                    }
+                    return symPlane.mirroredPos(pos);
+                }
+                return pos;
             }
-            return pos;
+            else
+            {
+                (float, Vector3) tup = myMesh.minDistanceToPoint(pos);
+                return tup.Item2;
+            }
         }
 
         public void updateMeshes()
