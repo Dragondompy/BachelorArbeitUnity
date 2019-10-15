@@ -675,7 +675,18 @@ namespace BachelorArbeitUnity
         {
             if (normalfitting)
             {
-                Ray ray = new Ray(pos + normal * 1.5f, -normal);
+                Vector3 posStart;
+                Ray rayHelper = new Ray(pos, normal);
+                RaycastHit[] hitsHelper = Physics.RaycastAll(rayHelper, 200f, maskOrgOnly);
+                if (hitsHelper.Length > 0)
+                {
+                    posStart = hitsHelper[0].point;
+                }
+                else {
+                    posStart = pos + normal * 1.5f;
+                }
+
+                Ray ray = new Ray(posStart, -normal);
                 RaycastHit[] hits = Physics.RaycastAll(ray, 200f, maskOrgOnly);
 
                 float minDis = float.MaxValue;
@@ -691,7 +702,7 @@ namespace BachelorArbeitUnity
                         }
                     }
                     return hit.point;
-                }
+                }/*
                 if (symPlane != null)
                 {
                     pos = symPlane.mirroredPos(pos);
@@ -712,8 +723,9 @@ namespace BachelorArbeitUnity
                         return symPlane.mirroredPos(hit.point);
                     }
                     return symPlane.mirroredPos(pos);
-                }
-                return pos;
+                }*/
+                (float, Vector3) tup = myMesh.minDistanceToPoint(pos);
+                return tup.Item2;
             }
             else
             {

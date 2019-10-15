@@ -137,8 +137,8 @@ namespace BachelorArbeitUnity
                     }
                 }
             }
-
             Mesh mesh = new Mesh();
+            mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
             mesh.vertices = getArrayfromList(vertices);
             mesh.colors = getArrayfromList(colors);
             mesh.triangles = triangles;

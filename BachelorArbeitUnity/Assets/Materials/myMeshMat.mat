@@ -80,7 +80,7 @@ Material:
     - _GlossyReflections: 0
     - _InvFade: 1
     - _LightingEnabled: 0
-    - _LineThickness: 1.5
+    - _LineThickness: 3
     - _Metallic: 0
     - _Mode: 0
     - _ObjSize: 1
