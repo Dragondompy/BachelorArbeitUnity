@@ -18,4 +18,5 @@ public static class InformationHolder {
     public static int threshHold;
     public static Controller con;
     public static List<int> PatchHolderToNewMesh;
+    public static bool useOrbit = true;
 }

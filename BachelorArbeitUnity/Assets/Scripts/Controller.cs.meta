@@ -1,9 +1,23 @@
 fileFormatVersion: 2
-guid: a7653a6b7895e7f43b1ff0aecb127b42
+guid: 87d729c88fb15924f8d3edb8d60fc093
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - MeshObject: {instanceID: 0}
+  - VertexObj: {instanceID: 0}
+  - LineObj: {instanceID: 0}
+  - MeshLineObj: {instanceID: 0}
+  - facePreviewObj: {instanceID: 0}
+  - FaceErrorMess: {instanceID: 0}
+  - wasdCamera: {fileID: 1365928000132495652, guid: e9125a842b8717c43a35146b5774d47b,
+      type: 3}
+  - orbitCamera: {fileID: 1365928000132495652, guid: 8652787cb6d7ec64db1c13492ca2eae1,
+      type: 3}
+  - myMeshMaterial: {instanceID: 0}
+  - patchesMaterial: {instanceID: 0}
+  - newMeshMaterial: {instanceID: 0}
+  - symPlaneObject: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

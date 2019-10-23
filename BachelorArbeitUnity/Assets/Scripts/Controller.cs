@@ -14,6 +14,9 @@ namespace BachelorArbeitUnity
         public GameObject MeshLineObj;
         public GameObject facePreviewObj;
         public GameObject FaceErrorMess;
+        public GameObject wasdCamera;
+        public GameObject orbitCamera;
+
 
         public LayerMask maskOrg;
         public LayerMask maskPH;
@@ -28,7 +31,6 @@ namespace BachelorArbeitUnity
 
         public float size;
 
-        Camera cam;
         MeshStruct myMesh;
         MeshStruct patchHolder;
         MeshStruct refinedMesh;
@@ -46,6 +48,15 @@ namespace BachelorArbeitUnity
             initializeOldMesh();
             initializePatchHolder();
             initializeNewMesh();
+
+            if (InformationHolder.useOrbit)
+            {
+                Instantiate(orbitCamera, new Vector3(0, 0, 0), Quaternion.identity);
+            }
+            else
+            {
+                Instantiate(wasdCamera, new Vector3(0, 0, -10), Quaternion.identity);
+            }
         }
 
         // Start is called before the first frame update

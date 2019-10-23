@@ -72,6 +72,7 @@
     <Compile Include="Assets\Scripts\InformationHolder.cs" />
     <Compile Include="Assets\Scripts\MeshStruct.cs" />
     <Compile Include="Assets\Scripts\Movement\CameraMovement.cs" />
+    <Compile Include="Assets\Scripts\Movement\orbitCamera.cs" />
     <Compile Include="Assets\Scripts\ObjLoader.cs" />
     <Compile Include="Assets\Scripts\ObjMesh.cs" />
     <Compile Include="Assets\Scripts\Pattern\EmptyPattern.cs" />

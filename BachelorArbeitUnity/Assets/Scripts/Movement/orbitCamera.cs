@@ -1,19 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BachelorArbeitUnity
 {
-    public class CameraMovement : MonoBehaviour
+    public class orbitCamera : MonoBehaviour
     {
+        public float distanceMin;
+        public float distanceMax;
         public float pitch;
         public float yaw;
-        // Start is called before the first frame update
-        void Start()
+        public float zoom;
+        public GameObject cam;
+        // Use this for initialization
+
+        private void Start()
         {
+            zoom = 10;
+            distanceMin = 1f;
+            distanceMax = 100f;
         }
-        // Update is called once per frame
-        void Update()
+
+        void LateUpdate()
         {
             if (Input.GetMouseButton(1))
             {
@@ -26,22 +32,27 @@ namespace BachelorArbeitUnity
 
                 transform.rotation = Quaternion.Euler(pitch, yaw, 0);
 
-                Vector3 direction = new Vector3(0, 0, 0);
+                /*Vector3 direction = new Vector3(0, 0, 0);
                 if (Input.GetAxis("Vertical") != 0)
                 {
-                    direction += Vector3.forward * Input.GetAxis("Vertical");
+                    direction.x = Input.GetAxis("Vertical");
                 }
                 if (Input.GetAxis("Horizontal") != 0)
                 {
-                    direction += Vector3.right * Input.GetAxis("Horizontal");
-                }
-                if (Input.GetAxis("FlyUp") != 0)
-                {
-                    direction += Vector3.up * Input.GetAxis("FlyUp");
+                    direction.z = Input.GetAxis("Horizontal");
                 }
                 direction.Normalize();
                 transform.Translate(InformationHolder.camSpeed * Time.deltaTime * direction);
-                //transform.eulerAngles(InformationHolder.camRotSpeed*())
+                */
+            }
+            else if (Input.GetMouseButton(2))
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+
+                zoom -= Input.GetAxis("Mouse Y") * InformationHolder.camSpeed * 0.2f;
+                zoom = Mathf.Clamp(zoom, distanceMin, distanceMax);
+
+                cam.transform.localPosition = new Vector3(0, 0, -zoom);
             }
             else
             {
